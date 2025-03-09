@@ -1,0 +1,301 @@
+%======================================================================
+%============================LaTex3====================================
+%======================================================================
+\usepackage{expl3,xparse}
+%===========================================================================
+% Math stuff
+%===========================================================================
+\usepackage{amsmath,amssymb,mathtools,empheq}
+%amsmath and ntheorem should be loaded before {fontspec}
+%mathtools offer pmatirx*
+\usepackage{cancel}
+%\cancel{} can be used in formulae!\bcancel{}\xcancle{}\cancelto{<value>}{<expression>}
+\usepackage{extarrows}
+\usepackage{amsthm,thmtools}
+\numberwithin{equation}{chapter}
+%===========================================================================
+%=================== font/encoding configuration ===========================
+%===========================================================================
+% File encoding
+%\usepackage[T1]{fontenc}   %% NOTE: This is now handled by the `fontspec` package
+
+%\usepackage{luaotfload}
+\usepackage{luatexja, fontspec, luatexja-fontspec, luatexja-ruby, polyglossia}
+%%  {fontspec}: set default non-cjk fonts;
+%%  {polyglossia}: set default language; exclude cjk;
+
+\setdefaultlanguage{english}
+\setmainfont{Noto Serif}%{Latin Modern Roman} %设置衬线英文字体，
+\setsansfont{Noto Sans} %设置无衬线英文字体
+\setmonofont[ItalicFont={Source Code Pro}]{Fira Code}%英文等宽字体%Fira Code does not offer italics
+\setmainjfont[ItalicFont={FZNewKai-Z03}, BoldFont={Source Han Serif Bold}, BoldItalicFont={Noto Serif}]{Source Han Serif}  %中文字体设置
+\setsansjfont{Microsoft YaHei} %设置中文无衬线字体
+\setmonojfont{HanaMinA} %设置中文等宽字体字体
+%---------------------math font -----------------------
+\usepackage[warnings-off={mathtools-colon,mathtools-overbracket}, math-style=ISO,bold-style=ISO]{unicode-math}
+%\setmathfont{STIX Two Math}
+\setmathfont{STIX Two Math}[StylisticSet={02}] %range={"1D454,"1D488,"1D467}
+\setmathfont{TeX Gyre Termes Math}[range={bb, scr, bfscr}]
+
+%\usepackage{microtype} %luatexja does not support microtype
+
+% Meta
+\input{preamble/meta}
+
+% Hyphenation
+\input{preamble/hyphenation}
+
+
+% Redefine cite command to include space before
+% <http://tex.stackexchange.com/questions/11602/>
+\let\origcite\cite%
+\def\cite#1{\unskip~\origcite{#1}}
+
+%=======================================================================
+%====================== layout setting ===============================
+%=======================================================================
+\usepackage{geometry}
+%packageometry save us from calculate parameters that affect each other
+\geometry{inner=2cm,outer=2cm,top=2cm,bottom=2cm}
+%out margin in (ams)book class
+\setlength{\emergencystretch}{1.5em}
+\usepackage{graphicx}
+%insert external pictures
+%usage \includegraphicx[]{}
+%parameter in [] : width, height, = ?cm scale = 0.6
+\usepackage[normalem]{ulem}
+%\uline{}, \uuline{}, \uwave{},\sout{}, \xout{},\dashuline{},\dotuline{},\sout{}(words only)
+
+\usepackage{fancyhdr}
+%control headers and footers
+\usepackage{pdfpages}
+
+% Colors and customizations
+\usepackage[table,x11names,dvipsnames]{xcolor}
+
+\definecolor{hekishoku}{RGB}{0,127,137}
+\definecolor{soga}{RGB}{243,244,127}
+\definecolor{usukihada}{RGB}{249,241,192}
+\definecolor{tokiiro}{RGB}{243,166,150}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{mizu}{RGB}{127,204,227}
+\definecolor{ao}{RGB}{0,149,217}
+\definecolor{kohaku}{RGB}{234,147,10}
+\definecolor{daidai}{RGB}{238,120,0}
+\definecolor{chaptercolor}{HTML}{1A254B}
+\definecolor{darkblue}{HTML}{1A254B}
+\definecolor{linkcolor}{HTML}{2B50AA}
+\definecolor{citecolor}{HTML}{2B50AA}
+\definecolor{linkcolor}{HTML}{2B50AA}
+\definecolor{lightlinkcolor}{HTML}{9A8F97}
+\definecolor{darklinkcolor}{HTML}{1A254B}
+\definecolor{pink}{HTML}{E05F60}
+\definecolor{lightblue}{HTML}{A7BED3}
+\definecolor{red}{HTML}{F2545B}
+\definecolor{blue}{HTML}{2b50aa}
+\colorlet{bg_minted}{LemonChiffon1!50!white}
+
+% Hyperlinks
+\usepackage[unicode]{hyperref}
+\hypersetup{
+    colorlinks=true,
+    linkcolor=DodgerBlue3,
+    citecolor=red,
+    urlcolor=DodgerBlue3,
+    anchorcolor=DodgerBlue3,
+    filecolor=DodgerBlue3,
+    linktoc=page,
+}
+
+
+% Widow and club penalties
+\clubpenalty=10000
+\widowpenalty=10000
+%\displaywidowpenalty=10000
+
+%===========================================================================
+% Figures, tables, and captions
+%===========================================================================
+\usepackage{tabularray}
+%\setlength{\extrarowheight}{3pt}
+%\newcommand{\tableheadline}[1]{\multicolumn{1}{c}{\spacedlowsmallcaps{#1}}}
+\usepackage{caption}
+%\captionsetup[figure]{format=plain, font=footnotesize, labelfont=bf}
+%\captionsetup[table]{format=plain, font=footnotesize, labelfont=bf}
+\usepackage{subcaption}
+%\captionsetup[subfigure]{format=hang, font=footnotesize, labelfont=bf, labelsep=period, labelformat=simple,justification=justified,singlelinecheck=false}
+
+\usepackage{adjustbox}
+\usepackage{wrapfig}
+\usepackage{lscape}
+\usepackage{multicol,multirow,booktabs,makecell,array}
+\setlength{\abovetopsep}{1ex} %offred extra space above top rule of a table, by booktabs package
+
+\usepackage{titlesec,titletoc,etoc}
+
+% tcolorbox
+\usepackage{tcolorbox}
+\tcbuselibrary{listings,skins,breakable,fitting,raster,xparse,external}
+\tcbset{
+	colback=lightgray!15,
+	colframe=cyan!40!black,
+	fonttitle=\bfseries,breakable,enhanced,
+	}
+\newtcolorbox[auto counter,number within=chapter,list inside=columns]{special_columns}[2][]{
+	colback=lightgray!15,
+	colframe=cyan!40!black,
+	fonttitle=\bfseries,breakable,enhanced,
+	title=Note: #2,#1}
+
+\newcommand{\listofcolumns}{%
+	\tcblistof[\chapter*]{columns}{List of Column Boxes}
+}
+
+
+% Code listings
+\usepackage{minted}
+\setminted{
+	autogobble,linenos,breaklines=true, breakanywhere,breaksymbolleft={\mbox{\quad}},breakautoindent=false,breaksymbolindent=0pt,
+	bgcolor =bg_minted, %The value of this option must not be a color command. Instead, it must be a color name, given as a string, of a previously-defined color
+	fontsize=\scriptsize, 
+	frame=lines,framerule=0.75pt,
+	numbersep=4pt,
+	style=manni
+	}
+\setmintedinline{
+  autogobble,linenos=false, fontsize=\footnotesize,
+  bgcolor={},
+}
+
+
+% Algorithms
+\usepackage[linesnumbered,lined,ruled]{algorithm2e}
+\newcommand\mycommentfont[1]{\scriptsize\ttfamily\textcolor{blue}{#1}}
+\SetCommentSty{mycommentfont}
+
+
+
+% Graphics
+\usepackage{graphicx}
+\usepackage{rotating}
+\usepackage{tikz,pgf,pgfplots,pgfplotstable}
+\usetikzlibrary{shapes, arrows.meta, trees, chains, positioning, shadows, calc,intersections,math,babel,cd,shapes.geometric}
+\usepgfplotslibrary{external,groupplots} 
+
+
+% Vertical line
+\newcommand\verpar[2]{
+    \par\vskip1ex
+\noindent\begin{tikzpicture}[
+paragraph/.style = {inner sep=0pt,
+                    text width=\textwidth-\baselineskip}
+                            ]
+\node (p1) [paragraph] {#2 \vspace{1pt}};
+\path ([xshift=-0.75\baselineskip] p1.south west) coordinate (p2)
+            -- node (p3) [sloped] {\color{blue} \footnotesize #1} (p2 |- p1.north);
+\draw[very thick] (p2) -- (p3.west) (p3.east) -- (p2 |- p1.north);
+\end{tikzpicture}
+\vspace{5pt}}
+
+% Marble
+\newcommand{\colorcircle}[1]{\tikz\node[circle=3pt, draw=#1, fill=#1, inner sep=1.75pt] (d) at (0,0) {};}
+\newcommand{\colorstar}[1]{\tikz\node[star=3pt, draw=#1, fill=#1, inner sep=1.75pt] (d) at (0,0) {};}
+\newcommand{\colorcube}[1]{\tikz\node[regular polygon=1pt, draw=#1, fill=#1, inner sep=1.5pt, regular polygon sides=3] (d) at (0,0) {};}
+\newcommand{\colordiamond}[1]{\tikz\node[diamond=3pt, draw=#1, fill=#1, inner sep=1.75pt] (d) at (0,0) {};}
+
+
+
+% List items
+\usepackage{enumitem}
+\setlist{noitemsep}
+\setlist[itemize,enumerate,1]{labelindent=\parindent,leftmargin=*}
+\setlist[enumerate,1]{label=\fbox{\arabic*.}}
+
+
+
+
+
+% Page numbers in plain style (chapter titles)
+
+% Adjust distance to footer (default is too large)
+\setlength{\footskip}{19pt}
+
+% Chapter font
+\newcommand{\chapterNumber}{\fontsize{70}{0}\usefont{OT1}{Alegreya-OsF}{m}{n}}
+
+
+% TOC
+%\renewcommand{\cftpartfont}{\color{chaptercolor}\normalfont}%
+%\renewcommand{\cftpartpagefont}{\normalfont}%
+\renewcommand{\thepart}{\Roman{part}}
+
+% Chapter number on inside
+\titleformat{\part}%command
+    [display]%shape
+    {\normalfont\centering\large}%format
+    {\thispagestyle{empty}\partname~\MakeUppercase{\thepart}}%label
+    {1em}%sep
+    {\color{darklinkcolor}\MakeUppercase}%beforcode
+\titleformat{\chapter}[display]%{<commmand>}[<shape>]
+  {\normalfont\bfseries\large} %<format>
+  %{\MakeUppercase{\chaptertitlename}}{10pt} %{<label>}{<sep>}
+  {\vspace*{-3\baselineskip}\makebox[\linewidth][r]{\color{darklinkcolor}\chapterNumber\thechapter}}{11pt}%{<label>}{<sep>}
+  {\raggedright\MakeUppercase} %{<beforcode>}
+  [\normalsize\vspace*{.8\baselineskip}\titlerule] %[<aftercode>]
+
+% Chapter abstract
+\def\chapterabstract#1{%
+  \begingroup
+  \baselineskip1.3em
+  \leftskip1em
+  \rightskip\leftskip\itshape#1
+  \par
+  \endgroup
+}
+
+% Chapter quotes
+\usepackage{csquotes} % smart quotes
+
+% Adapted from: <http://tex.stackexchange.com/questions/53377/inspirational-quote-at-start-of-chapter>
+\newcommand*\quotefont{\fontfamily{fxl}} % selects Libertine for quote font
+\newcommand*\quotesize{60} % if quote size changes, need a way to make shifts relative
+% Make commands for the quotes
+\newcommand*{\openquote}
+    {\tikz[remember picture,overlay,xshift=-4ex,yshift=-2.5ex]
+      \node (OQ) {\quotefont\fontsize{\quotesize}{\quotesize}\selectfont\textcolor{Silver}{``}};\kern0pt}
+
+\newcommand*{\closequote}[1]
+  {\tikz[remember picture,overlay,xshift=4ex,yshift={#1}]
+    \node (CQ) {\quotefont\fontsize{\quotesize}{\quotesize}\selectfont\textcolor{Silver}{''}};}
+
+
+
+
+
+
+% CV
+\newcommand{\cvleft}[1]{\begin{minipage}[t]{2.5cm}\begin{flushright}#1\end{flushright}\end{minipage}\hspace{5mm}}
+\newcommand{\cvright}[1]{\begin{minipage}[t]{8cm}{#1}\end{minipage}}
+
+
+
+% Margin notes
+\usepackage[fulladjust]{marginnote}
+%\setlength{\marginparsep}{5mm}
+%\setlength{\marginparwidth}{1in}
+%\marginnote instead of \marginpar
+\newcommand{\marginnoteteal}[1]{\marginnote{\textcolor{teal}{#1}}}
+
+
+% Encircle
+\makeatletter
+\newcommand*{\encircled}[1]{\relax\ifmmode\mathpalette\@encircled@math{#1}\else\@encircled{#1}\fi}
+\newcommand*{\@encircled@math}[2]{\@encircled{$\m@th#1#2$}}
+\newcommand*{\@encircled}[1]{%
+  \tikz[baseline,anchor=base]{\node[draw,circle,outer sep=0pt,inner sep=.2ex] {#1};}}
+\makeatother
+
+
+
+
