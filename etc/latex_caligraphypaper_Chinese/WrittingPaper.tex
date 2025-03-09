@@ -1,0 +1,54 @@
+\documentclass{ctexart}
+\usepackage[b4paper,hmargin={2cm},vmargin={2cm},landscape]{geometry}
+\usepackage{fancyhdr}
+\pagestyle{empty}
+\fancyhf{}
+\usepackage{tikz}
+\usetikzlibrary{shapes,snakes}
+\begin{document}
+%作文纸1
+ 
+\begin{tikzpicture}[scale=0.75]
+ 
+\foreach \m in {1,2,...,17}\draw(\m,0) -- (\m,{20*1.4-0.4});
+ 
+\foreach \n in {1,2,...,19}\draw[fill=white,line width=0.4pt](0,{1.4*\n-0.4})rectangle(17,{1.4*\n});
+ 
+\draw[thick](0,0)rectangle(17,{20*1.4-0.4});
+\end{tikzpicture}
+\rule{4cm}{0pt}
+\begin{tikzpicture}[scale=0.75]
+ 
+\foreach \m in {1,2,...,17}\draw(\m,0) -- (\m,{20*1.4-0.4});
+ 
+\foreach \n in {1,2,...,19}\draw[fill=white,line width=0.4pt](0,{1.4*\n-0.4})rectangle(17,{1.4*\n});
+ 
+\draw[thick](0,0)rectangle(17,{20*1.4-0.4});
+\end{tikzpicture}
+\end{document}
+
+
+\documentclass{ctexart}
+\usepackage[b4paper,hmargin={2cm},vmargin={3.1cm},landscape]{geometry}
+\usepackage{fancyhdr}
+\pagestyle{empty}
+\fancyhf{}
+\usepackage{tikz}
+\usetikzlibrary{shapes,snakes}
+\begin{document}
+%作文纸2
+ 
+\begin{tikzpicture}[scale=1,x=0.7cm,y=0.95cm]
+\foreach \x [count=\xi] in {1,2,...,20}
+\foreach \y [count=\yi] in {1,2,...,20}
+\node[anchor=east,draw,minimum size=0.7cm]at(\x,\y){};%$\y$
+\draw[thick](0,0.63)rectangle(20,20.37);
+\end{tikzpicture}
+\rule{2cm}{0pt}
+\begin{tikzpicture}[scale=1,x=0.7cm,y=0.95cm]
+\foreach \x [count=\xi] in {1,2,...,20}
+\foreach \y [count=\yi] in {1,2,...,20}
+\node[anchor=east,draw,minimum size=0.7cm]at(\x,\y){};%$\y$
+\draw[thick](0,0.63)rectangle(20,20.37);
+\end{tikzpicture}
+\end{document}
