@@ -1,0 +1,32 @@
+
+%% --- Set up the column boxes ---
+\tcbuselibrary{listings,skins,breakable,fitting,raster,xparse,external}
+\tcbset{
+	colback=lightgray!15,
+	colframe=cyan!40!black,
+	fonttitle=\bfseries,breakable,enhanced,
+	}
+\newtcolorbox[auto counter,number within=section,list inside=columns]{special_columns}[2][]{
+	colback=lightgray!15,
+	colframe=cyan!40!black,
+	fonttitle=\bfseries,breakable,enhanced,
+	title=Note: #2,#1}
+
+\newcommand{\listofcolumns}{%
+	\tcblistof[\chapter*]{columns}{List of Column Boxes}
+}
+
+
+
+\DeclareDocumentEnvironment{myquotation}{ m } % m for author as mandatory argument
+  {% Begin code
+    \newcommand*\QuoteAuthor{#1}
+    \begin{flushright}
+      \begin{minipage}{0.7\textwidth}
+      \hspace{1em}\itshape}
+  {% End code
+    \par\noindent
+    \hspace*{\fill}--- \rmfamily\QuoteAuthor
+  \end{minipage}
+  \end{flushright}
+  }

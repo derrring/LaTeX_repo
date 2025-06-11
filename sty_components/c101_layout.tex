@@ -1,0 +1,62 @@
+% sty_components/c101_layout.tex
+
+\setdefaultlanguage{english}
+
+\setmainfont{Noto Serif}[
+    UprightFont=*-Regular,
+    BoldFont=*-Bold,
+    ItalicFont=*-Italic,
+    BoldItalicFont=*-BoldItalic
+]%{Latin Modern Roman} %设置衬线英文字体，
+
+\setsansfont{Noto Sans}[
+    UprightFont=*-Regular,
+    BoldFont=*-Bold,
+    ItalicFont=*-Italic,
+    BoldItalicFont=*-BoldItalic
+]%设置无衬线英文字体
+
+
+\setmonofont{Source Code Pro}%英文等宽字体%Fira Code does not offer italics
+\setmainjfont[ItalicFont={FZNewKai-Z03}, BoldFont={Source Han Serif Bold}, BoldItalicFont={Noto Serif}]{Source Han Serif}  %中文字体设置
+\setsansjfont{Source Han Sans} %设置中文无衬线字体
+\setmonojfont{HanaMinA} %设置中文等宽字体字体
+%---------------------math font -----------------------
+%\setmathfont{STIX Two Math}
+\setmathfont{STIX Two Math}[StylisticSet={01}] %range={"1D454,"1D488,"1D467}
+\setmathfont{TeX Gyre Termes Math}[range={bb, scr, bfscr}]
+\setmathfont{Latin Modern Math}[range= {cal, bfcal}]
+
+%---------------------end math font -----------------------
+
+\clubpenalty=10000
+\widowpenalty=10000
+%\displaywidowpenalty=10000
+
+
+%packageometry save us from calculate parameters that affect each other
+\geometry{inner=2cm,outer=2cm,top=2cm,bottom=2cm}
+%out margin in (ams)book class
+\setlength{\emergencystretch}{1.5em}
+\setlength{\footskip}{19pt}
+% Adjust distance to footer (default is too large)
+\setlength{\abovetopsep}{1ex} %offred extra space above top rule of a table, by booktabs package
+
+
+
+%% --- Set up the page layout ---
+\renewcommand{\chapterautorefname}{Chapter}
+\renewcommand{\sectionautorefname}{Section}
+\renewcommand{\subsectionautorefname}{Section}
+\renewcommand{\subsubsectionautorefname}{Section}
+
+
+\UseTblrLibrary{booktabs}
+
+
+% itemize and enumerate
+\setlist{noitemsep}
+\setlist[itemize,enumerate,1]{labelindent=\parindent,leftmargin=*}
+\setlist[enumerate,1]{label=\fbox{\arabic*.}}
+
+

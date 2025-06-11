@@ -1,0 +1,121 @@
+\section*{Notation}
+\etoctoccontentsline*{section}{Notation}{1}
+
+\begingroup
+\DefTblrTemplate{caption}{default}{}    % Removes a caption
+\DefTblrTemplate{capcont}{default}{(Continued)}    % Removes a caption on subsequent pages
+%\DefTblrTemplate{contfoot}{default}{}   % Removes text denoting continuation on next page
+
+\subsection*{Mathematical Notation}
+
+
+\begin{longtblr}{colspec={lX},row{1}={bg=gray!25},hline{3-Y} = {dashed}
+	}
+	\toprule
+	\textbf{Notation} & \textbf{Interpretation} \\
+	\midrule
+	$\mbbN$ & Natural numbers (start from $0$) \\
+	$\mbbN^*$ & Positive natural numbers (start from $1$) \\
+	$\mbbZ$ & Integers \\
+	$\mbbZ^*$ & Non-zero integers \\
+	$\mbbQ$ & Rational numbers \\
+	$\mbbR$ & Real numbers \\
+	$\mbbR^d$ & $d$-dimensional real space \\
+	$\mbbR_+$ & Non negative real numbers \\
+	$\mbbR^*_+$ & Positive real numbers \\
+	$\mbbC$ & Complex numbers \\
+	$\mbbC^*$ & Non-zero complex numbers \\
+	$\sum^n_{i=1}x_i$ & Sum of $x_1,\ldots,x_n$ \\
+	$\prod^n_{i=1}x_i$ & Product of $x_1,\ldots,x_n$ \\
+	$\bigcup^n_{i=1} A_i$ & Union of sets $A_1,\ldots,A_n$ \\
+	$\bigsqcup^n_{i=1} A_i$ & Disjoint union of sets $A_1,\ldots,A_n$  \\
+	$\bigcap^n_{i=1} A_i$ & Intersection of sets $A_1,\ldots,A_n$ \\
+	$\mbbone_{A}(x) = \begin{cases}
+		1 & \text{if } x\in A\\
+		0 & \text{otherwise}
+		\end{cases}$& Indicator function of set $A$ \\
+	$f:\left\{\begin{array}{rcl}
+		E &\to &F\\
+		x&\mapsto& f(x)
+	\end{array}\right.$ & Function $f$ maps element $x\in E$ to $f(x)\in F$ \\
+	$f^{-1}$ & Inverse function of $f$ \\
+	$f(A)$ & Image of set $A$ under $f$, $f(A) = \ensemble{f(x):x\in A}$ \\
+	$f^{-1}(B)$ & Preimage of set $B$ under $f$, $f^{-1}(B) = \ensemble{x:f(x)\in B}$ \\
+	$f\circ g$ & Composition of functions $f$ and $g$, $(f\circ g)(x) = f(g(x))$ \\
+	$\nabla f$ & Gradient of function $f$ \\
+	$\ensemble{x\in E: P(x)}$ & Set of elements in $E$ that satisfy property $P$ \\
+	$\mscrP(E)$ & Power set of $E$, the set of all subsets of $E$ \\
+	$\mbbP$ & Probability measure \\
+	$\Prob(A)$ & Probability of event $A\in\mscrF$ \\
+	$\Prob(X\in A)$ & Probability that random variable $X$ takes value in set $A\in\mscrA$. The complete notation should be $\Prob(\ensemble{\omega\in \Omega: X(\omega)\in A})$  \\
+	$\Prob(\cdot\vert A)$ & Conditional probability given event $A$ \\
+	$P_X(\cdot)$ & Distribution of random variable $X$ \\
+	$P_{(X,Y)}(\cdot,\cdot)$, $P_X\otimes P_Y(\cdot)$ & Joint distribution of random variables $X$ and $Y$. The advantage of the later notation is, given random vector $(X_1,X_2,\ldots X_n)$, the joint distribution can be written as $\otimes^n_{i=1}P_{X_i}(\cdot)$. If they are independent, we further have $\otimes^n_{i=1}P_{X_i}(\cdot) = \prod_{i=1}^n P_{X_i}(\cdot)$. \\
+	$f_X$ & Density of random variable $X$ \\
+	$\mbbE[X]$ & Expectation of $X$ \\ 
+	$\Var(X)$ & Variance of $X$ \\
+	$\Cov(X,Y)$ & Covariance of $X$ and $Y$ \\
+	$\Omega$ & Sample space, collection of all possible outcomes in an experiment \\
+	$\mscrF$,$\mscrA$,$\mscrB(\mbbR^d)$& $\sigma$-algebra, particularly $\mscrF$ is the information field over $\Omega$ and  $\mscrB(\mbbR^d)$ is the Borel algebra over $\mbbR^d$\\
+	$(E,\mscrA,\nu)$ & Measurable spaces. The first component is the set involved, the second component is the $\sigma$-algebra over the set, the third componet is the measure applied in this space. Examples: $(\Omega, \mscrF, \Prob)$,$(E,\mscrA,P_X)$, $(\mbbR^d,\mscrB(\mbbR^d),P_X)$  \\
+	$X:(\Omega, \mscrF, \Prob)\to (E,\mscrA,P_X)$ & Random variable $X$ maps probability space $(\Omega, \mscrF, \Prob)$ to measurable space $(E,\mscrA,P_X)$. When $X$ is clearly understood, we could briefly write as $X:\Omega\to E$ \\
+	$X(\omega)$ & Realization of random variable $X$ at $\omega\in\Omega$ \\
+	$X^{-1}(A)$ & Preimage of set $A\in\mscrA$ under $X$ \\
+	$X\sim P_X$ & Random variable $X$ follows distribution $P_X$. Some $P_X$ have specific notations: $\mathrm{Bern}(p)$, $\mathrm{Bin}(n,p)$, $\mathrm{Geo}(p)$,  $\mathrm{Pois}(\lambda)$, $\mathrm{Exp}(\lambda)$, $\Gamma(\alpha,\beta)$, $\mcalN(\mu,\sigma^2)$, $\mathrm{Uni}(a,b)$, etc. \\
+	$X\independent Y$ & Random variables $X$ and $Y$ are independent \\
+	$\mcalP$ & Space of probability distributions \\
+	$\mcalD$ & Data set \\
+	$\beta,\hat{\beta}, \theta, \hat{\theta}$ & parameters and their estimations \\
+	\SetCell{mode=dmath}\int_E  & Integral over set $E$, when $E = [a,b]$ we have $\int_E = \int_{[a,b]}=\int^b_a$ \\
+	\SetCell{mode=dmath}L^p(E) & Space of $p$-integrable functions on $E$, i.e. $\ensemble{f:\int_E\abs{f}^p <\infty}$. When $E$ is a measurable space, it's good manner to write $L^p(E,\mscrA,\nu)$ to remind all properties. Reciprocally, if the space involved is clear, the simplified notation $L^p$ can be used\\
+	$f*g$ & Convolution of functions $f$ and $g$, $f*g(y) = \int f(x)g(y-x)\diff x$ \\
+	\SetCell{mode=dmath} \argmax_{x\in E} f(x), \argmin_{x\in E} f(x) & The set of arguments $x\in E$ that maximize/minimize $f(x)$ \\
+	\SetCell{mode=dmath} \max_{x\in E} f(x), \min_{x\in E} f(x) & The maximum/minimum value of $f(x)$ over $x\in E$ \\
+	\SetCell{mode=dmath} \sup_{x\in E} f(x), \inf_{x\in E} f(x) & The supremum/infimum value of $f(x)$ over $x\in E$ \\
+	
+	\bottomrule
+\end{longtblr}
+
+
+
+\subsection*{Acronyms}
+
+\begin{longtblr}{colspec={lX},row{1}={bg=gray!25},
+	}
+	\toprule
+	\textbf{Acronym} & \textbf{Meaning} \\
+	\midrule
+	r.v. & Random variable \\        
+	i.i.d. & Independent and identically distributed \\
+	PMF & Probability mass function \\
+	PDF & Probability density function \\
+	CDF & Cumulative distribution function \\
+	LLN & Law of large numbers \\
+	CLT & Central limit theorem \\
+	MLE & Maximum likelihood estimation \\
+	OLS & Ordinary least squares \\
+	ANOVA & Analysis of variance \\
+	GLM & Generalized linear model \\
+	GAM & Generalized additive model \\
+	GEE & Generalized estimating equations \\
+	MCMC & Markov chain Monte Carlo \\
+	EM & Expectation-maximization \\
+	PCA & Principal component analysis \\
+	SVD & Singular value decomposition \\
+	SPD &  Symmetric positive definite \\
+	HPD & Hermitian positive definite \\
+	RGB &   	Color model: Red, Green, Blue \\
+	CMYK &  	Color model: Cyan, Magenta, Yellow, Key \\
+	HSV &  	Color model: Hue, Saturation, Value \\
+	HSL &  	Color model: Hue, Saturation, Lightness \\
+	ARMA & Auto-regressive moving average \\
+	ARIMA & Auto-regressive integrated moving average \\
+	ARCH & Auto-regressive conditional heteroscedasticity \\
+	GARCH & Generalized autoregressive conditional heteroscedasticity \\
+	RDD &  Regression discontinuity design \\
+	DID &  Difference-in-differences \\
+	\bottomrule
+\end{longtblr}
+
+\endgroup
+\setcounter{table}{0}

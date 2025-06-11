@@ -1,0 +1,24 @@
+% e-common.sty
+
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{e_common}[E Common Macros (Modular)]
+
+% --- Load all style components from the sub-directory ---
+\input{sty_components/common-packages.tex}
+\input{sty_components/common-math.tex}
+\input{sty_components/common-notation.tex}
+\input{sty_components/common-hyphen.tex}
+
+% --- Load packages that must come last ---
+\hypersetup{
+    colorlinks=true,
+    linkcolor=DodgerBlue3,
+    citecolor=red,
+    urlcolor=DodgerBlue3,
+    anchorcolor=DodgerBlue3,
+    filecolor=DodgerBlue3,
+    linktoc=page,
+}
+
+
+\endinput

@@ -1,0 +1,20 @@
+\setminted{
+	autogobble,linenos,breaklines=true, breakanywhere,breaksymbolleft={\mbox{\quad}},breakautoindent=false,breaksymbolindent=0pt,
+	bgcolor =bg_minted_yellow, %The value of this option must not be a color command. Instead, it must be a color name, given as a string, of a previously-defined color
+	fontsize=\scriptsize,
+	frame=lines,framerule=0.75pt,
+	numbersep=4pt,
+	style=manni
+	}
+\setminted[r]{
+	bgcolor =bg_minted_gray,
+  style=tango
+	}
+\setmintedinline{
+  autogobble,linenos=false, fontsize=\footnotesize,
+  bgcolor={},
+}
+
+% algorithm2e
+\newcommand\mycommentfont[1]{\scriptsize\ttfamily\textcolor{blue}{#1}}
+\SetCommentSty{mycommentfont}

@@ -1,0 +1,105 @@
+% TOC
+
+\renewcommand{\thepart}{\Roman{part}}
+%-----------------------------------------------------------------------
+%\etoctocstyle[⟨kind⟩]{⟨number_of_columns⟩}{⟨title⟩}
+
+% part toc color
+% \titlecontents provided by titletoc package [deprecated, use etoc instead]
+% Define a custom TOC line style for parts
+% Customizing the TOC
+%\etocsettocstyle{⟨before_toc⟩}{⟨after_toc⟩}
+%\etocsetstyle{⟨levelname⟩}{⟨start⟩}{⟨prefix⟩}{⟨contents⟩}{⟨finish⟩}
+
+\def\mydotfill{\unskip\nobreak\leaders\hbox{\hss\ . \hss}\hfill\nobreak\relax}
+%\hss = \hskip 0pt plus 1fill minus 1fill
+
+\etocsetstyle{part}
+    {\begingroup\parindent 0pt \nobreak \etocskipfirstprefix}
+    {\pagebreak[3]\bigskip}
+    {\normalsize\rmfamily\centering \color{red} %\scshape 
+    \etocifnumbered{
+      Part \etocnumber{} -- 
+      }{
+    }\MakeUppercase{\etocthename}\par} 
+    {\endgroup}
+
+\etocsetstyle{chapter}
+    {\begingroup}
+    {\addvspace{0.5em}\parindent0pt \color{black}\small} % Pre-code
+    {\etocifnumbered{%
+    \etocnumber\hspace{0.5em} \MakeUppercase{\etocthename}\hfill  \etocpage\par \addvspace{0.25em}
+    }{%
+      \MakeUppercase{\etocthename}\hfill \etocpage\par \addvspace{0.25em}
+    }}
+    {\endgroup\addvspace{0.2em}} % Post-code
+
+\etocsetstyle{section}
+    {\begingroup\addvspace{0.25em}\leftskip0em\parindent0pt\smallskip}
+    {\footnotesize} % Pre-code
+    {\etocifnumbered{%
+    \etocnumber\hspace{0.3em} \etocname\mydotfill  \etocpage\par \addvspace{0.25em}
+    }{%
+    \etocname\hfill \etocpage\par\addvspace{0.25em}
+    }}
+    {\endgroup\par\medskip} % Post-code
+
+
+\etocsetstyle{subsection}
+  {\begingroup \leftskip1em \parfillskip 0pt plus 1fil\relax \nobreak}
+  {\footnotesize\rmfamily\mdseries}
+  {\etocifnumbered{%
+  \etocnumber\hspace{0.3em} \etocname\mydotfill  \etocpage\par
+  }{%
+  \etocname\hfill \etocpage\par
+  }}
+  {\endgroup\par\smallskip}
+
+\etocsetstyle{subsubsection}
+  {\begingroup \leftskip3em \parfillskip 0pt plus 1fil\relax \nobreak}
+  {\footnotesize\rmfamily\mdseries}
+  {\etocifnumbered{%
+  \etocnumber\hspace{0.3em} \etocname\mydotfill  \etocpage\par
+  }{%
+  \etocname\hfill \etocpage\par
+  }}
+  {\endgroup\par\smallskip}
+
+%\etocsetstyle{appendix}
+
+%-----------------------------------------------------------------------
+% Control the appearance of the title in mainmatter
+% \titleformat provided by titlesec package
+\titleformat{\part}%command
+    [display]%shape
+    {\normalfont\centering\large}%format
+    {\thispagestyle{empty}\partname~\MakeUppercase{\thepart}}%label
+    {1em}%sep
+    {\color{darklinkcolor}\MakeUppercase}%beforcode
+% Chapter number on inside
+    % Chapter font
+\newcommand{\chapterNumber}{\fontsize{70}{0}\usefont{OT1}{Alegreya-OsF}{m}{n}}
+
+\titleformat{\chapter}[display]%{<commmand>}[<shape>]
+  {\normalfont\bfseries\large} %<format>
+  %{\MakeUppercase{\chaptertitlename}}{10pt} %{<label>}{<sep>}
+  {\vspace*{-3\baselineskip}\makebox[\linewidth][r]{\color{darklinkcolor}\chapterNumber\thechapter}}{11pt}%{<label>}{<sep>}
+  {\raggedright\MakeUppercase} %{<beforcode>}
+  [\normalsize\vspace*{.8\baselineskip}\titlerule] %[<aftercode>]
+
+
+
+\ifcomment  
+\titleformat{\section}[block]
+  {\normalfont\bfseries\large}
+  {\rule{\textwidth}{1.5pt} \newline \vspace{1ex} }{0pt}
+  {\thesection\quad \MakeUppercase}
+  [\vspace{-2ex}\rule{\textwidth}{1.5pt}]
+
+
+\titleformat{name=\section,numberless}[block] %for unnumbered(starred*) sections
+{\normalfont\bfseries\large}
+{\rule{\textwidth}{1.5pt} \newline \vspace{1ex} }{0pt}
+{\MakeUppercase}
+[\vspace{-2ex}\rule{\textwidth}{1.5pt}]
+\fi
