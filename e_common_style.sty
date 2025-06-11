@@ -4,10 +4,21 @@
 \ProvidesPackage{e_common}[E Common Macros (Modular)]
 
 % --- Load all style components from the sub-directory ---
-\input{sty_components/common-packages.tex}
-\input{sty_components/common-math.tex}
-\input{sty_components/common-notation.tex}
-\input{sty_components/common-hyphen.tex}
+\input{sty_components/c001_packages.tex}
+\input{sty_components/c101_layout.tex}
+\input{sty_components/c102_color.tex}
+\input{sty_components/c103_title_toc.tex}
+\input{sty_components/c104_envs.tex}
+\input{sty_components/c105_commands.tex}
+\input{sty_components/c106_code_listings.tex}
+\input{sty_components/c201_tikz.tex}
+\input{sty_components/c301_math_symbol.tex}
+\input{sty_components/c302_math_envs.tex}
+\input{sty_components/c303_notation.tex}
+\input{sty_components/c401_hypenation.tex}
+\input{sty_components/c501_bib.tex}
+
+
 
 % --- Load packages that must come last ---
 \hypersetup{

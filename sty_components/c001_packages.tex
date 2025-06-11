@@ -16,8 +16,6 @@
 \RequirePackage{extarrows}
 \RequirePackage{amsthm,thmtools}
 
-\newif\ifcomment
-
 %===========================================================================
 %=================== font/encoding configuration ===========================
 %===========================================================================
@@ -32,12 +30,6 @@
 \RequirePackage{sourcecodepro}
 %\RequirePackage{microtype} %luatexja does not support microtype
 
-
-
-% Redefine cite command to include space before
-% <http://tex.stackexchange.com/questions/11602/>
-\let\origcite\cite%
-\def\cite#1{\unskip~\origcite{#1}}
 
 %=======================================================================
 %====================== layout setting ===============================
@@ -60,13 +52,6 @@
 
 % Hyperlinks
 \RequirePackage[unicode]{hyperref}
-
-
-
-% Widow and club penalties
-\clubpenalty=10000
-\widowpenalty=10000
-%\displaywidowpenalty=10000
 
 
 
@@ -95,34 +80,19 @@
 
 % Code listings
 \RequirePackage{minted}
-
-
 % Algorithms
 \RequirePackage[linesnumbered,lined,ruled]{algorithm2e}
-
-
 
 % Graphics
 \RequirePackage{graphicx}
 \RequirePackage{rotating}
 \RequirePackage{tikz,pgf,pgfplots,pgfplotstable}
 
-
-
-
 % List items
 \RequirePackage{enumitem}
 
-
-
-% Page numbers in plain style (chapter titles)
-
-
 % Chapter quotes
 \RequirePackage{csquotes} % smart quotes
-
-
-
 
 % Margin notes
 \RequirePackage[fulladjust]{marginnote}

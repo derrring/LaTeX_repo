@@ -1,0 +1,4 @@
+% Redefine cite command to include space before
+% <http://tex.stackexchange.com/questions/11602/>
+\let\origcite\cite%
+\def\cite#1{\unskip~\origcite{#1}}

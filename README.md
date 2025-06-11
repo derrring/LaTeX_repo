@@ -1,17 +1,18 @@
 
-# LaTeX_dynamic
+# Template and LaTeX 3 programming
 
 Programming in $\LaTeX 3$. Motivated by 
 
 
 1. Fixed template of function definition:
+
 $$
-        N: \left\{\begin{array}{ccc}
+        N: \begin{cases}
             H&\to&\mathbb{R}^+\\
-            x&\mapsto&\lVert x\rVert\\
-            
-        \end{array}\right.
+            x&\mapsto&\lVert x\rVert\\         
+        \end{cases}
 $$
+
 ```latex
  \begin{equation*}
         N: \left\{\begin{array}{ccc}
@@ -21,6 +22,7 @@ $$
         \end{array}\right.
     \end{equation*}
 ```
+
 we may abstract a environment or function to gain generality.
 
 2. Optional argument in `\newcommand` or `\def`
