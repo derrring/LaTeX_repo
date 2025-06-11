@@ -1,0 +1,27 @@
+% Main theme file for MyEspresso
+\mode<presentation>
+
+\ProvidesPackage{beamerthemeMyEspresso}
+
+
+\geometry{paperwidth=169mm, paperheight=102mm}
+
+
+% Load the different components of the theme
+\usecolortheme{MyEspresso}
+\usefonttheme{MyEspresso}
+\useinnertheme{MyEspresso}
+\useoutertheme{MyEspresso}
+
+\setbeamercovered{dynamic}
+
+\setbeamertemplate{title page}{
+  \vskip0pt plus 1filll
+  \hspace{1em}{\usebeamerfont{title}\usebeamercolor[fg]{maintitle}\inserttitle}
+  \vspace{0.5em}
+  \hspace{1.12em}{\usebeamerfont{subtitle}\usebeamercolor[fg]{maintitle}\insertsubtitle}
+  \vskip0pt plus 1filll
+  \vskip0pt plus 1filll
+}
+
+\mode<all>
