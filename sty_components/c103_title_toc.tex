@@ -1,6 +1,68 @@
 % TOC
 
-\renewcommand{\thepart}{\Roman{part}}
+\setcounter{secnumdepth}{3}
+\setcounter{tocdepth}{3}
+
+% Command for a two-column, brief table of contents (depth = 2)
+% Now includes itself in the table of contents.
+\newcommand{\brieftoc}{%
+  \begingroup
+  \etocsettocstyle
+    {% Before the ToC
+      \clearpage
+      \section*{Brief Contents}% Print the title
+      % Add the "Brief Contents" line to the ToC for the next compilation
+      \etoctoccontentsline{section}{Brief Contents}
+    }
+    {}% After the ToC
+  \setcounter{tocdepth}{2}%
+  \begin{multicols}{2}
+    \tableofcontents
+  \end{multicols}
+  \endgroup
+}
+
+% Command for a single-column, detailed table of contents (depth = 3)
+% Now includes itself in the table of contents.
+\newcommand{\detailedtoc}{%
+  \begingroup
+  \etocsettocstyle
+    {% Before the ToC
+      \clearpage
+      \section*{Detailed Contents}% Print the title
+      % Add the "Detailed Contents" line to the ToC for the next compilation
+      \etoctoccontentsline{section}{Detailed Contents}
+    }
+    {}% After the ToC
+  \setcounter{tocdepth}{3}%
+  \tableofcontents
+  \endgroup
+}
+
+\newcommand{\mytoc}{%
+    \cleardoublepage
+    { % Keep etoc settings local to the main ToC
+    \etocsettocstyle{
+        \setcounter{tocdepth}{3} % Main ToC depth
+        \renewcommand{\contentsname}{Contents}
+        \section*{\contentsname}
+    }{%
+        \etoctoccontentsline{section}{\contentsname}
+    }
+    \tableofcontents
+    }
+    \cleardoublepage
+}
+
+\newcommand{\setuplocaltoc}{%
+    \etocsettocstyle{
+        \setcounter{tocdepth}{3}
+        \rule{\linewidth}{1pt}
+        \vskip0.5\baselineskip\parindent0em
+    }{\vspace{-0.5em}\rule{\linewidth}{1pt}\vspace{2em}}
+}
+
+
 %-----------------------------------------------------------------------
 %\etoctocstyle[⟨kind⟩]{⟨number_of_columns⟩}{⟨title⟩}
 
@@ -44,7 +106,6 @@
     }}
     {\endgroup\par\medskip} % Post-code
 
-
 \etocsetstyle{subsection}
   {\begingroup \leftskip1em \parfillskip 0pt plus 1fil\relax \nobreak}
   {\footnotesize\rmfamily\mdseries}
@@ -66,41 +127,3 @@
   {\endgroup\par\smallskip}
 
 %\etocsetstyle{appendix}
-
-%-----------------------------------------------------------------------
-% Control the appearance of the title in mainmatter
-% \titleformat provided by titlesec package
-\titleformat{\part}%command
-    [display]%shape
-    {\normalfont\centering\large}%format
-    {\thispagestyle{empty}\partname~\MakeUppercase{\thepart}}%label
-    {1em}%sep
-    {\color{darklinkcolor}\MakeUppercase}%beforcode
-% Chapter number on inside
-    % Chapter font
-\newcommand{\chapterNumber}{\fontsize{70}{0}\usefont{OT1}{Alegreya-OsF}{m}{n}}
-
-\titleformat{\chapter}[display]%{<commmand>}[<shape>]
-  {\normalfont\bfseries\large} %<format>
-  %{\MakeUppercase{\chaptertitlename}}{10pt} %{<label>}{<sep>}
-  {\vspace*{-3\baselineskip}\makebox[\linewidth][r]{\color{darklinkcolor}\chapterNumber\thechapter}}{11pt}%{<label>}{<sep>}
-  {\raggedright\MakeUppercase} %{<beforcode>}
-  [\normalsize\vspace*{.8\baselineskip}\titlerule] %[<aftercode>]
-
-
-% --- Custom Authoring Tools ---
-\newif\ifcomment
-\ifcomment  
-\titleformat{\section}[block]
-  {\normalfont\bfseries\large}
-  {\rule{\textwidth}{1.5pt} \newline \vspace{1ex} }{0pt}
-  {\thesection\quad \MakeUppercase}
-  [\vspace{-2ex}\rule{\textwidth}{1.5pt}]
-
-
-\titleformat{name=\section,numberless}[block] %for unnumbered(starred*) sections
-{\normalfont\bfseries\large}
-{\rule{\textwidth}{1.5pt} \newline \vspace{1ex} }{0pt}
-{\MakeUppercase}
-[\vspace{-2ex}\rule{\textwidth}{1.5pt}]
-\fi
