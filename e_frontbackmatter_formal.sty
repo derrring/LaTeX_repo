@@ -1,0 +1,104 @@
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{e_frontbackmatter_formal}[Formal Front Back Matter]
+
+% 1. Load packages that are required for this front matter to work.
+% These might already be in your common style file, but \RequirePackage is safe.
+\RequirePackage{kvoptions}
+\RequirePackage{xcolor}
+\RequirePackage{hyperref} % For \pdfbookmark
+\RequirePackage{etoolbox} % For safety with command definitions
+
+
+% 2. Define commands for non-standard info (subtitle, location, etc.)
+% We will use the standard \author, \title, \date for the main info.
+\providecommand{\subtitle}[1]{\def\@subtitle{#1}}
+\providecommand{\location}[1]{\def\@location{#1}}
+\providecommand{\institution}[1]{\def\@institution{#1}}
+\providecommand{\email}[1]{\def\@email{#1}}
+
+% Set default values for new commands
+\subtitle{}
+\location{}
+\email{}
+\institution{}
+
+% 3. Define commands for optional content (Acknowledgements/Abstract)
+\providecommand{\setacknowledgements}[1]{\def\@myacknowledgements{#1}}
+\providecommand{\setabstract}[1]{\def\@myabstract{#1}}
+\providecommand{\setdedication}[1]{\def\@mydedication{#1}} 
+
+\setacknowledgements{}
+\setabstract{}
+\setdedication{}
+
+
+
+% 4. Define commands for each part of the front & back matter.
+%    These are now modified to use the standard \@author, \@title, \@date
+
+% == Main Title Page (from titlepage.tex) ==
+\providecommand{\makemaintitle}{%
+    \begin{titlepage}
+        \begin{center}
+            \large
+            \begingroup
+            \@institution\\
+            \vspace{0.5em}
+            \MakeUppercase{\@institution} \\
+            \endgroup
+            \vfill
+            \begingroup
+                {\@title}\\ % Uses standard \@title
+                \ifstrempty{\@subtitle}{}{%
+                    \vspace{1em}\MakeUppercase{\footnotesize \@subtitle}
+                }
+            \endgroup
+            \vfill
+            \begingroup
+                % Uses standard \@author. The email is now separate.
+                {\normalsize \@author\ifstrempty{\@email}{}{\footnote{\@email}}} \\
+            \endgroup
+            \vfill\vfill
+            \@location\\
+            \vspace{0.5em}
+            \@date% % Uses standard \@date
+            \vfill
+        \end{center}
+    \end{titlepage}
+}
+
+% == Dedication  ==
+\providecommand{\makededication}{%
+    % Check if content has been provided for the dedication.
+    \ifstrempty{\@mydedication}{}{%
+        \clearpage\thispagestyle{empty}\vspace*{3cm}
+        \@mydedication
+        \cleardoublepage
+    }%
+}
+
+% == Acknowledgements  ==
+\providecommand{\makeacknowledgements}{%
+    \ifstrempty{\@myacknowledgements}{}{%
+        \chapter*{Acknowledgements}
+        \@myacknowledgements 
+        \cleardoublepage
+    }%
+}
+
+% == Abstract  ==
+\providecommand{\makeabstract}{%
+    \ifstrempty{\@myabstract}{}{%
+        \chapter*{Abstract}
+        \@myabstract
+        \cleardoublepage
+    }%
+}
+
+
+\providecommand{\maketitleback}{%
+    \thispagestyle{empty}
+    \vfill
+    \noindent\@author: \textit{\@title,} \textcopyright\ \@date
+    \cleardoublepage
+}
