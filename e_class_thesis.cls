@@ -116,7 +116,7 @@
 % This section contains styling for chapters and ToC from general.tex
 
 % (A) Chapter title formatting
-\newcommand{\chapterNumber}{\fontsize{70}{0}\usefont{OT1}{Alegreya-OsF}{m}{n}}
+\renewcommand{\chapterNumber}{\fontsize{70}{0}\usefont{OT1}{Alegreya-OsF}{m}{n}}
 \titleformat{\chapter}[display]
   {\normalfont\bfseries\large}
   {\vspace*{-3\baselineskip}\makebox[\linewidth][r]{\color{darklinkcolor}\chapterNumber\thechapter}}{11pt}
