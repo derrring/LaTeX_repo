@@ -1,80 +1,106 @@
-import os
+#!/usr/bin/env python3
+import os,sys
 import subprocess
 import platform
+import shutil
+from pathlib import Path
 
-# --- USER CONFIGURATION: PLEASE EDIT THIS ---
-# The absolute path to your local folder containing .sty, .cls, .bst, etc.
-# Examples:
-# - Windows: "C:\\Users\\YourUser\\Documents\\MyLatexStyles"
-# - macOS/Linux: "/Users/youruser/Documents/MyLatexStyles"
-# SOURCE_FOLDER = "/path/to/your/local/latex/folder"  # <--- EDIT THIS!
-SOURCE_FOLDER = "/Users/zvezda/Onedrive/code/LaTeX_repo/"  # <--- EDIT THIS!
+"""
+This script creates symbolic links from the project's style directories
+(estyle, MyEspressoTheme) to the user's TEXMFHOME directory, making the 
+custom LaTeX classes and Beamer themes available to the TeX system.
+
+Variables:
+- TEXMFHOME: The directory where user-specific TeX files are stored.
+    - The script uses `kpsewhich` to find the TEXMFHOME directory.
+- estyle: The directory containing custom LaTeX styles.
+- MyEspressoTheme: The directory containing the custom Beamer theme.
+- src_path: The source path of the directories to link.
+    - beamer_src_path: The source path of the Beamer theme directory.
+    - style_src_path: The source path of the LaTeX styles directory.
+- dest_base_dir: The base directory in TEXMFHOME where the links will be created.
+- dest_path: The destination path in TEXMFHOME where the links will be created.
+
+"""
+
+
 def get_texmf_home():
-    """Gets the user-level texmf root directory."""
+    """Find the TEXMFHOME directory using kpsewhich."""
     try:
-        # 'kpsewhich' is a standard TeX utility to find TeX-related paths
         result = subprocess.run(
-            ['kpsewhich', '-var-value=TEXMFHOME'],
-            capture_output=True,
-            text=True,
-            check=True
+            ['kpsewhich', '-var-value', 'TEXMFHOME'],
+            capture_output=True, text=True, check=True
         )
-        return result.stdout.strip()
-    except (FileNotFoundError, subprocess.CalledProcessError) as e:
-        print(f"❌ Error: Could not find the 'kpsewhich' command.")
-        print("Please ensure your TeX/LaTeX distribution is installed correctly and in your system's PATH.")
-        print(f"Details: {e}")
+        path = result.stdout.strip()
+        if not path:
+            return None
+        return Path(path)
+    except (subprocess.CalledProcessError, FileNotFoundError):
         return None
 
-def create_symlink(source, destination_parent, link_name):
-    """Creates a symbolic link in the target destination."""
-    # Ensure the parent destination directory exists
-    os.makedirs(destination_parent, exist_ok=True)
-    
-    destination_path = os.path.join(destination_parent, link_name)
-    
-    # Check if a file or link already exists at the destination
-    if os.path.lexists(destination_path):
-        print(f"🤔 Link '{destination_path}' already exists. Skipping.")
-        return
+def link_directory(src_path: Path, dest_path: Path):
+    """Remove the old link/dir and create a new symbolic link."""
+    if not src_path.exists():
+        raise FileNotFoundError(f"Source directory '{src_path}' does not exist.")
+    print(f"Linking '{src_path.name}' directory...")
 
-    print(f"🔗 Preparing to link: '{source}' -> '{destination_path}'")
-    
+    # Remove existing link or directory at the destination
+    if dest_path.is_symlink() or dest_path.is_file():
+        dest_path.unlink()
+    elif dest_path.is_dir():
+        shutil.rmtree(dest_path)
+
+    # Create the symbolic link
+    dest_path.symlink_to(src_path, target_is_directory=True)
+    print(f"'{src_path}'\n -> \n'{dest_path}'\n")
+    print('=='*10)
+
+def main():
+    """Main function to perform the linking and database update."""
+    repo_root = Path(__file__).resolve().parent.parent
+
+    # --- Source Directories ---
+    style_src_path = repo_root / "e_style"
+    beamer_src_path = repo_root / "MyEspressoTheme"
+
+    # --- Find and prepare destination ---
+    texmf_home = get_texmf_home()
+    if not texmf_home:
+        print("Please ensure your TeX distribution is configured correctly.")
+        raise FileNotFoundError("Error: TEXMFHOME variable not found.")
+
+    dest_base_dir = texmf_home / "tex" / "latex"
+    dest_base_dir.mkdir(parents=True, exist_ok=True)
+
+    print(f"TEXMFHOME is: {texmf_home}")
+    print(f"Linking styles to: {dest_base_dir}\n")
+
+    # --- Create the links ---
+    link_directory(style_src_path, dest_base_dir / style_src_path.name)
+    link_directory(beamer_src_path, dest_base_dir / beamer_src_path.name)
+
+    print("\nDone linking files.")
+
+    # --- Update the TeX file database ---
+    print(f"Running texhash to update the file database for {texmf_home}...")
     try:
-        if platform.system() == "Windows":
-            # Creating symlinks on Windows requires admin rights
-            # Note the argument order: mklink /D Link Target
-            subprocess.run(['mklink', '/D', destination_path, source], shell=True, check=True)
-            print("✅ Link created successfully! (Windows)")
+        # Pass the specific texmf_home path to texhash
+        result = subprocess.run(
+            ["texhash", str(texmf_home)],  # <-- This line changed
+            capture_output=True,
+            text=True,
+            check=True,
+        )
+        print("Database updated successfully.")
+    except (subprocess.CalledProcessError, FileNotFoundError) as e:
+        print("\nError: Failed to run 'texhash'.")
+        if isinstance(e, FileNotFoundError):
+            print("Please ensure 'texhash' is installed and in your system's PATH.")
         else:
-            # For macOS and Linux
-            # Note the argument order: ln -s target link_name
-            os.symlink(source, destination_path)
-            print("✅ Link created successfully! (macOS/Linux)")
-    except OSError as e:
-        print(f"❌ Error: Link creation failed.")
-        if platform.system() == "Windows":
-            print("Hint: On Windows, you often need to run this script as an Administrator to create symbolic links.")
-        print(f"Details: {e}")
-    except Exception as e:
-        print(f"❌ An unknown error occurred: {e}")
+            print("--- texhash error output ---")
+            print(e.stderr)
+            print("----------------------------")
 
 
 if __name__ == "__main__":
-    texmf_home = get_texmf_home()
-    
-    if texmf_home and os.path.isdir(SOURCE_FOLDER):
-        print(f"Found TEXMFHOME directory: {texmf_home}")
-        # Get the folder name from the source path to use as the link name
-        link_name = os.path.basename(os.path.normpath(SOURCE_FOLDER))
-        
-        # The target directory is typically texmf/tex/latex
-        destination_dir = os.path.join(texmf_home, "tex", "latex")
-        
-        create_symlink(SOURCE_FOLDER, destination_dir, link_name)
-        
-        print("\n🎉 Process finished. You may need to run 'texhash' or 'mktexlsr' to update TeX's file database.")
-    elif not texmf_home:
-        print("Could not proceed because the TEXMFHOME directory was not found.")
-    else:
-        print(f"❌ Error: The source folder '{SOURCE_FOLDER}' does not exist or is not a directory. Please check the path.")
+    main()

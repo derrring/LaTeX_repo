@@ -11,7 +11,7 @@
 % Process standard options for the article class (e.g., 10pt, 11pt, 12pt, a4paper)
 \DeclareOption*{\PassOptionsToClass{\CurrentOption}{book}}
 % Set default options
-\ExecuteOptions{12pt, a4paper}
+\ExecuteOptions{12pt}
 % Process given options
 \ProcessOptions\relax
 % Load the base class
@@ -36,9 +36,9 @@
 
 \titleformat{name=\chapter,numberless}[block] %for unnumbered(starred*) sections
 {\normalfont\bfseries\large}
-{\rule{\textwidth}{1.5pt} \newline \vspace{1ex} }{0pt}
+{\rule{\columnwidth}{1.5pt} \newline \vspace{1ex} }{0pt}
 {\MakeUppercase}
-[\vspace{-2ex}\rule{\textwidth}{1.5pt}]
+[\vspace{-2ex}\rule{\columnwidth}{1.5pt}]
 
 
 

@@ -1,48 +1,72 @@
 #!/bin/bash
 
-# --- USER CONFIGURATION: PLEASE EDIT THIS ---
-# The absolute path to your local folder containing .sty, .cls, .bst, etc.
-# Examples:
-# - Windows: "C:\\Users\\YourUser\\Documents\\MyLatexStyles"
-# - macOS/Linux: "/Users/youruser/Documents/MyLatexStyles"
-SOURCE_FOLDER="/Users/zvezda/Onedrive/code/LaTeX_repo/" # <--- EDIT THIS!
+# This script creates symbolic links from the project's style directories
+# to the user's TEXMFHOME directory, making the custom LaTeX classes and
+# Beamer themes available to the TeX system.
 
-# --- SCRIPT START ---
+# Get the absolute path of the directory where the script is located
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
+REPO_ROOT="$(dirname "$SCRIPT_DIR")"
 
-# Check if the source folder exists
-if [ ! -d "$SOURCE_FOLDER" ]; then
-    echo "❌ Error: Source folder '$SOURCE_FOLDER' not found."
+# --- Configuration ---
+# Source directories within your repository
+STYLE_SRC_DIR="e_style"
+BEAMER_SRC_DIR="MyEspressoTheme"
+
+# --- Script Logic ---
+# Find the TEXMFHOME directory
+TEXMFHOME=$(kpsewhich -var-value TEXMFHOME)
+
+if [ -z "$TEXMFHOME" ]; then
+    echo "Error: TEXMFHOME variable not found."
+    echo "Please ensure your TeX distribution is configured correctly."
     exit 1
 fi
 
-# Automatically find the TEXMFHOME path
-TEXMF_HOME=$(kpsewhich -var-value=TEXMFHOME)
+# The base destination for LaTeX packages
+DEST_BASE_DIR="$TEXMFHOME/tex/latex"
 
-if [ -z "$TEXMF_HOME" ]; then
-    echo "❌ Error: Could not find TEXMFHOME directory. Please ensure TeX is installed correctly."
-    exit 1
-fi
+# Create the base destination directory if it doesn't exist
+mkdir -p "$DEST_BASE_DIR"
 
-echo "Found TEXMFHOME directory: $TEXMF_HOME"
+echo "TEXMFHOME is: $TEXMFHOME"
+echo "Linking styles to: $DEST_BASE_DIR"
+echo ""
 
-# Define the destination for the link
-# Custom packages are usually placed in texmf/tex/latex/
-DESTINATION_DIR="$TEXMF_HOME/tex/latex/"
-LINK_NAME=$(basename "$SOURCE_FOLDER")
-FULL_DESTINATION_PATH="$DESTINATION_DIR$LINK_NAME"
+# --- Link the 'estyle' directory ---
+SRC_PATH_STYLE="$REPO_ROOT/$STYLE_SRC_DIR"
+DEST_PATH_STYLE="$DEST_BASE_DIR/$STYLE_SRC_DIR"
 
-# Ensure the parent destination directory exists
-mkdir -p "$DESTINATION_DIR"
-
-# Check if the link already exists before trying to create it
-if [ -L "$FULL_DESTINATION_PATH" ]; then
-    echo "🤔 Link '$FULL_DESTINATION_PATH' already exists. Skipping."
-else
-    echo "🔗 Creating link: $SOURCE_FOLDER -> $FULL_DESTINATION_PATH"
+if [ -e "$SRC_PATH_STYLE" ]; then
+    echo "Linking class/style directory..."
+    # Remove existing link/directory at the destination to avoid conflicts
+    rm -rf "$DEST_PATH_STYLE"
     # Create the symbolic link
-    ln -s "$SOURCE_FOLDER" "$FULL_DESTINATION_PATH"
-    echo "✅ Link created successfully!"
+    ln -s "$SRC_PATH_STYLE" "$DEST_PATH_STYLE"
+    echo "  '$SRC_PATH_STYLE' -> '$DEST_PATH_STYLE'"
+else
+    echo "Warning: Source directory '$STYLE_SRC_DIR' not found. Skipping."
 fi
 
-# Remind the user to update TeX's file database
-echo -e "\n🎉 Process finished. We recommend running 'texhash' or 'mktexlsr' to update TeX's file database."
+# --- Link the 'MyEspressoTheme' directory ---
+SRC_PATH_BEAMER="$REPO_ROOT/$BEAMER_SRC_DIR"
+DEST_PATH_BEAMER="$DEST_BASE_DIR/$BEAMER_SRC_DIR"
+
+if [ -e "$SRC_PATH_BEAMER" ]; then
+    echo "Linking Beamer theme directory..."
+    # Remove existing link/directory at the destination
+    rm -rf "$DEST_PATH_BEAMER"
+    # Create the symbolic link
+    ln -s "$SRC_PATH_BEAMER" "$DEST_PATH_BEAMER"
+    echo "  '$SRC_PATH_BEAMER' -> '$DEST_PATH_BEAMER'"
+else
+    echo "Warning: Source directory '$BEAMER_SRC_DIR' not found. Skipping."
+fi
+
+echo ""
+echo "Done linking files."
+
+# --- Update the TeX file database ---
+echo "Running texhash to update the database for $TEXMFHOME..."
+texhash "$TEXMFHOME" 
+echo "Database updated successfully."

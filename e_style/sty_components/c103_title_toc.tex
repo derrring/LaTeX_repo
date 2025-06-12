@@ -3,57 +3,76 @@
 \setcounter{secnumdepth}{3}
 \setcounter{tocdepth}{3}
 
-% Command for a two-column, brief table of contents (depth = 2)
-% Now includes itself in the table of contents.
+% --- Command for a two-column, brief ToC (depth = 2) ---
 \newcommand{\brieftoc}{%
   \begingroup
   \etocsettocstyle
     {% Before the ToC
       \clearpage
-      \section*{Brief Contents}% Print the title
-      % Add the "Brief Contents" line to the ToC for the next compilation
-      \etoctoccontentsline{section}{Brief Contents}
+      % Conditionally set the title as a chapter or section
+      \ifcsdef{chapter}{%
+        \chapter*{Brief Contents}%
+        \etoctoccontentsline{chapter}{Brief Contents}%
+      }{%
+        \section*{Brief Contents}%
+        \etoctoccontentsline{section}{Brief Contents}%
+      }
     }
     {}% After the ToC
-  \setcounter{tocdepth}{2}%
+  \setcounter{tocdepth}{2}% Set local depth for this ToC
   \begin{multicols}{2}
     \tableofcontents
   \end{multicols}
   \endgroup
 }
 
-% Command for a single-column, detailed table of contents (depth = 3)
-% Now includes itself in the table of contents.
+% --- Command for a single-column, detailed ToC (depth = 3) ---
 \newcommand{\detailedtoc}{%
   \begingroup
   \etocsettocstyle
     {% Before the ToC
       \clearpage
-      \section*{Detailed Contents}% Print the title
-      % Add the "Detailed Contents" line to the ToC for the next compilation
-      \etoctoccontentsline{section}{Detailed Contents}
+      % Conditionally set the title as a chapter or section
+      \ifcsdef{chapter}{%
+        \chapter*{Detailed Contents}%
+        \etoctoccontentsline{chapter}{Detailed Contents}%
+      }{%
+        \section*{Detailed Contents}%
+        \etoctoccontentsline{section}{Detailed Contents}%
+      }
     }
     {}% After the ToC
-  \setcounter{tocdepth}{3}%
+  \setcounter{tocdepth}{3}% Set local depth for this ToC
   \tableofcontents
   \endgroup
 }
 
+% --- Command for the main ToC ---
 \newcommand{\mytoc}{%
-    \cleardoublepage
-    { % Keep etoc settings local to the main ToC
+    \clearpage
+    { % Keep etoc settings local to this ToC
     \etocsettocstyle{
         \setcounter{tocdepth}{3} % Main ToC depth
         \renewcommand{\contentsname}{Contents}
-        \section*{\contentsname}
+        % Conditionally set the title as a chapter or section
+        \ifcsdef{chapter}{%
+            \chapter*{\contentsname}%
+        }{%
+            \section*{\contentsname}%
+        }
     }{%
-        \etoctoccontentsline{section}{\contentsname}
+        % Add the ToC itself to the list of contents
+        \ifcsdef{chapter}{%
+            \etoctoccontentsline{chapter}{\contentsname}%
+        }{%
+            \etoctoccontentsline{section}{\contentsname}%
+        }
     }
     \tableofcontents
     }
-    \cleardoublepage
 }
 
+% --- Command to set up a local ToC (e.g., at the start of a chapter) ---
 \newcommand{\setuplocaltoc}{%
     \etocsettocstyle{
         \setcounter{tocdepth}{3}
@@ -61,7 +80,6 @@
         \vskip0.5\baselineskip\parindent0em
     }{\vspace{-0.5em}\rule{\linewidth}{1pt}\vspace{2em}}
 }
-
 
 %-----------------------------------------------------------------------
 %\etoctocstyle[⟨kind⟩]{⟨number_of_columns⟩}{⟨title⟩}

@@ -17,10 +17,10 @@
 \providecommand{\email}[1]{\def\@email{#1}}
 
 % Set default values for new commands
-\subtitle{}
-\location{}
-\email{}
-\institution{}
+\subtitle{ }
+\location{ }
+\email{ }
+\institution{ }
 
 % 3. Define commands for optional content (Acknowledgements/Abstract)
 \providecommand{\setacknowledgements}[1]{\def\@myacknowledgements{#1}}
@@ -41,32 +41,42 @@
     \begin{titlepage}
         \begin{center}
             \large
-            \begingroup
-            \@institution\\
-            \vspace{0.5em}
-            \MakeUppercase{\@institution} \\
-            \endgroup
+            % --- Institution (Optional) ---
+            \ifstrempty{\@institution}{}{%
+                \begingroup
+                    \@institution\\
+                    \vspace{0.5em}
+                    \MakeUppercase{\@institution}
+                \endgroup\\
+            }
             \vfill
+            % --- Title and Subtitle ---
+            % This assumes \@title will always be provided.
             \begingroup
-                {\@title}\\ % Uses standard \@title
-                \ifstrempty{\@subtitle}{}{%
-                    \vspace{1em}\MakeUppercase{\footnotesize \@subtitle}
-                }
+                {\@title}\\
             \endgroup
+            % Subtitle is already optional.
+            \ifstrempty{\@subtitle}{}{%
+                \vspace{1em}\MakeUppercase{\footnotesize \@subtitle}
+            }
             \vfill
+            % --- Author and Email (Email is optional) ---
+            % This assumes \@author will always be provided.
             \begingroup
-                % Uses standard \@author. The email is now separate.
+                % The footnote for the email will only appear if \@email is set.
                 {\normalsize \@author\ifstrempty{\@email}{}{\footnote{\@email}}} \\
             \endgroup
             \vfill\vfill
-            \@location\\
-            \vspace{0.5em}
-            \@date% % Uses standard \@date
+            % --- Location (Optional) ---
+            \ifstrempty{\@location}{}{%
+                \@location\\
+                \vspace{0.5em}
+            }
+            \@date% % \@date is usually set automatically
             \vfill
         \end{center}
     \end{titlepage}
 }
-
 % == Dedication  ==
 \providecommand{\makededication}{%
     % Check if content has been provided for the dedication.
