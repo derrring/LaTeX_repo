@@ -3,74 +3,49 @@
 \setcounter{secnumdepth}{3}
 \setcounter{tocdepth}{3}
 
-% --- Command for a two-column, brief ToC (depth = 2) ---
-\newcommand{\brieftoc}{%
-  \begingroup
-  \etocsettocstyle
-    {% Before the ToC
-      \clearpage
-      % Conditionally set the title as a chapter or section
-      \ifcsdef{chapter}{%
-        \chapter*{Brief Contents}%
-        \etoctoccontentsline{chapter}{Brief Contents}%
-      }{%
-        \section*{Brief Contents}%
-        \etoctoccontentsline{section}{Brief Contents}%
-      }
-    }
-    {}% After the ToC
-  \setcounter{tocdepth}{2}% Set local depth for this ToC
-  \begin{multicols}{2}
-    \tableofcontents
-  \end{multicols}
-  \endgroup
-}
 
-% --- Command for a single-column, detailed ToC (depth = 3) ---
-\newcommand{\detailedtoc}{%
-  \begingroup
-  \etocsettocstyle
-    {% Before the ToC
-      \clearpage
-      % Conditionally set the title as a chapter or section
-      \ifcsdef{chapter}{%
-        \chapter*{Detailed Contents}%
-        \etoctoccontentsline{chapter}{Detailed Contents}%
-      }{%
-        \section*{Detailed Contents}%
-        \etoctoccontentsline{section}{Detailed Contents}%
-      }
-    }
-    {}% After the ToC
-  \setcounter{tocdepth}{3}% Set local depth for this ToC
-  \tableofcontents
-  \endgroup
-}
+% ====================================================================
+% == Table of Contents Commands 
+% ====================================================================
+
 
 % --- Command for the main ToC ---
 \newcommand{\mytoc}{%
-    \clearpage
-    { % Keep etoc settings local to this ToC
-    \etocsettocstyle{
-        \setcounter{tocdepth}{3} % Main ToC depth
-        \renewcommand{\contentsname}{Contents}
-        % Conditionally set the title as a chapter or section
-        \ifcsdef{chapter}{%
-            \chapter*{\contentsname}%
-        }{%
-            \section*{\contentsname}%
-        }
+    \cleardoublepage
+    \etocsettocstyle{\renewcommand{\contentsname}{Contents}}{}
+        \printtoctitle{\contentsname}
+        \tableofcontents
+    \cleardoublepage
+}
+
+% --- Custom command to print a ToC title ---
+% This is your excellent helper command. It contains all the conditional
+% logic to choose the right title style.
+\newcommand{\printtoctitle}[1]{%
+    \ifcsdef{chapter}{%
+        % In a book-style class, mimic the chapter title format
+        \par\noindent
+        \begingroup
+            \normalfont\bfseries\large
+            \rule{\columnwidth}{1.5pt} \newline
+            \vspace{1ex}
+            \MakeUppercase{#1} \par
+            \vspace{-2ex}
+            \noindent\rule{\columnwidth}{1.5pt}
+        \endgroup
+        \par\nobreak
+        \vspace{2em} % Space after the title
+
     }{%
-        % Add the ToC itself to the list of contents
-        \ifcsdef{chapter}{%
-            \etoctoccontentsline{chapter}{\contentsname}%
-        }{%
-            \etoctoccontentsline{section}{\contentsname}%
-        }
-    }
-    \tableofcontents
+        % In an article-style class, just use a simple \section*
+        \section*{#1}
     }
 }
+
+
+
+
+
 
 % --- Command to set up a local ToC (e.g., at the start of a chapter) ---
 \newcommand{\setuplocaltoc}{%
@@ -90,6 +65,10 @@
 % Customizing the TOC
 %\etocsettocstyle{⟨before_toc⟩}{⟨after_toc⟩}
 %\etocsetstyle{⟨levelname⟩}{⟨start⟩}{⟨prefix⟩}{⟨contents⟩}{⟨finish⟩}
+
+
+
+
 
 \def\mydotfill{\unskip\nobreak\leaders\hbox{\hss\ . \hss}\hfill\nobreak\relax}
 %\hss = \hskip 0pt plus 1fill minus 1fill
@@ -145,3 +124,5 @@
   {\endgroup\par\smallskip}
 
 %\etocsetstyle{appendix}
+
+

@@ -1,0 +1,60 @@
+% ====================================================================
+% == ToC Styles for Classes WITHOUT Chapters (e.g., article)
+% ====================================================================
+
+
+
+\setcounter{secnumdepth}{3}
+\setcounter{tocdepth}{3}
+
+
+% --- Command for a two-column, brief ToC ---
+\newcommand{\brieftoc}{%
+  \begingroup
+  \etocsettocstyle{\clearpage}{}
+  \setcounter{tocdepth}{2}%
+  \printtoctitle{Brief Contents}
+  \begin{multicols}{2}
+    \tableofcontents
+  \end{multicols}
+  \endgroup
+}
+
+% --- Command for a single-column, detailed ToC ---
+\newcommand{\detailedtoc}{%
+  \begingroup
+  \etocsettocstyle{\clearpage}{}
+  \setcounter{tocdepth}{3}%
+  \printtoctitle{Detailed Contents}
+  \tableofcontents
+  \endgroup
+}
+
+
+% --- Command for local ToCs (e.g., in-section) ---
+\newcommand{\setuplocaltoc}{%
+    \etocsettocstyle{
+        \setcounter{tocdepth}{3}
+        \rule{\columnwidth}{1pt}
+        \vskip0.5\baselineskip\parindent0em
+    }{\vspace{-0.5em}\rule{\columnwidth}{1pt}\vspace{2em}}
+}
+
+
+
+% ====================================================================
+% === Title formatting for classes WITHOUT Chapters (e.g., article)
+% ====================================================================
+
+\titleformat{\section}[block]
+  {\normalfont\bfseries\large}
+  {\rule{\textwidth}{1.5pt} \newline \vspace{1ex} }{0pt}
+  {\thesection\quad \MakeUppercase}
+  [\vspace{-2ex}\rule{\textwidth}{1.5pt}]
+
+
+\titleformat{name=\section,numberless}[block] %for unnumbered(starred*) sections
+{\normalfont\bfseries\large}
+{\rule{\textwidth}{1.5pt} \newline \vspace{1ex} }{0pt}
+{\MakeUppercase}
+[\vspace{-2ex}\rule{\textwidth}{1.5pt}]
