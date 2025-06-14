@@ -5,7 +5,7 @@
 % =================================================================
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesClass{e_class_note}[Lecture Notes Class]
+\ProvidesClass{e_class_noteLong}[Lecture Notes Class]
 
 % --- Class Options ---
 % Process standard options for the article class (e.g., 10pt, 11pt, 12pt, a4paper)
@@ -20,7 +20,7 @@
 
 \RequirePackage{e_common_style}
 \RequirePackage{e_frontbackmatter_formal}
-
+\RequirePackage{e_title_fenced_chap}
 
 
 

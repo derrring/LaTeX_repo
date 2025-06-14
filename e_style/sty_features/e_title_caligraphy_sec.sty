@@ -1,0 +1,18 @@
+
+
+% ====================================================================
+% === Title formatting for classes WITHOUT Chapters (e.g., article)
+% ====================================================================
+
+\titleformat{\section}[block]
+  {\normalfont\bfseries\large}
+  {\rule{\textwidth}{1.5pt} \newline \vspace{1ex} }{0pt}
+  {\thesection\quad \MakeUppercase}
+  [\vspace{-2ex}\rule{\textwidth}{1.5pt}]
+
+
+\titleformat{name=\section,numberless}[block] %for unnumbered(starred*) sections
+{\normalfont\bfseries\large}
+{\rule{\textwidth}{1.5pt} \newline \vspace{1ex} }{0pt}
+{\MakeUppercase}
+[\vspace{-2ex}\rule{\textwidth}{1.5pt}]

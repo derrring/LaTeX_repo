@@ -5,7 +5,7 @@
 % =================================================================
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesClass{e_class_report}[Report and Article Class]
+\ProvidesClass{e_class_noteShort}[Article Class]
 
 % --- Class Options ---
 % Process standard options for the article class (e.g., 10pt, 11pt, 12pt, a4paper)
@@ -20,5 +20,6 @@
 
 \RequirePackage{e_common_style}
 \RequirePackage{e_frontbackmatter_simple}
+\RequirePackage{e_title_fenced_sec}
 
 \endinput

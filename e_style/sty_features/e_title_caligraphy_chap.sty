@@ -1,0 +1,23 @@
+%-----------------------------------------------------------------------
+% Control the appearance of the title in mainmatter
+% \titleformat provided by titlesec package
+\renewcommand{\thepart}{\Roman{part}}
+
+\titleformat{\part}%command
+    [display]%shape
+    {\normalfont\centering\large}%format
+    {\thispagestyle{empty}\partname~\MakeUppercase{\thepart}}%label
+    {1em}%sep
+    {\color{darklinkcolor}\MakeUppercase}%beforcode
+% Chapter number on inside
+    % Chapter font
+\newcommand{\chapterNumber}{\fontsize{70}{0}\usefont{OT1}{Alegreya-OsF}{m}{n}}
+
+\titleformat{\chapter}[display]%{<commmand>}[<shape>]
+    {\normalfont\bfseries\large} %<format>
+    %{\MakeUppercase{\chaptertitlename}}{10pt} %{<label>}{<sep>}
+    {\vspace*{-3\baselineskip}\makebox[\linewidth][r]{\color{darklinkcolor}\chapterNumber\thechapter}}{11pt}%{<label>}{<sep>}
+    {\raggedright\MakeUppercase} %{<beforcode>}
+    [\normalsize\vspace*{.8\baselineskip}\titlerule] %[<aftercode>]
+
+

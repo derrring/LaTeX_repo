@@ -17,8 +17,9 @@
 
 % --- 2. Load the common style package ---
 % This single command loads all your modular style components (packages, commands, colors, etc.).
-\RequirePackage{es_common_style}
-\RequirePackage{es_frontbackmatter_formal} % Load the front and back matter package
+\RequirePackage{e_common_style}
+\RequirePackage{e_frontbackmatter_formal} % Load the front and back matter package
+\RequirePackage{e_title_caligraphy_chap}
 
 % --- 3. Define user-facing commands for thesis metadata ---
 

@@ -4,22 +4,24 @@
 # to the user's TEXMFHOME directory, making the custom LaTeX classes and
 # Beamer themes available to the TeX system.
 
+# --- MODIFICATION: Exit immediately if a command exits with a non-zero status. ---
+set -e
+
 # Get the absolute path of the directory where the script is located
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 REPO_ROOT="$(dirname "$SCRIPT_DIR")"
 
 # --- Configuration ---
-# Source directories within your repository
-STYLE_SRC_DIR="e_style"
-BEAMER_SRC_DIR="MyEspressoTheme"
+# An array of source directories within your repository
+SOURCE_DIRS=("e_style" "MyEspressoTheme")
 
 # --- Script Logic ---
 # Find the TEXMFHOME directory
 TEXMFHOME=$(kpsewhich -var-value TEXMFHOME)
 
 if [ -z "$TEXMFHOME" ]; then
-    echo "Error: TEXMFHOME variable not found."
-    echo "Please ensure your TeX distribution is configured correctly."
+    echo "Error: TEXMFHOME variable not found." >&2
+    echo "Please ensure your TeX distribution is configured correctly." >&2
     exit 1
 fi
 
@@ -31,42 +33,35 @@ mkdir -p "$DEST_BASE_DIR"
 
 echo "TEXMFHOME is: $TEXMFHOME"
 echo "Linking styles to: $DEST_BASE_DIR"
-echo ""
+echo "========================================"
 
-# --- Link the 'estyle' directory ---
-SRC_PATH_STYLE="$REPO_ROOT/$STYLE_SRC_DIR"
-DEST_PATH_STYLE="$DEST_BASE_DIR/$STYLE_SRC_DIR"
+# --- MODIFICATION: Loop through the array of directories ---
+for dir in "${SOURCE_DIRS[@]}"; do
+    SRC_PATH="$REPO_ROOT/$dir"
+    DEST_PATH="$DEST_BASE_DIR/$dir"
 
-if [ -e "$SRC_PATH_STYLE" ]; then
-    echo "Linking class/style directory..."
-    # Remove existing link/directory at the destination to avoid conflicts
-    rm -rf "$DEST_PATH_STYLE"
-    # Create the symbolic link
-    ln -s "$SRC_PATH_STYLE" "$DEST_PATH_STYLE"
-    echo "  '$SRC_PATH_STYLE' -> '$DEST_PATH_STYLE'"
-else
-    echo "Warning: Source directory '$STYLE_SRC_DIR' not found. Skipping."
-fi
+    if [ -d "$SRC_PATH" ]; then
+        echo "Processing '$dir' directory..."
 
-# --- Link the 'MyEspressoTheme' directory ---
-SRC_PATH_BEAMER="$REPO_ROOT/$BEAMER_SRC_DIR"
-DEST_PATH_BEAMER="$DEST_BASE_DIR/$BEAMER_SRC_DIR"
+        # Remove existing link/directory at the destination to avoid conflicts
+        # Use -f to avoid errors if it doesn't exist
+        rm -rf "$DEST_PATH"
 
-if [ -e "$SRC_PATH_BEAMER" ]; then
-    echo "Linking Beamer theme directory..."
-    # Remove existing link/directory at the destination
-    rm -rf "$DEST_PATH_BEAMER"
-    # Create the symbolic link
-    ln -s "$SRC_PATH_BEAMER" "$DEST_PATH_BEAMER"
-    echo "  '$SRC_PATH_BEAMER' -> '$DEST_PATH_BEAMER'"
-else
-    echo "Warning: Source directory '$BEAMER_SRC_DIR' not found. Skipping."
-fi
+        # Create the symbolic link
+        ln -s "$SRC_PATH" "$DEST_PATH"
+        echo "  Successfully linked '$SRC_PATH' -> '$DEST_PATH'"
+    else
+        echo "Warning: Source directory '$dir' not found at '$SRC_PATH'. Skipping." >&2
+    fi
+    echo "----------------------------------------"
+done
+# --- END MODIFICATION ---
 
-echo ""
+
 echo "Done linking files."
+echo ""
 
 # --- Update the TeX file database ---
-echo "Running texhash to update the database for $TEXMFHOME..."
-texhash "$TEXMFHOME" 
+echo "Running texhash to update the database for '$TEXMFHOME'..."
+texhash "$TEXMFHOME"
 echo "Database updated successfully."
