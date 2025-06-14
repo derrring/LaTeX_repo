@@ -2,8 +2,7 @@
 \ProvidesPackage{e_frontbackmatter_formal}[Formal Front Back Matter]
 
 % 1. Load packages that are required for this front matter to work.
-% These might already be in your common style file, but \RequirePackage is safe.
-\RequirePackage{kvoptions}
+% These might already be in common style file, but \RequirePackage is safe.
 \RequirePackage{xcolor}
 \RequirePackage{hyperref} % For \pdfbookmark
 \RequirePackage{etoolbox} % For safety with command definitions
@@ -37,23 +36,24 @@
 %    These are now modified to use the standard \@author, \@title, \@date
 
 % == Main Title Page (from titlepage.tex) ==
-\providecommand{\makefrontpage}{%
+\providecommand{\makefrontmatter}{%
     \begin{titlepage}
         \begin{center}
             \large
             % --- Institution (Optional) ---
-            \ifstrempty{\@institution}{}{%
+            \ifstrempty{\@institution}{ }{%
                 \begingroup
-                    \@institution\\
-                    \vspace{0.5em}
-                    \MakeUppercase{\@institution}
-                \endgroup\\
+                    % Use a tabular environment to allow for line breaks in \@institution
+                    \begin{tabular}{c}
+                        \@institution
+                    \end{tabular}
+                \endgroup\par
+                \vfill
             }
-            \vfill
             % --- Title and Subtitle ---
             % This assumes \@title will always be provided.
             \begingroup
-                {\@title}\\
+                {\@title}\par
             \endgroup
             % Subtitle is already optional.
             \ifstrempty{\@subtitle}{}{%
@@ -64,13 +64,13 @@
             % This assumes \@author will always be provided.
             \begingroup
                 % The footnote for the email will only appear if \@email is set.
-                {\normalsize \@author\ifstrempty{\@email}{}{\footnote{\@email}}} \\
+                {\normalsize \@author\ifstrempty{\@email}{}{\footnote{\@email}}} \par
             \endgroup
             \vfill\vfill
             % --- Location (Optional) ---
             \ifstrempty{\@location}{}{%
-                \@location\\
-                \vspace{0.5em}
+            \@location\par
+            \vspace{0.5em}%
             }
             \@date% % \@date is usually set automatically
             \vfill
@@ -106,7 +106,7 @@
 }
 
 
-\providecommand{\makebackpage}{%
+\providecommand{\makebackmatter}{%
     \thispagestyle{empty}
     \vfill
     \noindent\@author: \textit{\@title,} \textcopyright\ \@date

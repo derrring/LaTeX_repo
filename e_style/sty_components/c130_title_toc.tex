@@ -1,19 +1,9 @@
 % TOC
-
 \setcounter{secnumdepth}{3}
-\setcounter{tocdepth}{3}
 
 % ====================================================================
 % == Table of Contents Commands
 % ====================================================================
-
-% --- Command for the main ToC ---
-\newcommand{\mytoc}{%
-    \etocsettocstyle{\renewcommand{\contentsname}{Contents}}{}
-    \printtoctitle{\contentsname}
-    \tableofcontents
-    \clearpage
-}
 
 % --- Custom command to print a ToC title ---
 % This is your excellent helper command. It contains all the conditional
@@ -22,15 +12,16 @@
     \ifcsdef{chapter}{%
         % In a book-style class, mimic the chapter title format
         \par\noindent
-            \begingroup
-            \normalfont\bfseries\large
-            \rule{\columnwidth}{1.5pt} \newline
-            \vspace{1ex}
-            \MakeUppercase{#1} \par
-            \vspace{-2ex}
-            \noindent\rule{\columnwidth}{1.5pt}
-            \endgroup
-        \par\nobreak    
+        \begingroup
+        \normalfont\bfseries\large
+        %\rule{\columnwidth}{1.5pt}
+        \newline
+        %\vspace{1ex}
+        \MakeUppercase{#1} \par
+        \vspace*{.2\baselineskip}
+        \noindent\rule{\columnwidth}{0.5pt}
+        \endgroup
+        \par\nobreak
         \vspace{2em} % Space after the title
 
     }{%
@@ -38,7 +29,6 @@
         \section*{#1}
     }
 }
-
 
 %-----------------------------------------------------------------------
 %\etoctocstyle[⟨kind⟩]{⟨number_of_columns⟩}{⟨title⟩}
@@ -52,36 +42,59 @@
 
 % --- Command for a two-column, brief ToC ---
 \newcommand{\brieftoc}{%
-  \begingroup
-  \etocsettocstyle{}{}%
-  \setcounter{tocdepth}{2}%
-  \begin{multicols}{2}
-    \printtoctitle{Brief Contents}
-    \tableofcontents
-  \end{multicols}
-  \clearpage
-  \endgroup
+    \begingroup
+    \etocsettocstyle{}{}%
+    \newgeometry{left=1.5cm, right=1.5cm, top=2.5cm, bottom=2.5cm}
+    \ifcsdef{chapter}{
+        \setcounter{tocdepth}{1}
+    }
+    {
+        \setcounter{tocdepth}{2}
+    }
+    \begin{multicols}{2}
+        \printtoctitle{Brief Contents}
+        \tableofcontents
+    \end{multicols}
+    \restoregeometry
+    \clearpage
+    \endgroup
 }
 
 % --- Command for a single-column, detailed ToC ---
 \newcommand{\detailedtoc}{%
-  \begingroup
-  \etocsettocstyle{}{\clearpage}
-  \setcounter{tocdepth}{3}%
+    \begingroup
+    \etocsettocstyle{
+    }{\clearpage}
+    \ifcsdef{chapter}{
+        \setcounter{tocdepth}{3}
+    }{
+        \setcounter{tocdepth}{3}
+    }
     \printtoctitle{Detailed Contents}
     \tableofcontents
-  \endgroup
+
+    \endgroup
+}
+
+% --- Command for the main ToC ---
+\newcommand{\mytoc}{%
+    \etocsettocstyle{\renewcommand{\contentsname}{Contents}}{}
+    \setcounter{tocdepth}{3}
+    \printtoctitle{\contentsname}
+    \tableofcontents
+    \clearpage
 }
 
 % --- Command to set up a local ToC (e.g., at the start of a chapter) ---
 \newcommand{\setuplocaltoc}{%
-  \etocsettocstyle{
-    \setcounter{tocdepth}{3}
-    \rule{\linewidth}{1pt}
-    \vskip0.5\baselineskip\parindent0em
-  }{\vspace{-0.5em}\rule{\linewidth}{1pt}\vspace{2em}}
+    \etocsettocstyle{
+        \setcounter{tocdepth}{3}
+        \rule{\linewidth}{1pt}
+        \vskip0.5\baselineskip\parindent0em
+    }{\vspace{-0.5em}\rule{\linewidth}{1pt}\vspace{2em}}
 }
 
+\setuplocaltoc
 %-----------------------------------------------------------------------
 %\etoctocstyle[⟨kind⟩]{⟨number_of_columns⟩}{⟨title⟩}
 
@@ -95,15 +108,13 @@
 \def\mydotfill{\unskip\nobreak\leaders\hbox{\hss\ . \hss}\hfill\nobreak\relax}
 %\hss = \hskip 0pt plus 1fill minus 1fill
 
-
-
 \etocsetstyle{part}
 {\begingroup\parindent 0pt \nobreak \etocskipfirstprefix}
 {\pagebreak[3]\bigskip}
 {\normalsize\rmfamily\centering \color{red} %\scshape
-  \etocifnumbered{
-    Part \etocnumber{} --
-  }{
+    \etocifnumbered{
+        Part \etocnumber{} --
+    }{
 }\MakeUppercase{\etocthename}\par}
 {\endgroup}
 
@@ -111,10 +122,10 @@
 {\begingroup}
 {\addvspace{0.5em}\parindent0pt \color{black}\small} % Pre-code
 {\etocifnumbered{%
-    \etocnumber\hspace{0.5em} \MakeUppercase{\etocthename}\hfill
-    \etocpage\par \addvspace{0.25em}
-  }{%
-    \MakeUppercase{\etocthename}\hfill \etocpage\par \addvspace{0.25em}
+        \etocnumber\hspace{0.5em} \MakeUppercase{\etocthename}\hfill
+        \etocpage\par \addvspace{0.25em}
+    }{%
+        \MakeUppercase{\etocthename}\hfill \etocpage\par \addvspace{0.25em}
 }}
 {\endgroup\addvspace{0.2em}} % Post-code
 
@@ -122,10 +133,10 @@
 {\begingroup\addvspace{0.25em}\leftskip0em\parindent0pt\smallskip}
 {\footnotesize} % Pre-code
 {\etocifnumbered{%
-    \etocnumber\hspace{0.3em} \etocname\mydotfill  \etocpage\par
-    \addvspace{0.25em}
+        \etocnumber\hspace{0.3em} \etocname\mydotfill  \etocpage\par
+        \addvspace{0.25em}
     }{%
-    \etocname\hfill \etocpage\par\addvspace{0.25em}
+        \etocname\hfill \etocpage\par\addvspace{0.25em}
 }}
 {\endgroup\par\medskip} % Post-code
 
@@ -133,9 +144,9 @@
 {\begingroup \leftskip1em \parfillskip 0pt plus 1fil\relax \nobreak}
 {\footnotesize\rmfamily\mdseries}
 {\etocifnumbered{%
-    \etocnumber\hspace{0.3em} \etocname\mydotfill  \etocpage\par
+        \etocnumber\hspace{0.3em} \etocname\mydotfill  \etocpage\par
     }{%
-    \etocname\hfill \etocpage\par
+        \etocname\hfill \etocpage\par
 }}
 {\endgroup\par\smallskip}
 
@@ -143,14 +154,12 @@
 {\begingroup \leftskip3em \parfillskip 0pt plus 1fil\relax \nobreak}
 {\footnotesize\rmfamily\mdseries}
 {\etocifnumbered{%
-    \etocnumber\hspace{0.3em} \etocname\mydotfill  \etocpage\par
-  }{%
-    \etocname\hfill \etocpage\par
+        \etocnumber\hspace{0.3em} \etocname\mydotfill  \etocpage\par
+    }{%
+        \etocname\hfill \etocpage\par
 }}
 {\endgroup\par\smallskip}
 
 %\etocsetstyle{appendix}
 
-
 % Title format for main text
-
