@@ -1,0 +1,23 @@
+% File: espresso/features/e_frontbackmatter_simple.sty
+% Purpose: Provides a simple frontmatter style that reverts to the
+%          default title block of the base class (book or article).
+
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{e_frontbackmatter_simple}[Simple Frontmatter]
+
+% In the 'simple' frontmatter style, we define the extra metadata
+% commands from the 'formal' style to take one argument but do nothing.
+% This prevents errors if a user includes them in a document that uses
+% this simple style, while ensuring they have no effect on the standard
+% title block.
+
+\newcommand{\institution}[1]{}
+\newcommand{\location}[1]{}
+\newcommand{\subtitle}[1]{}
+\newcommand{\email}[1]{}
+
+% We intentionally do NOT redefine \maketitle here.
+% By not redefining it, we force LaTeX to use the default \maketitle
+% command that is provided by the base document class (e.g., 'book.cls'
+% or 'article.cls'). This is the desired behavior for a simple style
+% and automatically adapts to the user's choice of class.

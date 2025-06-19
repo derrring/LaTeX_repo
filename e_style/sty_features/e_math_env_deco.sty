@@ -1,0 +1,45 @@
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{e_math_env_deco}[E Math Environment Decoration]
+%----------  wrap/decorate !EXISTED! theorem-like environments ----------------
+%------------------------realized by tcolorbox-------------------------
+
+\tcolorboxenvironment{proof}{% add a vertical bar to the left
+    breakable, before skip=\parskip,after skip=.5em,frame hidden, enhanced,
+borderline west={1mm}{0pt}{airforceblue!75}}
+\tcolorboxenvironment{definition}{
+    enhanced,breakable, 
+    frame hidden,
+    colback=persiangreen!5!white,
+    borderline west={1mm}{0pt}{persiangreen!75!black},
+    before skip=.5em,after skip=\parskip,width=\linewidth,
+}
+\tcolorboxenvironment{theorem}{
+    enhanced,breakable,
+    frame hidden,
+    colback=royalpurple!5!white,
+    borderline west={1mm}{0pt}{royalpurple!75!black},
+    before skip=.5em,after skip=\parskip,
+}
+
+\tcolorboxenvironment{proposition}{
+    enhanced,breakable,
+    frame hidden,
+    colback=bleudefrance!5!white,
+    borderline west={1mm}{0pt}{bleudefrance!50!black},
+    before skip=.5em,after skip=\parskip,
+}
+
+\tcolorboxenvironment{corollary}{
+    enhanced,breakable,
+    frame hidden,
+    colback=bleudefrance!5!white,
+    borderline west={1mm}{0pt}{bleudefrance!50!black},
+    before skip=.5em,after skip=\parskip,
+}
+\tcolorboxenvironment{lemma}{
+    enhanced,breakable,
+    frame hidden,
+    colback=bleudefrance!5!white,
+    borderline west={1mm}{0pt}{bleudefrance!50!black},
+    before skip=.5em,after skip=\parskip,
+}

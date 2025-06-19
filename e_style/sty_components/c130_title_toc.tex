@@ -43,7 +43,7 @@
 % --- Command for a two-column, brief ToC ---
 \newcommand{\brieftoc}{%
     \begingroup
-    \etocsettocstyle{}{}%
+    \etocsettocstyle{}{\clearpage}%
     \newgeometry{left=1.5cm, right=1.5cm, top=2.5cm, bottom=2.5cm}
     \ifcsdef{chapter}{
         \setcounter{tocdepth}{1}
@@ -56,7 +56,7 @@
         \tableofcontents
     \end{multicols}
     \restoregeometry
-    \clearpage
+    \setcounter{tocdepth}{3}
     \endgroup
 }
 
@@ -72,26 +72,29 @@
     }
     \printtoctitle{Detailed Contents}
     \tableofcontents
-
     \endgroup
 }
 
 % --- Command for the main ToC ---
 \newcommand{\mytoc}{%
+    \begingroup
     \etocsettocstyle{\renewcommand{\contentsname}{Contents}}{}
     \setcounter{tocdepth}{3}
     \printtoctitle{\contentsname}
     \tableofcontents
+    \endgroup
     \clearpage
 }
 
 % --- Command to set up a local ToC (e.g., at the start of a chapter) ---
+
 \newcommand{\setuplocaltoc}{%
     \etocsettocstyle{
         \setcounter{tocdepth}{3}
         \rule{\linewidth}{1pt}
         \vskip0.5\baselineskip\parindent0em
-    }{\vspace{-0.5em}\rule{\linewidth}{1pt}\vspace{2em}}
+    } %Code Before
+    {\vspace{-0.5em}\rule{\linewidth}{1pt}\vspace{2em}} %Code After
 }
 
 \setuplocaltoc
@@ -109,56 +112,63 @@
 %\hss = \hskip 0pt plus 1fill minus 1fill
 
 \etocsetstyle{part}
-{\begingroup\parindent 0pt \nobreak \etocskipfirstprefix}
+{\begingroup\parindent0pt \nobreak}
 {\pagebreak[3]\bigskip}
-{\normalsize\rmfamily\centering \color{red} %\scshape
+{\normalsize\rmfamily\centering \color{cornellred} %\scshape
     \etocifnumbered{
         Part \etocnumber{} --
     }{
-}\MakeUppercase{\etocthename}\par}
+}\MakeUppercase{\etocthename}\par\vspace{1em}}
 {\endgroup}
 
 \etocsetstyle{chapter}
 {\begingroup}
-{\addvspace{0.5em}\parindent0pt \color{black}\small} % Pre-code
+{\parindent0pt \color{black}\small} % Pre-code
 {\etocifnumbered{%
+        \leftskip0em\rightskip.5cm\parfillskip-\rightskip
         \etocnumber\hspace{0.5em} \MakeUppercase{\etocthename}\hfill
-        \etocpage\par \addvspace{0.25em}
+        \etocpage\par
     }{%
-        \MakeUppercase{\etocthename}\hfill \etocpage\par \addvspace{0.25em}
+        \MakeUppercase{\etocthename}\hfill \etocpage\par
 }}
-{\endgroup\addvspace{0.2em}} % Post-code
+{\endgroup} % Post-code
 
 \etocsetstyle{section}
-{\begingroup\addvspace{0.25em}\leftskip0em\parindent0pt\smallskip}
+{\begingroup\leftskip0em\parindent0pt}
 {\footnotesize} % Pre-code
 {\etocifnumbered{%
-        \etocnumber\hspace{0.3em} \etocname\mydotfill  \etocpage\par
-        \addvspace{0.25em}
+        \leftskip1.5em\rightskip.5cm\parfillskip-\rightskip
+        \etocnumber\hspace{0.3em}
+        \hangindent2em\etocname\mydotfill
+        \etocpage\par
     }{%
-        \etocname\hfill \etocpage\par\addvspace{0.25em}
+        \etocname\hfill \etocpage\par
 }}
-{\endgroup\par\medskip} % Post-code
+{\endgroup} % Post-code
 
 \etocsetstyle{subsection}
 {\begingroup \leftskip1em \parfillskip 0pt plus 1fil\relax \nobreak}
 {\footnotesize\rmfamily\mdseries}
 {\etocifnumbered{%
-        \etocnumber\hspace{0.3em} \etocname\mydotfill  \etocpage\par
+        \leftskip3.5em\rightskip.5cm\parfillskip-\rightskip
+        \etocnumber\hspace{0.3em}
+        \hangindent2em\etocname\mydotfill  \etocpage\par
     }{%
         \etocname\hfill \etocpage\par
 }}
-{\endgroup\par\smallskip}
+{\endgroup}
 
 \etocsetstyle{subsubsection}
 {\begingroup \leftskip3em \parfillskip 0pt plus 1fil\relax \nobreak}
 {\footnotesize\rmfamily\mdseries}
 {\etocifnumbered{%
-        \etocnumber\hspace{0.3em} \etocname\mydotfill  \etocpage\par
+        \leftskip6.3em\rightskip.5cm\parfillskip-\rightskip
+        \etocnumber\hspace{0.3em}
+        \hangindent2em\etocname\mydotfill  \etocpage\par
     }{%
         \etocname\hfill \etocpage\par
 }}
-{\endgroup\par\smallskip}
+{\endgroup}
 
 %\etocsetstyle{appendix}
 

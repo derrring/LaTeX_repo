@@ -12,7 +12,8 @@
 %amsmath and ntheorem should be loaded before {fontspec}
 %mathtools offer pmatirx*
 \RequirePackage{cancel}
-%\cancel{} can be used in formulae!\bcancel{}\xcancle{}\cancelto{<value>}{<expression>}
+%\cancel{} can be used in
+% formulae!\bcancel{}\xcancle{}\cancelto{<value>}{<expression>}
 \RequirePackage{extarrows}
 \RequirePackage{amsthm,thmtools}
 
@@ -20,18 +21,19 @@
 %=================== font/encoding configuration ===========================
 %===========================================================================
 % File encoding
-%\RequirePackage[T1]{fontenc}   %% NOTE: This is now handled by the `fontspec` package
+%\RequirePackage[T1]{fontenc}   %% NOTE: This is now handled by the
+% `fontspec` package
 
 %\RequirePackage{luaotfload}
-\RequirePackage{luatexja, fontspec, luatexja-fontspec, luatexja-ruby, polyglossia}
+\RequirePackage{luatexja, fontspec, luatexja-fontspec, luatexja-ruby,
+polyglossia}
 %%  {fontspec}: set default non-cjk fonts;
 %%  {polyglossia}: set default language; exclude cjk;
 \RequirePackage{noto}
 \RequirePackage{sourcecodepro}
 %\RequirePackage{microtype} %luatexja does not support microtype
-\RequirePackage[warnings-off={mathtools-colon,mathtools-overbracket}, math-style=ISO,bold-style=ISO]{unicode-math}
-
-
+\RequirePackage[warnings-off={mathtools-colon,mathtools-overbracket},
+math-style=ISO,bold-style=ISO]{unicode-math}
 
 %=======================================================================
 %====================== layout setting ===============================
@@ -43,7 +45,8 @@
 %usage \includegraphicx[]{}
 %parameter in [] : width, height, = ?cm scale = 0.6
 \RequirePackage[normalem]{ulem}
-%\uline{}, \uuline{}, \uwave{},\sout{}, \xout{},\dashuline{},\dotuline{},\sout{}(words only)
+%\uline{}, \uuline{}, \uwave{},\sout{},
+% \xout{},\dashuline{},\dotuline{},\sout{}(words only)
 \RequirePackage{pdfpages}
 \RequirePackage{fancyhdr}
 %control headers and footers
@@ -51,11 +54,9 @@
 % Colors and customizations
 \RequirePackage[table,x11names,dvipsnames]{xcolor}
 
-
 % Hyperlinks
 \RequirePackage[unicode]{hyperref}
-
-
+\RequirePackage{bookmark}
 
 %===========================================================================
 % Figures, tables, and captions
@@ -67,7 +68,9 @@
 %\captionsetup[figure]{format=plain, font=footnotesize, labelfont=bf}
 %\captionsetup[table]{format=plain, font=footnotesize, labelfont=bf}
 \RequirePackage{subcaption}
-%\captionsetup[subfigure]{format=hang, font=footnotesize, labelfont=bf, labelsep=period, labelformat=simple,justification=justified,singlelinecheck=false}
+%\captionsetup[subfigure]{format=hang, font=footnotesize,
+% labelfont=bf, labelsep=period,
+% labelformat=simple,justification=justified,singlelinecheck=false}
 
 \RequirePackage{adjustbox}
 \RequirePackage{wrapfig}
@@ -78,7 +81,6 @@
 
 % tcolorbox
 \RequirePackage{tcolorbox}
-
 
 % Code listings
 \RequirePackage{minted}
@@ -96,6 +98,5 @@
 % Chapter quotes
 \RequirePackage{csquotes} % smart quotes
 
-
-
-
+% Big delimiters for matrices and other structures
+\RequirePackage{bigdelim}

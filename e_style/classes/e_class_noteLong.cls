@@ -10,18 +10,16 @@
 % --- Class Options ---
 % Process standard options for the article class (e.g., 10pt, 11pt, 12pt, a4paper)
 \DeclareOption*{\PassOptionsToClass{\CurrentOption}{book}}
-% Set default options
-\ExecuteOptions{12pt}
 % Process given options
 \ProcessOptions\relax
 % Load the base class
-\LoadClass{book}
+\LoadClass[12pt]{book}
 
 
 \RequirePackage{e_common_style}
 \RequirePackage{e_frontbackmatter_formal}
 \RequirePackage{e_title_fenced_chap}
-
+\RequirePackage{e_math_env_deco}
 
 
 \endinput

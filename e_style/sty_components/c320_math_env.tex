@@ -10,105 +10,84 @@
 %\newcommand{\proofbegin}{\raisebox{0.35ex}{$\scriptstyle\triangleright$}\hspace{0.3em}}
 %\newcommand{\exbegin}{\raisebox{0.25ex}{$\textstyle\concavediamond$}\hspace{0.3em}}
 \newcommand{\remarkend}{\raisebox{0.35ex}{$\scriptstyle\blacktriangleleft$}\hspace{0.3em}}
+\newcommand{\solbegin}{\raisebox{0.1ex}{$-\!\prec$}\hspace{0.3em}}
+\newcommand{\solend}{\raisebox{0.1ex}{$\succ\!-$}\hspace{0.3em}}
 
 \declaretheoremstyle[
-spaceabove=7pt, spacebelow=7pt,
-headfont=\normalfont\bfseries,
-notefont=\mdseries, notebraces={(}{)},
-headpunct ={},
-headformat=\thmbegin\NAME~\NUMBER \NOTE,
-bodyfont=\normalfont\itshape,
-postheadspace=1em,
+    spaceabove=7pt, spacebelow=7pt,
+    headfont=\normalfont\bfseries,
+    notefont=\mdseries, notebraces={(}{)},
+    headpunct ={},
+    headformat=\NAME~\NUMBER \NOTE,
+    bodyfont=\normalfont\itshape,
+    postheadspace=1em,
 ]{general_thm_style}
 
 \declaretheoremstyle[
-spaceabove=7pt, spacebelow=7pt,
-headfont=\normalfont\bfseries,
-notefont=\mdseries, notebraces={(}{)},
-headpunct ={},
-headformat=\defbegin\NAME~\NUMBER \NOTE,
-bodyfont=\normalfont\itshape,
-postheadspace=1em,
+    spaceabove=7pt, spacebelow=7pt,
+    headfont=\normalfont\bfseries,
+    notefont=\mdseries, notebraces={(}{)},
+    headpunct ={},
+    headformat=\NAME~\NUMBER \NOTE,
+    bodyfont=\normalfont\itshape,
+    postheadspace=1em,
 ]{def_style}
 
 \declaretheoremstyle[
-spaceabove=7pt, spacebelow=7pt,
-headfont=\normalfont\bfseries,
-notefont=\mdseries, notebraces={(}{)},
-headpunct ={},
-headformat=\NAME~\NUMBER \NOTE,
-bodyfont=\normalfont,
-postheadspace=1em,
+    spaceabove=7pt, spacebelow=7pt,
+    headfont=\normalfont\bfseries,
+    notefont=\mdseries, notebraces={(}{)},
+    headpunct ={},
+    headformat=\NAME~\NUMBER \NOTE,
+    bodyfont=\normalfont,
+    postheadspace=1em,
 ]{remark_style}
 
 \declaretheoremstyle[
-spaceabove=7pt, spacebelow=7pt,
-headfont=\normalfont\itshape,
-notefont=\mdseries, notebraces={(}{)},
-bodyfont=\normalfont,
-postheadspace=1em,
-headpunct={.},
-headformat= \NAME \NOTE,
-qed=\qedsymbol,
+    spaceabove=7pt, spacebelow=7pt,
+    headfont=\normalfont\itshape,
+    notefont=\mdseries, notebraces={(}{)},
+    bodyfont=\normalfont,
+    postheadspace=1em,
+    headpunct={.},
+    headformat= \NAME \NOTE,
+    qed=\qedsymbol,
 ]{proof_style}
 
 \declaretheoremstyle[
-spaceabove=7pt, spacebelow=7pt,
-headfont=\normalfont\bfseries\itshape,
-notefont=\mdseries, notebraces={(}{)},
-bodyfont=\normalfont,
-postheadspace=1em,
-headpunct={:},
-headformat=\NAME \NOTE,
-qed=$\blacksquare$
+    spaceabove=7pt, spacebelow=7pt,
+    headfont=\normalfont,
+    notefont=\mdseries, notebraces={(}{)},
+    bodyfont=\normalfont,
+    postheadspace=1em,
+    headpunct={},
+    headformat=\solbegin\NAME\solend \NOTE,
+    qed=$\blacksquare$
 ]{solution_style}
 
 \declaretheorem[numbered=no, name=Proof, style=proof_style]{proof}
 \declaretheorem[numbered=no, name=Solution, style=solution_style]{solution}
-\declaretheorem[numberwithin=chapter, name=Theorem, style=general_thm_style]{theorem}
-\declaretheorem[sibling=theorem, name=Proposition, style=general_thm_style]{proposition}
-\declaretheorem[sibling=theorem, name=Definition, style=def_style]{definition}
+\ifcsdef{chapter}{
+    \declaretheorem[numberwithin=chapter, name=Theorem,
+    style=general_thm_style]{theorem}
+    \declaretheorem[numberwithin=chapter,
+    name=Example,style=remark_style]{example}
+    \declaretheorem[numberwithin=chapter, name=Exercise,
+    style=remark_style]{exercise}
+}
+{
+    \declaretheorem[numberwithin=section, name=Theorem,
+    style=general_thm_style]{theorem}
+    \declaretheorem[numberwithin=section,
+    name=Example,style=remark_style]{example}
+    \declaretheorem[numberwithin=section, name=Exercise,
+    style=remark_style]{exercise}
+}
+\declaretheorem[sibling=theorem, name=Proposition,
+style=general_thm_style]{proposition}
+\declaretheorem[sibling=theorem, name=Definition, style=def_style,]{definition}
 \declaretheorem[sibling=theorem, name=Lemma, style=general_thm_style]{lemma}
-\declaretheorem[sibling=theorem, name=Corollary, style=general_thm_style]{corollary}
-\declaretheorem[numberwithin=chapter, name=Example,style=remark_style]{example}
-\declaretheorem[numberwithin=chapter, name=Exercise, style=remark_style]{exercise}
+\declaretheorem[sibling=theorem, name=Corollary,
+style=general_thm_style]{corollary}
+
 \declaretheorem[name=Remark,style=remark_style]{remark}
-
-
-
-%----------  decorate !EXISTED! theorem-like environments ----------------
-%------------------------realized by tcolorbox------------------------- 
-\tcolorboxenvironment{proof}{% add a vertical bar to the left
-    blanker,breakable,left=5mm, before skip=10pt,after skip=10pt, borderline west={1mm}{0pt}{airforceblue!75}}
-
-
-
-%----------------------------------------------------------------------
-%% Delimiters
-%----------------------------------------------------------------------
-% offered by \usepackage{mathtools}
-\newcommand{\ensemble}[1]{\left\{ #1 \right\}} 		% for braces
-\newcommand{\bracks}[1]{\left[#1\right]}		% for brackets
-\newcommand{\parens}[1]{\left(#1\right)}		% for parentheses
-\newcommand{\innerp}[1]{\left\langle#1\right\rangle}	% for scalar product
-% Problematic: the \ensemble{} should allow linebreak within math mode. 
-% Potential solution : https://tex.stackexchange.com/questions/78670/how-to-achieve-line-break-in-simple-formula-mode
-% as well as https://tex.stackexchange.com/questions/119675/why-allowbreak-is-not-working
-% to be used within a \left \right pair to allow line break after comma
-\def\middlebreak {\nulldelimiterspace0pt
-\right.\allowbreak\mskip 0mu plus .5mu \nulldelimiterspace0pt\left.}%
-
-
-\newcommand{\bra}[1]{\left\langle#1\right\rvert}		% for bras
-\newcommand{\ket}[1]{\left\lvert#1\right\rangle}		% for kets
-\newcommand{\braket}[2]{\left\langle#1\middle\vert#2\right\rangle}	% for brakets
-\newcommand{\abs}[1]{\left\lvert#1\right\rvert}		% for absolute value
-\newcommand{\ceil}[1]{\left\lceil#1\right\rceil}		% for ceiling
-\newcommand{\floor}[1]{\left\lfloor#1\right\rfloor}		% for floor
-\newcommand{\negpart}[1]{\left[#1\right]_{-}}		% for negative part
-\newcommand{\pospart}[1]{\left[#1\right]_{+}}	% for positive part
-\newcommand{\norm}[1]{\left\lVert#1\right\rVert}		% for norm
-\newcommand{\trinorm}[1]{{\left\vert\kern-0.25ex\left\vert\kern-0.25ex\left\vert #1
-    \right\vert\kern-0.25ex\right\vert\kern-0.25ex\right\vert}
-    } % for triple vertical norm
-

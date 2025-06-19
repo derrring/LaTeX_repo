@@ -2,13 +2,47 @@
 %% General
 %----------------------------------------------------------------------
 
-% Math mode set \mathnormal as default, we don't abbreviate \mathsf (sans-serif) and \mathtt. 
+% Math mode set \mathnormal as default, we don't abbreviate \mathsf
+% (sans-serif) and \mathtt.
 % Main goals of general part are:
-% 1. to simplify the usage of \mathbb, \mathscr, \mathcal, \mathfrak, \bm(= \mathbf)
+% 1. to simplify the usage of \mathbb, \mathscr, \mathcal, \mathfrak,
+% \bm(= \mathbf)
 % 2. to define  \mathsfit and \mathbmsfit
 
 %Note: \bm provided by \usepackage{bm} is replaced by \symbsfit and \mathbmsfit
-%Note: c.f. package {unicode-math} 
+%Note: c.f. package {unicode-math}
+
+%----------------------------------------------------------------------
+%% Delimiters
+%----------------------------------------------------------------------
+% offered by \usepackage{mathtools}
+\newcommand{\ensemble}[1]{\left\{ #1 \right\}}         % for braces
+\newcommand{\bracks}[1]{\left[#1\right]}        % for brackets
+\newcommand{\parens}[1]{\left(#1\right)}        % for parentheses
+\newcommand{\innerp}[1]{\left\langle#1\right\rangle}    % for scalar product
+% Problematic: the \ensemble{} should allow linebreak within math mode.
+% Potential solution :
+% https://tex.stackexchange.com/questions/78670/how-to-achieve-line-break-in-simple-formula-mode
+% as well as
+% https://tex.stackexchange.com/questions/119675/why-allowbreak-is-not-working
+% to be used within a \left \right pair to allow line break after comma
+\def\middlebreak {\nulldelimiterspace0pt
+\right.\allowbreak\mskip 0mu plus .5mu \nulldelimiterspace0pt\left.}%
+
+\newcommand{\bra}[1]{\left\langle#1\right\rvert}        % for bras
+\newcommand{\ket}[1]{\left\lvert#1\right\rangle}        % for kets
+\newcommand{\braket}[2]{\left\langle#1\middle\vert#2\right\rangle}
+% for brakets
+\newcommand{\abs}[1]{\left\lvert#1\right\rvert}        % for absolute value
+\newcommand{\ceil}[1]{\left\lceil#1\right\rceil}        % for ceiling
+\newcommand{\floor}[1]{\left\lfloor#1\right\rfloor}        % for floor
+\newcommand{\negpart}[1]{\left[#1\right]_{-}}        % for negative part
+\newcommand{\pospart}[1]{\left[#1\right]_{+}}    % for positive part
+\newcommand{\norm}[1]{\left\lVert#1\right\rVert}        % for norm
+\newcommand{\trinorm}[1]{{\left\vert\kern-0.25ex\left\vert\kern-0.25ex\left\vert
+        #1
+    \right\vert\kern-0.25ex\right\vert\kern-0.25ex\right\vert}
+} % for triple vertical norm
 
 % Sets
 \newcommand{\mbbA}{\mathbb{A}}
@@ -39,7 +73,6 @@
 \newcommand{\mbbZ}{\mathbb{Z}}
 
 \newcommand{\mbbone}{\mathbb{1}}
-
 
 % Bold for \mathbf
 \newcommand{\mbfzero}{\symbf{0}}
@@ -159,10 +192,6 @@
 \newcommand{\mbfVarsigma}{\symbf{\Varsigma}}
 \newcommand{\mbfVarphi}{\symbf{\Varphi}}
 
-
-
-
-
 % Caligraphic, Fraktur, Script
 
 \newcommand{\mcalA}{\mathcal{A}}
@@ -246,7 +275,6 @@
 \newcommand{\mfraky}{\mathfrak{y}}
 \newcommand{\mfrakz}{\mathfrak{z}}
 
-
 \newcommand{\mscrA}{\mathscr{A}}
 \newcommand{\mscrB}{\mathscr{B}}
 \newcommand{\mscrC}{\mathscr{C}}
@@ -274,9 +302,6 @@
 \newcommand{\mscrY}{\mathscr{Y}}
 \newcommand{\mscrZ}{\mathscr{Z}}
 
-
-
-
 % \mathsfit and \mathbmsfit
 
 \newcommand{\tens}[1]{\mathbmsfit{#1}}
@@ -284,15 +309,13 @@
 % Same font as tensor, without \bm wrapper
 \newcommand{\etens}[1]{\mathsfit{#1}}
 
-
-
-
-
-
 %----------------------------------------------------------------------
-\numberwithin{equation}{chapter}
+\ifcsdef{chapter}{
+    \numberwithin{equation}{chapter}
+}{
+    \numberwithin{equation}{section}
 
-
+}
 
 %----------------------------------------------------------------------
 %% Modifiers
@@ -301,10 +324,11 @@
 %----------------------------------------------------------------------
 %% Operators
 %----------------------------------------------------------------------
-\DeclareMathOperator*{\argmax}{arg\,max}		% for argmax
-\DeclareMathOperator*{\argmin}{arg\,min}		% for argmin
+\DeclareMathOperator*{\argmax}{arg\,max}        % for argmax
+\DeclareMathOperator*{\argmin}{arg\,min}        % for argmin
 \newcommand{\const}{ \mathrm{Const.} }
-\newcommand{\Res}{\mathrm{Res\mathop{}}}    % for residue and resultant if no ambiguity
+\newcommand{\Res}{\mathrm{Res\mathop{}}}    % for residue and
+% resultant if no ambiguity
 \newcommand{\Ind}{\mathrm{Ind\mathop{}}}    % for winding number
 \newcommand{\NaN}{\texttt{NaN}}
 \newcommand{\Card}{\mathrm{Card\mathop{}}}
@@ -314,15 +338,16 @@
 \newcommand{\curl}{\operatorname{curl\mathop{}}} % for curl
 \newcommand{\grad}{\operatorname{grad\mathop{}}} % for gradient%
 \newcommand{\tr}{\operatorname{tr\mathop{}}} % for trace
-\DeclareMathOperator{\proj}{\symbf{pr}}		% for projection
-\DeclareMathOperator{\prox}{\symrm{prox}}		% for proximal operator
+\DeclareMathOperator{\proj}{\symbf{pr}}        % for projection
+\DeclareMathOperator{\prox}{\symrm{prox}}        % for proximal operator
 \DeclareMathOperator*{\infconv}{%for infimal convolution
-\mathbin{\ooalign{\raisebox{-.35ex}{$\wedge$}\cr\hidewidth\raisebox{.5ex}{\scalebox{.9}{+}}\hidewidth}}}  
+\mathbin{\ooalign{\raisebox{-.35ex}{$\wedge$}\cr\hidewidth\raisebox{.5ex}{\scalebox{.9}{+}}\hidewidth}}}
 
 % Other
 \newcommand{\diff}{\mathop{}\!\textrm{d}} % for differential
-\newcommand{\ddrm}{\frac{\mathrm{d}}{\mathrm{d}t}}		% for derivative
-\newcommand{\ddpartial}{\frac{\partial}{\partial x }}		% for partial derivative
+\newcommand{\ddrm}{\frac{\mathrm{d}}{\mathrm{d}t}}        % for derivative
+\newcommand{\ddpartial}{\frac{\partial}{\partial x }}        % for
+% partial derivative
 
 % aligned inf and sup (use either of them)
 % Raised subscript in \verb|\sup|
@@ -334,75 +359,86 @@
 %% Points and sets
 %----------------------------------------------------------------------
 \newcommand{\sgn}{\operatorname{sgn}}        % for sign
-\newcommand{\inj}{\hookrightarrow}		% for injections
-\newcommand{\surj}{\twoheadrightarrow}		% for surjections
-\newcommand{\bij}{\leftrightarrow}		% for bijections
+\newcommand{\inj}{\hookrightarrow}        % for injections
+\newcommand{\surj}{\twoheadrightarrow}        % for surjections
+\newcommand{\bij}{\leftrightarrow}        % for bijections
 \newcommand{\supp}{\mathrm{supp\mathop{}}} % for support of a function
 \newcommand{\Intr}{\mathrm{Int\mathop{}}} % for interior
 \newcommand{\diam}{\mathrm{diam\mathop{}}} % for diameter
-\DeclareMathOperator{\dist}{dist}		% for distance
+\DeclareMathOperator{\dist}{dist}        % for distance
 \newcommand{\Dom}{\mathrm{Dom\mathop{}}} % for domain
 \newcommand{\Ker}{\mathrm{Ker\mathop{}}} % for kernel of a function
 \newcommand{\Img}{\mathrm{Im\mathop{}}} % for image of a function
 \newcommand{\Spec}{\mathrm{Spec}}
 
-
-
 %----------------------------------------------------------------------
 %% Indices, Sequences and recursions
 %----------------------------------------------------------------------
 
-
 %----------------------------------------------------------------------
 %% Matrices and vectors
 %----------------------------------------------------------------------
-\newcommand{\diag}{\operatorname{diag}}  
-\newcommand{\SPD}{\mbbS_{++}}		% for Symmetric Positive Definite Matrices
-\newcommand{\Rank}{\mathrm{Rank\mathop{}}} 
+\newcommand{\diag}{\operatorname{diag}}
+\newcommand{\SPD}{\mbbS_{++}}        % for Symmetric Positive Definite Matrices
+\newcommand{\Rank}{\mathrm{Rank\mathop{}}}
 %----------------------------------------------------------------------
 %% Probability
 %----------------------------------------------------------------------
-\newcommand{\Prob}{\mathbb{P}} 
+\newcommand{\Prob}{\mathbb{P}}
 \newcommand{\Var}{\operatorname{Var\mathop{}}} % for variance
 \newcommand{\Cov}{\operatorname{Cov\mathop{}}} % for covariance
+\newcommand{\iid}{\mathrm{i.i.d.}} % for independent and identically distributed
+\newcommand{\simiid}{\stackrel{\mathrm{i.i.d.}}{\sim}}
 
 \ExplSyntaxOn
 \cs_new_protected:Nn \__independence_symbol:Nn
-  {
+{
     \mathrel
-      {
+    {
         \rlap{$#1#2$}
         \mkern2mu
         {#1#2}
-      }
-  }
+    }
+}
 
 \NewDocumentCommand{\independent}{}
-  {
+{
     \mkern-1.5mu
     \mathpalette\__independence_symbol:Nn{\perp}
     \mkern-1.5mu
-  }
-\ExplSyntaxOff
-% Conditional expectation
-\NewDocumentCommand{\expect}{ e{_^} s >{\SplitArgument{1}{|}}m }{%
-    \operatorname{\mbbE}% the expectation operator
-    \IfValueT{#1}{_{#1}}% the measure of the expectation, in subscript form
-    \IfValueT{#2}{^{#2}}% superscript, if present
-    \IfBooleanTF{#3}{% *-variant
-        \expectarg*{\expectvar#4}%
-    }{% no *-variant
-        \expectarg{\expectvar#4}%
-    }%
-}%
-\NewDocumentCommand{\expectvar}{mm}{%
-    #1\IfValueT{#2}{\middle\vert #2}%
 }
-\newcommand{\expectarg}[1]{\left\lbrack#1\right\rbrack}
 
+\ExplSyntaxOff
 
-
-
+%-------------------------------------------------------------------------------
+% \expect command for mathematical expectation
+%
+% SYNTAX :
+% \expect_{<subscript>}^{<superscript>}[<condition>]{<expression>}
+%
+% BEHAVIOR:
+% - Creates the expectation symbol \mathbb{E}.
+% - Subscripts (_) and superscripts (^) are  placed *before* the other
+%   arguments and are attached to the \mathbb{E} symbol.
+% - If the optional [<condition>] argument is provided, it typesets the
+%   conditional expectation E[expression | condition].
+% - If the optional argument is omitted, it typesets the standard
+%   expectation E[expression].
+%
+% We use \operatorname{\mathbb{E}} to ensure that \mathbb{E} is treated
+% as a mathematical operator. The `e{_^}` argument specifier from xparse
+% is now at the beginning of the argument list to change the syntax order.
+%-------------------------------------------------------------------------------
+\NewDocumentCommand{\expect}{e{_^} O{} m}{
+    \operatorname{\mathbb{E}}%
+    \IfValueT{#1}{_{#1}}%
+    \IfValueT{#2}{^{#2}}%
+    \IfValueTF{#3}{
+        \left[#4 \middle\vert #3\right]%
+    }{
+        \left[#4\right]%
+    }
+}
 
 %==============Category Theory================
 
@@ -436,4 +472,3 @@
 \newcommand{\cod}{\mathrm{cod}} % for codomain
 
 %==========Category Theory================EOF
-
