@@ -25,4 +25,75 @@
 \setbeamercolor{block title}{bg=blue_primary}
 \setbeamercolor{block body}{bg=blue_pale!15}
 
+
+% Define MyEspresso colors
+\definecolor{MyEspressoRed}{rgb}{0.6,0.,0.}
+\definecolor{MyEspressoBlack}{rgb}{0.17,0.17,0.17}
+\definecolor{MyEspressoOrange}{RGB}{230,108,17}
+\definecolor{MyEspressoBlue}{RGB}{55,119,231}
+\definecolor{MyEspressoGreen}{rgb}{0.1,0.4,0.1}
+\definecolor{MyEspressoRemarkColor}{rgb}{0.2,0.2,0.2}
+
+% Default color scheme
+\colorlet{MyEspresso@structure}{MyEspressoRed}
+\colorlet{MyEspresso@alert}{MyEspressoOrange}
+\colorlet{MyEspresso@info}{MyEspressoBlue}
+\colorlet{MyEspresso@example}{MyEspressoGreen}
+\colorlet{MyEspresso@rule}{black}
+
+% Alternative color schemes based on options
+\ifbeamer@me@myespressoblue
+\colorlet{MyEspresso@structure}{MyEspressoBlue!80!black}
+\colorlet{MyEspresso@alert}{MyEspressoOrange}
+\colorlet{MyEspresso@info}{MyEspressoRed}
+\colorlet{MyEspresso@example}{MyEspressoGreen}
+\fi
+
+\ifbeamer@me@myespressogreen
+\colorlet{MyEspresso@structure}{MyEspressoGreen!80!black}
+\colorlet{MyEspresso@alert}{MyEspressoOrange}
+\colorlet{MyEspresso@info}{MyEspressoRed}
+\colorlet{MyEspresso@example}{MyEspressoBlue}
+\fi
+
+\ifbeamer@me@myespressoblack
+\colorlet{MyEspresso@structure}{MyEspressoBlack}
+\colorlet{MyEspresso@alert}{MyEspressoOrange}
+\colorlet{MyEspresso@info}{MyEspressoRed}
+\colorlet{MyEspresso@example}{MyEspressoBlue}
+\setbeamercolor{description item}{bg=white,fg=MyEspresso@info}
+\fi
+
+% Apply colors to Beamer elements
+\setbeamercolor{structure}{fg=MyEspresso@structure}
+\setbeamercolor{itemize item}{fg=structure!60}
+\setbeamercolor{itemize subitem}{fg=structure!60}
+\setbeamercolor{enumerate item}{bg=structure!60,fg=white}
+\setbeamercolor{enumerate subitem}{fg=structure!60}
+\setbeamercolor{block title}{fg=structure}
+\setbeamercolor{alerted text}{fg=MyEspresso@alert,bg=MyEspresso@alert!20}
+\setbeamercolor{subsection in toc}{fg=gray!70!black}
+\setbeamercolor{mail}{fg=structure!60}
+
+% Sidebar colors (if sidebar is enabled)
+\ifbeamer@me@sidebar
+  \setbeamercolor{sidebar}{fg=white}
+  \setbeamercolor{author in sidebar}{fg=black!20!white}
+  \setbeamercolor{title in sidebar}{fg=white}
+  \setbeamercolor{section in sidebar}{bg=black!30!structure,fg=white}
+  \setbeamercolor{subsection in sidebar}{bg=black!30!structure,fg=white}
+\fi
+
+% Frame title color
+\setbeamercolor{frametitle}{fg=structure}
+
+% TOC colors
+\setbeamercolor{section number projected}{bg=white,fg=structure}
+
+% Block colors for mathematical environments
+\setbeamercolor{block title alerted}{use=structure,fg=white,bg=MyEspresso@alert}
+\setbeamercolor{block body alerted}{parent=normal text,use=block title,bg=gray!10}
+\setbeamercolor{block title example}{fg=MyEspresso@example}
+
 \mode<all>
+

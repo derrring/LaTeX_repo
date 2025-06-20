@@ -1,28 +1,188 @@
-% Defines the headline, footline, etc., for the MyEspresso theme
+% MyEspresso Outer Theme
+% Based on Amurmaple theme by Maxime CHUPIN
+
+\NeedsTeXFormat{LaTeX2e}[2021-11-15]
+\ProvidesPackage{beamerouterthemeMyEspresso}[2024/02/07 v.1.3 MyEspresso Outer Theme for Beamer]
+
 \mode<presentation>
 
-\ProvidesPackage{beamerouterthemeMyEspresso}
+% Require TikZ libraries
+\usetikzlibrary{backgrounds}
+\usetikzlibrary{quotes,angles}
+\usetikzlibrary{automata}
+\usetikzlibrary{arrows}
+\usetikzlibrary{calc}
 
-\useoutertheme{sidebar}
+% Dimensions and margins
+\def\myespresso@sidebarwidth{58pt}  % Default sidebar width
 
-% A simple footline that shows author, title, and page number
-\defbeamertemplate*{footline}{myespresso_simple}
+\ExplSyntaxOn
+\ifbeamer@me@sidebar
+  \dim_const:Nn \c_myespresso_barre_dim  { \myespresso@sidebarwidth }
+\else
+  \dim_const:Nn \c_myespresso_barre_dim  { 15pt }
+\fi
+\dim_const:Nn \c_myespresso_margin {15pt}
+\ifbeamer@me@sidebar
+  \tl_set:Nx \l_myespresso_margin_left { \dim_eval:n {\c_myespresso_margin } }
+\else
+  \tl_set:Nx \l_myespresso_margin_left { \dim_eval:n { \c_myespresso_barre_dim+\c_myespresso_margin } }
+\fi
+\setbeamersize
 {
-  \leavevmode%
-  \hbox{%
-  \begin{beamercolorbox}[wd=.333333\paperwidth,ht=2.25ex,dp=1ex,center]{author in head/foot}%
-    \usebeamerfont{author in head/foot}\insertshortauthor
-  \end{beamercolorbox}%
-  \begin{beamercolorbox}[wd=.333333\paperwidth,ht=2.25ex,dp=1ex,center]{title in head/foot}%
-    \usebeamerfont{title in head/foot}\insertshorttitle
-  \end{beamercolorbox}%
-  \begin{beamercolorbox}[wd=.333333\paperwidth,ht=2.25ex,dp=1ex,right]{date in head/foot}%
-    \usebeamerfont{date in head/foot}\insertframenumber{} / \inserttotalframenumber\hspace*{2ex}
-  \end{beamercolorbox}}%
-  \vskip0pt%
+  text~ margin~ left=\l_myespresso_margin_left,
+  text~ margin~ right=\c_myespresso_margin
 }
+\ExplSyntaxOff
 
-% Apply the new footline template
-\setbeamertemplate{footline}[myespresso_simple]
+% Sidebar configuration
+\ifbeamer@me@sidebar
+  \useoutertheme[height=0pt,width=\myespresso@sidebarwidth,hideothersubsections]{sidebar}
+  \setbeamertemplate{sidebar left}{%
+    \ifbeamer@me@toplogo
+      \hskip -0.03cm%
+      \hbox to \beamer@sidebarwidth{
+        \hfil \hbox{\insertlogo} \hfil
+      }
+    \fi
+    \beamer@tempdim=\beamer@sidebarwidth%
+    \advance\beamer@tempdim by -6pt%  % Account for margins
+    {\usebeamerfont{title in sidebar}%
+      \vskip1.5em%
+      \hbox to \beamer@sidebarwidth{\hfil%
+        \parbox{\beamer@tempdim}{\centering%
+          \usebeamercolor[fg]{title in sidebar}%
+          {\hypersetup{linkcolor=white}\insertshorttitle[width=\beamer@tempdim,center,respectlinebreaks]}%
+        }\hfil}%
+      \vskip1.em%
+    }%
+    {%
+      \hbox to \beamer@sidebarwidth{\hfil%
+        \parbox{\beamer@tempdim}{\centering%
+          \usebeamercolor[fg]{author in sidebar}%
+          \usebeamerfont{author in sidebar}%
+          \insertshortauthor[width=\beamer@tempdim,center,respectlinebreaks]%
+        }\hfil}%
+      \vskip1.25em%
+    }%
+    \insertverticalnavigation{\beamer@sidebarwidth}%
+    \vfill
+    \ifx\beamer@sidebarside\beamer@lefttext%
+    \else%
+      \usebeamercolor{normal text}%
+      \llap{\usebeamertemplate***{navigation symbols}\hskip0.1cm}%
+      \vskip2pt%
+    \fi%
+  }%
+  % Margins for sidebar
+  \setbeamersize{text margin left=0.5cm,text margin right=0.5cm}
+\fi
+
+% Background template
+\ExplSyntaxOn
+\setbeamertemplate{background}%
+{%
+  \hypersetup{linkcolor=white}%
+  \begin{tikzpicture}[remember~picture,overlay]%
+    \fill[MyEspresso@structure]%
+    (current~page.south~west) rectangle ([xshift=\c_myespresso_barre_dim]current~%
+    page.north~west);%
+    \ifbeamer@me@rule
+      \fill[MyEspresso@rule]%
+      ([xshift=\c_myespresso_barre_dim]current~page.south~west) rectangle ([xshift=\c_myespresso_barre_dim+1pt]current~%
+      page.north~west);%
+    \fi
+    \ifbeamer@me@nomail%
+    \node[anchor=south,color=black!40,rotate=90] at ($(current~page.east)$)%
+      (title) {\tiny%
+          \texttt{\myespresso@printmail}%
+      };%
+    \fi%
+    \ifbeamer@me@sidebar%
+      \ifbeamer@me@nogauge%
+        \ifnum\insertframenumber>\insertmainframenumber % gauge only in main part
+        \else%
+          \node[anchor=south~west,color=white,inner~sep=0pt] at ([xshift=3pt,yshift=5pt]current~page.south~west)%
+          (gauge) {\myespresso@gauge[\the\beamer@sidebarwidth-6pt]};%
+        \fi%
+      \fi%
+      \ifx\logo\empty%
+      \else%
+        \ifbeamer@me@toplogo%
+        \else%
+          \node [anchor=south~west,inner~sep=0pt] at ($(current~page.south~west)+(0,0.5)$)%
+            (logo) {\insertlogo};%
+        \fi
+      \fi%
+    \else%
+      \node[anchor=north~west,rotate=90,color=white] at (current~page.south~west)%
+      (title) {\scriptsize\insertshorttitle\quad---\quad \insertshortauthor%
+      };%%
+      \ifbeamer@me@nogauge%
+        \ifnum\insertframenumber>\insertmainframenumber % gauge only in main part%
+        \else%
+          \node[anchor=north~east,rotate=90,color=white] at (current~page.north~west)%
+          (gauge) {\myespresso@gauge};%
+        \fi%
+      \fi%
+    \fi%
+  \end{tikzpicture}%
+}%
+\ExplSyntaxOff
+
+% Frame title template
+\ExplSyntaxOn
+\setbeamertemplate{frametitle}{%
+  \ifbeamer@me@leftframetitle
+    \usebeamerfont{frametitle}\insertframetitle%
+    \vphantom{g}% To avoid fluctuations per frame
+    \par%
+    \vspace*{-0.3cm}%
+    \hspace*{-\c_myespresso_margin}\rule{0.5\paperwidth}{2pt}%%
+    \par%
+    \vspace*{-0.3cm}%
+    {\ifx\insertframesubtitle\@empty%
+      \else%
+        \usebeamerfont{framesubtitle}\insertframesubtitle%
+      \fi}%
+    \par%
+  \else
+    \raggedleft
+    \usebeamerfont{frametitle}\insertframetitle%
+    \vphantom{g}% To avoid fluctuations per frame
+    \par
+    \raggedleft
+    \vspace*{-0.3cm}
+    \rule{0.5\paperwidth}{2pt}\hspace*{-1cm}%%
+    \par
+    \raggedleft
+    \vspace*{-0.3cm}%
+    {\ifx\insertframesubtitle\@empty%
+      \else%
+        \usebeamerfont{framesubtitle}\insertframesubtitle%
+      \fi}%
+    \par
+  \fi
+}
+\ExplSyntaxOff
+
+% Navigation symbols and frame numbering
+\setbeamertemplate{navigation symbols}{}
+\newcounter{myespresso@appendixframenumber}
+\newcounter{myespresso@appendixtotalframenumber}
+\newcounter{myespresso@numberofframes}
+\newcounter{myespresso@numberofmainframes}
+\addtobeamertemplate{navigation symbols}{}{%
+  \hspace{1em}%
+  \setcounter{myespresso@numberofframes}{\inserttotalframenumber}
+  \setcounter{myespresso@numberofmainframes}{\insertmainframenumber}
+  \setcounter{myespresso@appendixtotalframenumber}{\numexpr\value{myespresso@numberofframes}-\value{myespresso@numberofmainframes}}
+  \setcounter{myespresso@appendixframenumber}{\numexpr\value{framenumber}-\value{myespresso@numberofmainframes}}
+  \ifnum\insertframenumber>\insertmainframenumber% appendix
+  \footnotesize\color{black}\roman{myespresso@appendixframenumber}/\roman{myespresso@appendixtotalframenumber}
+  \else % main part
+  \footnotesize\color{black}\insertframenumber/\insertmainframenumber
+  \fi
+}
 
 \mode<all>

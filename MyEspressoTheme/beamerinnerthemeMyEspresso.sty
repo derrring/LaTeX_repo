@@ -1,16 +1,246 @@
-% Defines the style of inner elements for the MyEspresso theme
+% MyEspresso Inner Theme
+% Based on Amurmaple theme by Maxime CHUPIN
+
+\NeedsTeXFormat{LaTeX2e}[2021-11-15]
+\ProvidesPackage{beamerinnerthemeMyEspresso}[2024/02/07 v.1.3 MyEspresso Inner Theme for Beamer]
+
 \mode<presentation>
 
-\ProvidesPackage{beamerinnerthemeMyEspresso}
+% Use rectangles inner theme as base
+\useinnertheme{rectangles}
 
-\useinnertheme{rounded}
+% Require tcolorbox for enhanced environments
+\RequirePackage{tcolorbox}
+\tcbuselibrary{skins}
 
+% TOC template
+\setbeamertemplate{subsection in toc}
+{\leavevmode\leftskip=2em\rule{0.6em}{0.6em}\hskip0.5em\inserttocsubsection\par}
 
-% Sets the style for itemize environments
-% Other options include: [square], [triangle], [ball]
-\setbeamertemplate{items}[circle]
+\setbeamertemplate{section in toc}[square]
 
-% This makes theorem environments numbered within sections.
-\setbeamertemplate{theorems}[numbered]
+% Itemize and enumerate templates
+\setbeamertemplate{itemize item}{\faAngleRight}
+\setbeamertemplate{itemize subitem}{\faAngleDoubleRight}
+\setbeamertemplate{enumerate item}
+{
+  \hbox{%
+    \usebeamerfont*{item projected}%
+    \usebeamercolor[bg]{enumerate item}%
+    \vrule width2.25ex height1.85ex depth.4ex%
+    \hskip-2.25ex%
+    \hbox to2.25ex{%
+      \hfil%
+      \usebeamercolor[fg]{enumerate item}\insertenumlabel%
+      \hfil}%
+  }%
+}
+\setbeamertemplate{enumerate subitem}{\alph{enumii}.}
+
+% Title page template
+\ExplSyntaxOn
+\setbeamertemplate{title~page}{%
+  \bgroup
+   \setbeamertemplate{background}{}
+  \setbeamertemplate{navigation~symbols}{}
+  \setbeamercolor{background~canvas}{bg=white}
+  \begin{tikzpicture}[remember~picture,overlay]
+    \fill[white]
+    ([yshift=15pt]current~page.west) rectangle (current~page.north~
+    east);
+    \ifbeamer@me@delaunay
+    \ifLuaTeX
+    \myespresso@buildpoints
+    \myespresso@buildmesh
+    \fi
+    \fi
+    \fill[structure]
+    ([yshift=15pt]current~page.west)~rectangle~(current~page.south~
+    east);
+    \ifbeamer@me@rule
+      \fill[MyEspresso@rule]
+      ([yshift=15pt]current~page.west)~rectangle~([yshift=10pt]current~page.
+      east);
+    \fi
+    \node[anchor=east]~
+    at~([yshift=-35pt,xshift=-20pt]current~page.north~east)~(author)~
+    {\parbox[t]{.6\paperwidth}{\raggedleft%
+        \usebeamerfont{author}\color{structure}%
+          \insertauthor
+          \IfValueT { \l_myespresso_mail_tl} {
+            \par \usebeamerfont{mail}\usebeamercolor[fg]{mail} \tl_use:N \l_myespresso_mail_tl
+          }
+          \IfValueT { \l_myespresso_webpage_tl} {
+            \par \usebeamerfont{mail}\usebeamercolor[fg]{mail} \expandafter\url{\tl_use:N \l_myespresso_webpage_tl}
+          }
+        }};
+    \node[anchor=north~east]
+    at~([yshift=-60pt,xshift=-20pt]current~page.north~east)
+    (institute)
+    {\parbox[t]{.78\paperwidth}{\raggedleft%
+        \usebeamerfont{institute}\textcolor{gray}{\insertinstitute}}};
+    \node[anchor=south~east]
+    at ([yshift=15pt,xshift=-20pt]current~page.east)
+    (date)
+    {\parbox[t]{.78\paperwidth}{\raggedleft%
+        \usebeamerfont{date}\textcolor{black}{\insertdate}}};
+    \node[anchor=south~west]
+    at ([yshift=20pt]current~page.west)~(logo)
+    {\parbox[t]{.19\paperwidth}{\raggedleft%
+        \usebeamercolor[fg]{titlegraphic}\inserttitlegraphic}};
+    \node[anchor=east]
+    at ([yshift=-25pt,xshift=-20pt]current~
+    page.east) (title)
+    {\parbox[t]{\textwidth}{\raggedleft%
+        \usebeamerfont{title}\color{white}%
+        \inserttitle
+        \ifx\insertsubtitle\@empty%
+        \else\par\bigskip \usebeamerfont{subtitle}\color{white}\insertsubtitle
+        \fi
+      }};
+    \IfValueT { \l_myespresso_collab_tl} {
+      \node[anchor=south,white,text~width=0.95\linewidth,align=center] at ([yshift=10pt]current~page.south) {\itshape\tl_use:N \l_myespresso_collab_tl};
+    }
+\end{tikzpicture}
+\egroup
+}
+\ExplSyntaxOff
+
+% Section page template
+\setbeamertemplate{section page}{
+  \hypersetup{linkcolor=structure}
+  \begin{tikzpicture}[remember picture,overlay]
+    \fill[white]
+    ([yshift=15pt]current page.west) rectangle (current page.north
+    east);
+    \ifbeamer@me@delaunay
+    \ifLuaTeX
+    \myespresso@buildpoints
+    \myespresso@buildmesh
+    \fi
+    \fi
+    \fill[structure]
+    ([yshift=15pt]current page.west) rectangle (current page.south
+    east);
+    \ifbeamer@me@rule
+      \fill[MyEspresso@rule]
+      ([yshift=15pt]current page.west) rectangle ([yshift=10pt]current page.east);
+    \fi
+    \node[anchor=east, font=\huge, text width=0.95\linewidth,align=right]
+    at ([yshift=-50pt,xshift=-20pt]current page.north east) (section)
+    { Section \insertsectionnumber: \bfseries\textcolor{structure}{\insertsection}};
+  \end{tikzpicture}
+}
+
+% Part page template
+\setbeamertemplate{part page}{
+  \hypersetup{linkcolor=structure}
+  \begin{tikzpicture}[remember picture,overlay]
+    \fill[white]
+    ([yshift=15pt]current page.west) rectangle (current page.south
+    east);
+    \fill[structure]
+    ([yshift=15pt]current page.west) rectangle (current page.north
+    east);
+    \ifbeamer@me@rule
+      \fill[MyEspresso@rule]
+      ([yshift=15pt]current page.west) rectangle ([yshift=10pt]current page.east);
+    \fi
+    \node[anchor=north]
+    at ([yshift=-20pt]current page.north) (section)
+    {\Large\textcolor{white}{Part~\insertpartnumber}};
+    \node[anchor=north, font=\huge\bfseries, text width=0.9\linewidth,align=center]
+    at ([yshift=-50pt]current page.north) (part)
+    {\textcolor{white}{\insertpart}};
+  \end{tikzpicture}
+}
+
+% Button template
+\setbeamertemplate{button}{\tikz
+  \node[
+  inner xsep=4pt,
+  minimum height = 2em,
+  draw=structure!80,
+  fill=structure!50,
+  rounded corners=1pt,
+    align=center]  {\footnotesize\insertbuttontext};}
+
+% Enhanced environments
+\RenewDocumentEnvironment{abstract}{}{%
+  \begin{tcolorbox}[boxrule=0pt,frame hidden,sharp corners,enhanced,borderline
+    north={1pt}{0pt}{structure},borderline
+    south={1pt}{0pt}{structure}]
+    \begin{center}\bfseries
+      \abstractname
+    \end{center}\itshape
+  }
+  {%
+  \end{tcolorbox}%
+}%
+
+\RenewDocumentEnvironment{quotation}{o}{%
+  \begin{tcolorbox}[boxrule=0pt,frame hidden,sharp corners,enhanced,borderline west={4pt}{0pt}{structure}]\itshape
+  }
+  {%
+    \IfNoValueTF{#1}{%
+    }{
+      \begin{flushright}%
+        \normalfont #1%
+      \end{flushright}%
+    }
+  \end{tcolorbox}%
+}
+
+% Information environment
+\newcommand\myespresso@info{\raisebox{-0.8mm}{
+  \Large\textcolor{MyEspresso@info}{\faInfoCircle}%  
+}}%
+
+\NewDocumentEnvironment{information}{o}{%
+  \tcbset{leftrule=1mm,rightrule=0mm,toprule=0mm, bottomrule=0mm,%
+    colframe=MyEspresso@info,
+    sharp corners,
+    detach title,%
+    before title={\myespresso@info~},
+    fonttitle = \color{black}\bfseries\sffamily,
+    before upper={\tcbtitle\par\medskip}
+  }
+  \IfNoValueTF{#1}{%
+    \begin{tcolorbox}[title=\translate{Information}]
+    }{
+      \begin{tcolorbox}[title=#1]
+      }
+    }%
+    {%
+    \end{tcolorbox}
+  }%
+
+% Remark environment
+\NewDocumentEnvironment{remark}{o}{
+   \tcbset{%
+    arc=0pt,outer arc=0pt,colback=MyEspressoRemarkColor!10,colframe=MyEspressoRemarkColor,
+    boxsep=0pt,left=10pt,right=10pt,top=8pt,bottom=10pt, bottomtitle = 3pt, toptitle=3pt,
+    boxrule=0pt
+  }
+  \smallskip
+  \begin{tcolorbox}[fonttitle=\bfseries,title={\translate{Remark} \IfNoValueF{#1}{(#1)}}]}%
+  {\end{tcolorbox}\medskip
+}
+
+% Mathematical environment colors
+\AtBeginEnvironment{theorem}{%
+  \setbeamercolor{block body}{fg=black,bg=gray!20}
+  \setbeamercolor{block title}{fg=white,bg=structure}
+}
+
+\AtBeginEnvironment{definition}{%
+  \setbeamercolor{block body}{fg=black,bg=gray!10}
+  \setbeamercolor{block title}{fg=MyEspresso@example,bg=MyEspresso@example!40}
+}
+
+\AtBeginEnvironment{corollary}{%
+  \setbeamercolor{block body}{fg=black,bg=gray!10}
+  \setbeamercolor{block title}{fg=structure,bg=structure!30}
+}
 
 \mode<all>

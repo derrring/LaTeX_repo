@@ -83,12 +83,13 @@ math-style=ISO,bold-style=ISO]{unicode-math}
 
 
 % Chapter quotes
-\RequirePackage{csquotes} % smart quotes
+\RequirePackage[autostyle]{csquotes} % smart quotes
 
 % Big delimiters for matrices and other structures
 \RequirePackage{bigdelim}
 % --- 2. Input SAFE Style Components ---
 % These files contain custom commands, colors, and math settings.
+\input{sty_components/c111_fonts.tex}          % Font settings
 \input{sty_components/c120_color.tex}          % Color definitions
 \input{sty_components/c140_envs.tex}           % Custom tcolorbox environments
 \input{sty_components/c150_commands.tex}      % Custom general-purpose commands

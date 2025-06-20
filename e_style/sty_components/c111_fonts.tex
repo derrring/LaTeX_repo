@@ -1,0 +1,35 @@
+% sty_components/c101_layout.tex
+
+\setdefaultlanguage{english}
+
+% Text fonts (keep simple and consistent)
+\setmainfont{Noto Serif}[
+    UprightFont=*-Regular,
+    BoldFont=*-Bold,
+    ItalicFont=*-Italic,
+    BoldItalicFont=*-BoldItalic
+]
+
+\setsansfont{Noto Sans}[
+    UprightFont=*-Regular,
+    BoldFont=*-Bold,
+    ItalicFont=*-Italic,
+    BoldItalicFont=*-BoldItalic
+]
+
+\setmonofont{Source Code Pro}
+
+% Japanese fonts (if using luatexja)
+\IfPackageLoadedTF{luatexja}{%
+    \setmainjfont[BoldFont={Source Han Serif Bold}]{Source Han Serif}
+    \setsansjfont{Source Han Sans}
+    \setmonojfont{HanaMinA}
+}{}
+
+% Simplified math font setup - Choose ONE approach:
+
+% Option 1: Pure STIX2 (recommended for consistency)
+
+\setmathfont{STIX Two Math}[StylisticSet={01}] %range={"1D454,"1D488,"1D467}
+\setmathfont{TeX Gyre Termes Math}[range={bb, scr, bfscr}]
+\setmathfont{Latin Modern Math}[range= {cal, bfcal}]

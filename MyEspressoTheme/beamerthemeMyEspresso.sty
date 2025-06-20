@@ -3,28 +3,269 @@
 
 \ProvidesPackage{beamerthemeMyEspresso}
 
+\RequirePackage{e_core}
+\setbeamercovered{dynamic} %overlays not yet revealed will faintly appear
 
-\geometry{paperwidth=169mm, paperheight=102mm}
+% Theme options
+\def\myespresso@sidebarwidth{58pt}  % Default sidebar width
+\newif\ifbeamer@me@nogauge
+\beamer@me@nogaugetrue
+\DeclareOptionBeamer{nogauge}{\beamer@me@nogaugefalse}
+\newif\ifbeamer@me@nomail
+\beamer@me@nomailtrue
+\DeclareOptionBeamer{nomail}{\beamer@me@nomailfalse}
+\newif\ifbeamer@me@delaunay
+\beamer@me@delaunayfalse
+\DeclareOptionBeamer{delaunay}{\beamer@me@delaunaytrue}
+\newif\ifbeamer@me@myespressoblue
+\beamer@me@myespressobluefalse
+\DeclareOptionBeamer{myespressoblue}{\beamer@me@myespressobluetrue}
+\newif\ifbeamer@me@myespressogreen
+\beamer@me@myespressogreenfalse
+\DeclareOptionBeamer{myespressogreen}{\beamer@me@myespressogreentrue}
+\newif\ifbeamer@me@myespressoblack
+\beamer@me@myespressoblackfalse
+\DeclareOptionBeamer{myespressoblack}{\beamer@me@myespressoblacktrue}
+\newif\ifbeamer@me@sidebar
+\beamer@me@sidebarfalse
+\def\myespresso@sidebarwidth{58pt}
+\DeclareOptionBeamer{sidebarwidth}{\def\myespresso@sidebarwidth{#1}}
+\DeclareOptionBeamer{sidebar}{\beamer@me@sidebartrue}
+\newif\ifbeamer@me@toplogo
+\beamer@me@toplogofalse
+\DeclareOptionBeamer{toplogo}{\beamer@me@toplogotrue}
+\newif\ifbeamer@me@leftframetitle
+\beamer@me@leftframetitlefalse
+\DeclareOptionBeamer{leftframetitle}{\beamer@me@leftframetitletrue}
+\newif\ifbeamer@me@rule
+\beamer@me@rulefalse
+\DeclareOptionBeamer{rule}{\beamer@me@ruletrue}
+\DeclareOptionBeamer{rulecolor}{\colorlet{MyEspresso@rule}{#1}}
+\ProcessOptionsBeamer
+
+\RequirePackage{fontawesome5}
+\RequirePackage{iftex}
+% Delaunay check
+\ifbeamer@me@delaunay
+\ifLuaTeX
+\RequirePackage{luamesh}
+\else
+\errmessage{Delaunay option only available with luaLaTeX}
+\fi
+\fi
+
+% randomseed
+\ExplSyntaxOn
+\sys_gset_rand_seed:n {\time}
+\ExplSyntaxOff
+
+% counters to set the depth of toc in \sepframe
+\newcounter{myespressotoc}
+\setcounter{myespressotoc}{1}
+\newcounter{myespresso@oldtoc}
 
 
-% Load the different components of the theme
+% Email, webpage, collaboration commands
+\ExplSyntaxOn
+\tl_new:N \l_myespresso_mail_tl
+\tl_new:N \l_myespresso_webpage_tl
+\tl_new:N \l_myespresso_collab_tl
+
+\NewDocumentCommand{\mail}{m}{
+  \tl_set:Nn  \l_myespresso_mail_tl {#1}
+}
+
+\NewDocumentCommand{\webpage}{m}{
+  \tl_set:Nn  \l_myespresso_webpage_tl {#1}
+}
+
+\NewDocumentCommand{\collaboration}{m}{
+  \tl_set:Nn  \l_myespresso_collab_tl {#1}
+}
+
+\NewDocumentCommand{\myespresso@printmail}{}{
+  \IfValueT { \l_myespresso_mail_tl} {
+    \tl_use:N \l_myespresso_mail_tl
+  }
+}
+\NewDocumentCommand{\myespresso@printwebpage}{}{
+  \IfValueT { \l_myespresso_webpage_tl} {
+    \tl_use:N \l_myespresso_webpage_tl
+  }
+}
+\ExplSyntaxOff
+
+
+% Load sub-themes
 \usecolortheme{MyEspresso}
 \usefonttheme{MyEspresso}
 \useinnertheme{MyEspresso}
 \useoutertheme{MyEspresso}
 
-\setbeamercovered{dynamic}
+% Additional theme-specific commands that need all components loaded
 
-\setbeamertemplate{title page}{
-  \vskip0pt plus 1filll
-  \hspace{1em}{\usebeamerfont{title}\usebeamercolor[fg]{maintitle}\inserttitle}
-  \vspace{0.5em}
-  \hspace{1.12em}{\usebeamerfont{subtitle}\usebeamercolor[fg]{maintitle}\insertsubtitle}
-  \vskip0pt plus 1filll
-  \vskip0pt plus 1filll
+% Progress gauge
+\newlength{\gauge@step}
+\NewDocumentCommand{\myespresso@gauge}{o}{%
+  \def\myespresso@gaugewidth{40pt}%
+  \IfNoValueF{#1}{%
+    \def\myespresso@gaugewidth{#1}%
+  }%
+  \setlength{\gauge@step}{(\myespresso@gaugewidth-2pt)/10}%
+  \def\pourc{\numexpr(10*\insertframenumber/\insertmainframenumber)}%
+  \def\xj{\numexpr(4.95*\pourc)}%
+  \begin{tikzpicture}[x=0.7cm,y=0.7cm]%
+    \draw[color=white] (0pt,-2pt)--(\myespresso@gaugewidth,-2pt)--(\myespresso@gaugewidth,4pt)--(0pt,4pt)--cycle;%
+    \foreach \i in {0,...,10}{%
+      \ifnum\i<\pourc%
+      \fill[color=white]
+      (\the\gauge@step*\i+1pt,-1pt)--(\the\gauge@step+\the\gauge@step*\i+1pt,-1pt)--(\the\gauge@step+\the\gauge@step*\i+1pt,3pt)--(0+\the\gauge@step*\i+1pt,3pt)--cycle;%
+      \fi%
+    }%
+  \end{tikzpicture}%
 }
 
+% Delaunay mesh generation
+\ExplSyntaxOn
+\tl_new:N \l_delaunaypointlist_tl
+\NewDocumentCommand\myespresso@buildpoints{}{
+  \tl_clear:N \l_delaunaypointlist_tl
+  \int_set:Nn \l_tmpa_int { 1 }
+  \tl_put_right:Nn \l_delaunaypointlist_tl {(0,0);(16,0);(16,4.5);(0,4.5);}
+  \int_do_while:nNnn { \l_tmpa_int} < {40}
+  {
+    \tl_put_right:Nn \l_delaunaypointlist_tl {(\fpeval{16*rand()},\fpeval{4.5*rand()});}
+    \int_incr:N \l_tmpa_int
+  }
+  \tl_put_right:Nn \l_delaunaypointlist_tl {(\fpeval{16*rand()},\fpeval{4.5*rand()})}
+}
 
+\NewExpandableDocumentCommand\myespresso@buildmesh{}{
+\node[anchor = north~west] at
+    ([xshift=-50pt,yshift=30pt]current~page.north~west){\resizebox{1.5\paperwidth}{0.8\paperheight}{\buildMeshBW[color=structure!15,colorBbox=structure!15,scale=2cm]{\l_delaunaypointlist_tl}}};
+}
+\ExplSyntaxOff
+
+% Frame section command
+\ExplSyntaxOn
+\NewDocumentCommand{\framesection}{m}{
+  \medskip
+  \noindent{\large\bfseries\textcolor{structure}{#1}}\par\vspace*{-0.2cm}
+  \hspace*{-\c_myespresso_margin}{\color{structure}\rule{0.4\paperwidth}{2pt}}\par\smallskip%
+}
+\ExplSyntaxOff
+
+% Separation frame
+\ExplSyntaxOn
+\keys_define:nn { myespresso/sepframe } {
+  title .tl_set:N = \l_sepframetitle_tl ,
+  image .tl_set:N = \l_sepframeimage_tl
+}
+
+\NewDocumentCommand{\sepframe}{o}{
+  \IfNoValueF{#1}{
+    \keys_set:nn { myespresso/sepframe} {#1}
+  }
+  \begingroup
+  \setcounter{myespresso@oldtoc}{\value{tocdepth}}
+  \setbeamercolor{section~in~toc}{fg=white}
+  \str_if_eq:VnTF{\l_sepframetitle_tl}{}{%
+    \def\myespresso@septitle{\secname}
+  }{%
+    \def\myespresso@septitle{\l_sepframetitle_tl}
+  }
+  \setbeamertemplate{background}{}
+  \setbeamertemplate{navigation~symbols}{}
+  \setbeamercolor{background~canvas}{bg=white}
+  \begin{frame}[noframenumbering,plain]
+    \begin{tikzpicture}[remember~picture,overlay]
+      \ifbeamer@me@delaunay
+      \ifLuaTeX
+      \myespresso@buildpoints
+      \myespresso@buildmesh
+      \fi
+      \fi
+      \fill[structure]
+      ([yshift=15pt]current~page.west) rectangle (current~page.south~
+      east);
+      \ifbeamer@me@rule
+      \fill[MyEspresso@rule]
+      ([yshift=15pt]current~page.west)~rectangle~([yshift=10pt]current~page.
+      east);
+      \fi
+      \node[anchor=east,text~width = 0.75\linewidth, font=\huge\bfseries,align=right]
+      at ([yshift=-50pt,xshift=-20pt]current~page.north~east) (section)
+      {\textcolor{structure}{\myespresso@septitle}};
+      \node[]
+      at ([yshift=-40pt]current~page.center) (toc)
+      {\color{white}\begin{minipage}{0.9\paperwidth}%
+          \begin{multicols}{2}\hypersetup{linkcolor=white}\setcounter{tocdepth}{\themyespressotoc}\tableofcontents%
+          \end{multicols}\end{minipage}
+      };
+      \str_if_eq:VnTF{\l_sepframeimage_tl}{}{%
+      }{
+        \node[anchor=south~west]
+        at ([yshift=20pt]current~page.west) (logo)
+        {\parbox[t]{.19\paperwidth}{\raggedleft%
+            \usebeamercolor[fg]{titlegraphic}\l_sepframeimage_tl}};
+      }
+    \end{tikzpicture}
+    \setcounter{tocdepth}{\value{myespresso@oldtoc}}
+  \end{frame}
+  \endgroup
+  \tl_clear:N \l_sepframetitle_tl
+  \tl_clear:N \l_sepframeimage_tl
+}
+\ExplSyntaxOff
+
+% Thanks frame
+\NewDocumentCommand{\thanksframe}{o m}{
+  \begingroup
+  \setbeamertemplate{background}{}
+  \setbeamertemplate{navigation symbols}{}
+  \setbeamercolor{background canvas}{bg=white}
+  \IfNoValueTF{#1}{%
+    \def\myespresso@finalgraphic{\inserttitlegraphic}
+  }{%
+    \def\myespresso@finalgraphic{#1}
+  }
+  \begin{frame}[noframenumbering,plain]
+    \begin{tikzpicture}[remember picture,overlay]
+      \ifbeamer@me@delaunay
+      \ifLuaTeX
+      \myespresso@buildpoints
+      \myespresso@buildmesh
+      \fi
+      \fi
+      \fill[structure]
+      ([yshift=15pt]current page.west) rectangle (current page.south
+      east);
+      \ifbeamer@me@rule
+      \fill[MyEspresso@rule]
+      ([yshift=15pt]current page.west) rectangle ([yshift=10pt]current page.east);
+      \fi
+      \node[anchor=east,text width = 0.95\linewidth, font=\huge\bfseries,align=right]
+      at ([yshift=50pt,xshift=-20pt]current page.south east) (section)
+      {\textcolor{white}{#2}};
+      \node[anchor=south west]
+    at ([yshift=20pt]current page.west) (logo)
+    {\parbox[t]{.19\paperwidth}{\raggedleft%
+        \usebeamercolor[fg]{titlegraphic}\myespresso@finalgraphic}};
+    \end{tikzpicture}
+  \end{frame}
+  \endgroup
+}
+
+% Box alert command
+\newenvironment{boxalertenv}{\begin{altenv}%
+      {\usebeamertemplate{alerted text begin}\usebeamercolor[fg]{alerted text}\usebeamerfont{alerted text}\colorbox{bg}}
+      {\usebeamertemplate{alerted text end}}{\color{.}}{}}{\end{altenv}}
+
+\newcommand<>{\boxalert}[1]{{%
+  \begin{boxalertenv}#2{#1}\end{boxalertenv}%
+}}
+
+\mode<all>
 \hypersetup{
     colorlinks=true,
     linkcolor=mylinkcolor,
