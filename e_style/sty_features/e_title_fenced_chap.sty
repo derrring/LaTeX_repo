@@ -1,6 +1,17 @@
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesPackage{e_title_fenced_chap}[Title Fenced Chapter Style]
 
+
+\renewcommand{\thepart}{\Roman{part}}
+
+\titleformat{\part}%command
+    [display]%shape
+    {\normalfont\centering\Large}%format
+    {\thispagestyle{empty}\color{titlecolorchapter}\partname~\MakeUppercase{\thepart}}%label
+    {1em}%sep
+    {\color{titlecolorchapter}\MakeUppercase}%beforcode
+    []
+
 \titleformat{\chapter}[block]
   {\normalfont\bfseries\large}
   {\rule{\textwidth}{1.5pt} \newline \vspace{1ex} }{0pt}

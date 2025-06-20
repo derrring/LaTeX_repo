@@ -4,8 +4,11 @@
 %------------------------realized by tcolorbox-------------------------
 
 \tcolorboxenvironment{proof}{% add a vertical bar to the left
-    breakable, before skip=\parskip,after skip=.5em,frame hidden, enhanced,
-borderline west={1mm}{0pt}{airforceblue!75}}
+    enhanced,breakable, frame hidden, colback=white,
+    borderline west={1mm}{0pt}{airforceblue!75},
+    before skip=0em,after skip=.5em,
+}
+
 \tcolorboxenvironment{definition}{
     enhanced,breakable, 
     frame hidden,
