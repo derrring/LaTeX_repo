@@ -1,114 +1,142 @@
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesPackage{e_frontbackmatter_formal}[Formal Front Back Matter]
 
-% 1. Load packages that are required for this front matter to work.
-% These might already be in common style file, but \RequirePackage is safe.
-\RequirePackage{xcolor}
-\RequirePackage{hyperref} % For \pdfbookmark
-\RequirePackage{etoolbox} % For safety with command definitions
 
 
-% 2. Define commands for non-standard info (subtitle, location, etc.)
-% We will use the standard \author, \title, \date for the main info.
+\makeatletter
+
+% --- Correctly Scoped Multi-Author System using expl3 ---
+
+\ExplSyntaxOn
+
+% 1. Define sequences to hold the author names and emails.
+\seq_new:N \g_efrontmatter_authors_seq
+\seq_new:N \g_efrontmatter_emails_seq
+
+% 2. Define \clearauthors to reset the lists.
+
+
+\AtEndDocument{
+    \seq_gclear:N \g_efrontmatter_authors_seq
+    \seq_gclear:N \g_efrontmatter_emails_seq
+}
+
+% 3. Define \addauthor to add an author and optional email to the lists.
+\NewDocumentCommand{\addauthor}{ o m }
+    {
+        \seq_gput_right:Nn \g_efrontmatter_authors_seq { #2 }
+        \IfNoValueTF { #1 }
+        { \seq_gput_right:Nn \g_efrontmatter_emails_seq {} }
+        { \seq_gput_right:Nn \g_efrontmatter_emails_seq { #1 } }
+    }
+
+% 4. Standard metadata commands
 \providecommand{\subtitle}[1]{\def\@subtitle{#1}}
 \providecommand{\location}[1]{\def\@location{#1}}
 \providecommand{\institution}[1]{\def\@institution{#1}}
-\providecommand{\email}[1]{\def\@email{#1}}
+\subtitle{}
+\location{}
+\institution{}
 
-% Set default values for new commands
-\subtitle{ }
-\location{ }
-\email{ }
-\institution{ }
-
-% 3. Define commands for optional content (Acknowledgements/Abstract)
 \providecommand{\setacknowledgements}[1]{\def\@myacknowledgements{#1}}
 \providecommand{\setabstract}[1]{\def\@myabstract{#1}}
-\providecommand{\setdedication}[1]{\def\@mydedication{#1}} 
-
+\providecommand{\setdedication}[1]{\def\@mydedication{#1}}
 \setacknowledgements{}
 \setabstract{}
 \setdedication{}
 
 
-
-% 4. Define commands for each part of the front & back matter.
-%    These are now modified to use the standard \@author, \@title, \@date
-
-% == Main Title Page (from titlepage.tex) ==
+% 5. The \makefrontmatter command.
+% The entire definition is wrapped in ExplSyntaxOn because it *uses* expl3 commands.
 \providecommand{\makefrontmatter}{%
     \begin{titlepage}
+        \thispagestyle{empty}
+        \mbox{}\vfill
         \begin{center}
             \large
-            % --- Institution (Optional) ---
+            % The \ifstrempty command from etoolbox is safe to use here.
             \ifstrempty{\@institution}{ }{%
                 \begingroup
-                    % Use a tabular environment to allow for line breaks in \@institution
-                    \begin{tabular}{c}
-                        \@institution
-                    \end{tabular}
-                \endgroup\par
-                \vfill
+                    \begin{tabular}{c} \@institution \end{tabular}
+                \endgroup\par \vfill
             }
-            % --- Title and Subtitle ---
-            % This assumes \@title will always be provided.
             \begingroup
-                {\@title}\par
+                {\LARGE \@title}\par
             \endgroup
-            % Subtitle is already optional.
             \ifstrempty{\@subtitle}{}{%
-                \vspace{1em}\MakeUppercase{\footnotesize \@subtitle}
+                \vspace{1em}\MakeUppercase{\normalsize \@subtitle}
             }
             \vfill
-            % --- Author and Email (Email is optional) ---
-            % This assumes \@author will always be provided.
             \begingroup
-                % The footnote for the email will only appear if \@email is set.
-                {\normalsize \@author\ifstrempty{\@email}{}{\footnote{\@email}}} \par
+                \normalsize
+                % Loop through the author list
+                \seq_map_indexed_inline:Nn \g_efrontmatter_authors_seq
+                {
+                ##2 % Print author name
+                \tl_if_blank:nTF { \seq_item:Nn \g_efrontmatter_emails_seq {##1} }{
+                    % If no email, just print the name
+                    }
+                    { \textsuperscript{##1} } % Print superscript mark
+                \par\vspace{0.5em}
+                }
             \endgroup
-            \vfill\vfill
-            % --- Location (Optional) ---
+            \vfill
             \ifstrempty{\@location}{}{%
             \@location\par
             \vspace{0.5em}%
             }
-            \@date% % \@date is usually set automatically
-            \vfill
+            \@date%
         \end{center}
+        \vfill
+        \par
+        \noindent
+        \begin{minipage}{\textwidth}
+            % if authors provided emails, add a rule
+            \ifnum \seq_count:N \g_efrontmatter_emails_seq > 0
+            \rule{0.35\textwidth}{0.45pt}\par
+            \fi
+            % Loop through the email list for the footnote text
+            \seq_map_indexed_inline:Nn \g_efrontmatter_emails_seq
+              {            
+                \tl_if_blank:nF {##2}
+                  {
+                    \textsuperscript{##1} \texttt{##2} \par
+                  }
+              }
+        \end{minipage}%
     \end{titlepage}
 }
-% == Dedication  ==
+
+
+% Other commands
 \providecommand{\makededication}{%
-    % Check if content has been provided for the dedication.
     \ifstrempty{\@mydedication}{}{%
         \clearpage\thispagestyle{empty}\vspace*{3cm}
-        \@mydedication
-        \cleardoublepage
+        \@mydedication \cleardoublepage
     }%
 }
-
-% == Acknowledgements  ==
 \providecommand{\makeacknowledgements}{%
     \ifstrempty{\@myacknowledgements}{}{%
-        \chapter*{Acknowledgements}
-        \@myacknowledgements 
-        \cleardoublepage
+        \chapter*{Acknowledgements} \@myacknowledgements \cleardoublepage
     }%
 }
-
-% == Abstract  ==
 \providecommand{\makeabstract}{%
     \ifstrempty{\@myabstract}{}{%
-        \chapter*{Abstract}
-        \@myabstract
-        \cleardoublepage
+        \chapter*{Abstract} \@myabstract \cleardoublepage
     }%
 }
-
-
 \providecommand{\makebackmatter}{%
     \thispagestyle{empty}
     \vfill
-    \noindent\@author: \textit{\@title,} \textcopyright\ \@date
+    \noindent
+    % Use \seq_use to print the author list with a comma separator
+    \seq_use:Nn \g_efrontmatter_authors_seq { ,~ }
+    : \textit{\@title,} \textcopyright\ \@date
     \cleardoublepage
 }
+
+% Turn off expl3 syntax
+\ExplSyntaxOff
+
+% Revert @ to its normal behavior
+\makeatother

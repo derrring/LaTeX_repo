@@ -16,7 +16,7 @@
 \LoadClass[12pt]{book}
 
 
-\RequirePackage{e_common_style}
+\RequirePackage{e_standard_doc}
 \RequirePackage{e_frontbackmatter_formal}
 \RequirePackage{e_title_fenced_chap}
 \RequirePackage{e_math_env_deco}

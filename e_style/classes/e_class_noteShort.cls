@@ -18,7 +18,7 @@
 \LoadClass{article}
 
 
-\RequirePackage{e_common_style}
+\RequirePackage{e_standard_doc}
 \RequirePackage{e_frontbackmatter_simple}
 \RequirePackage{e_title_fenced_sec}
 

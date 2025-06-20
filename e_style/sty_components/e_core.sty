@@ -1,0 +1,107 @@
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{e_core}[2025/06/20 Core definitions for custom classes and themes]
+
+% --- 1. Load UNIVERSALLY SAFE Packages ---
+% These packages are generally compatible with all major classes, including Beamer.
+\RequirePackage{expl3,xparse}
+\RequirePackage{amsmath,amssymb,mathtools,empheq}
+\RequirePackage{amsthm,thmtools}
+%amsmath and ntheorem should be loaded before {fontspec}
+%mathtools offer pmatirx*
+\RequirePackage{cancel}
+%\cancel{} can be used in
+% formulae!\bcancel{}\xcancle{}\cancelto{<value>}{<expression>}
+\RequirePackage{extarrows}
+%===========================================================================
+%=================== font/encoding configuration ===========================
+%===========================================================================
+% File encoding
+%\RequirePackage[T1]{fontenc}   %% NOTE: This is now handled by the
+% `fontspec` package
+
+%\RequirePackage{luaotfload}
+\RequirePackage{luatexja, fontspec, luatexja-fontspec, luatexja-ruby,
+polyglossia}
+%%  {fontspec}: set default non-cjk fonts;
+%%  {polyglossia}: set default language; exclude cjk;
+\RequirePackage{noto}
+\RequirePackage{sourcecodepro}
+%\RequirePackage{microtype} %luatexja does not support microtype
+\RequirePackage[warnings-off={mathtools-colon,mathtools-overbracket},
+math-style=ISO,bold-style=ISO]{unicode-math}
+
+
+%=======================================================================
+%====================== layout setting ===============================
+%=======================================================================
+\RequirePackage{graphicx}
+%insert external pictures
+%usage \includegraphicx[]{}
+%parameter in [] : width, height, = ?cm scale = 0.6
+\RequirePackage[normalem]{ulem}
+%\uline{}, \uuline{}, \uwave{},\sout{},
+% \xout{},\dashuline{},\dotuline{},\sout{}(words only)
+\RequirePackage{pdfpages}
+% Colors and customizations
+\RequirePackage[table,x11names,dvipsnames]{xcolor}
+
+
+
+%===========================================================================
+% Figures, tables, and captions
+%===========================================================================
+\RequirePackage{tabularray}
+%\setlength{\extrarowheight}{3pt}
+%\newcommand{\tableheadline}[1]{\multicolumn{1}{c}{\spacedlowsmallcaps{#1}}}
+\RequirePackage{caption}
+%\captionsetup[figure]{format=plain, font=footnotesize, labelfont=bf}
+%\captionsetup[table]{format=plain, font=footnotesize, labelfont=bf}
+\RequirePackage{subcaption}
+%\captionsetup[subfigure]{format=hang, font=footnotesize,
+% labelfont=bf, labelsep=period,
+% labelformat=simple,justification=justified,singlelinecheck=false}
+
+\RequirePackage{adjustbox}
+\RequirePackage{wrapfig}
+\RequirePackage{lscape}
+\RequirePackage{multicol,multirow,makecell,booktabs,array}
+
+
+
+% tcolorbox
+\RequirePackage{tcolorbox}
+
+% Code listings
+\RequirePackage{minted}
+% Algorithms
+\RequirePackage[linesnumbered,lined,ruled]{algorithm2e}
+
+% Graphics
+\RequirePackage{graphicx}
+\RequirePackage{rotating}
+\RequirePackage{tikz,pgf}
+
+
+% Chapter quotes
+\RequirePackage{csquotes} % smart quotes
+
+% Big delimiters for matrices and other structures
+\RequirePackage{bigdelim}
+% --- 2. Input SAFE Style Components ---
+% These files contain custom commands, colors, and math settings.
+\input{sty_components/c120_color.tex}          % Color definitions
+\input{sty_components/c140_envs.tex}           % Custom tcolorbox environments
+\input{sty_components/c150_commands.tex}      % Custom general-purpose commands
+\input{sty_components/c160_code_listings.tex} % Minted settings
+\input{sty_components/c210_tikz.tex}           % TikZ libraries
+\input{sty_components/c310_math_symbol.tex}    % Math symbols
+%\input{sty_components/c320_math_env.tex}       % Math environments (theorems)
+\input{sty_components/c410_hyphenation.tex}    % Hyphenation rules
+\input{sty_components/c510_bib.tex}            % Bibliography tweaks
+
+% --- 3. Final Universal Setup ---
+
+% tabularray package
+\UseTblrLibrary{booktabs}
+
+\endinput

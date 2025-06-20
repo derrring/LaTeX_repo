@@ -2,25 +2,27 @@
 \mode<presentation>
 
 \ProvidesPackage{beamercolorthemeMyEspresso}
+\RequirePackage{e_core}
+
 
 % Color definitions from your original file
-\definecolor{oxfordblue}{RGB}{0,33,71}
-\definecolor{n_darkblue}{HTML}{027BAB}
-\definecolor{n_blue}{HTML}{0191C8}
-\definecolor{n_paleblue}{HTML}{74C2E1}
-\definecolor{n_gr}{HTML}{D1D1D1}
+
+
+\definecolor{blue_primary}{HTML}{027BAB} %#027BAB
+\definecolor{blue_medium}{HTML}{0191C8}  %#0191C8
+\definecolor{blue_pale}{HTML}{74C2E1}   %#74C2E1
 
 % Set the colors for different parts of the presentation
-\setbeamercolor{itemize item}{fg=n_darkblue}
+\setbeamercolor{itemize item}{fg=blue_primary}
 \setbeamercolor{alerted text}{fg=green!80!yellow}
-\setbeamercolor*{palette primary}{bg=n_darkblue,fg=white}
-\setbeamercolor*{palette secondary}{fg=white,bg=n_paleblue}
-\setbeamercolor*{palette tertiary}{fg=white,bg=n_blue}
+\setbeamercolor*{palette primary}{bg=blue_primary,fg=white}
+\setbeamercolor*{palette secondary}{fg=white,bg=blue_pale}
+\setbeamercolor*{palette tertiary}{fg=white,bg=blue_medium}
 \setbeamercolor*{palette quaternary}{fg=white,bg=yellow}
-\setbeamercolor*{structure}{fg=n_darkblue,bg=white}
-\setbeamercolor{frametitle}{fg=n_darkblue,bg=white}
+\setbeamercolor*{structure}{fg=blue_primary,bg=white}
+\setbeamercolor{frametitle}{fg=blue_primary,bg=white}
 \setbeamercolor{maintitle}{bg=white,fg=oxfordblue}
-\setbeamercolor{block title}{bg=n_darkblue}
-\setbeamercolor{block body}{bg=n_paleblue!15}
+\setbeamercolor{block title}{bg=blue_primary}
+\setbeamercolor{block body}{bg=blue_pale!15}
 
 \mode<all>
