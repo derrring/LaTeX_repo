@@ -109,66 +109,216 @@
 %\etocsettocstyle{⟨before_toc⟩}{⟨after_toc⟩}
 %\etocsetstyle{⟨levelname⟩}{⟨start⟩}{⟨prefix⟩}{⟨contents⟩}{⟨finish⟩}
 
-\def\mydotfill{\unskip\nobreak\leaders\hbox{\hss\ . \hss}\hfill\nobreak\relax}
-%\hss = \hskip 0pt plus 1fill minus 1fill
+% =====================================================
+% COMPREHENSIVE TOC STYLING WITH AUTO-WIDTH ADJUSTMENT
+% =====================================================
 
+% Custom dot fill definition
+\def\mydotfill{\unskip\nobreak\leaders\hbox{\hss\ . \hss}\hfill\nobreak\relax}
+
+% Define lengths for consistent spacing
+\newlength{\tocrightmargin}
+\newlength{\tocpartsep}
+\newlength{\tocchapternumwidth}
+\newlength{\tocsectionnumwidth}
+\newlength{\tocsubsectionnumwidth}
+\newlength{\tocsubsubsectionnumwidth}
+
+% Set fixed lengths
+\setlength{\tocrightmargin}{0.5cm}
+\setlength{\tocpartsep}{1em}
+
+% =====================================================
+% METHOD 2: PRE-CALCULATED WIDTH BASED ON PATTERNS
+% =====================================================
+% Adjust these patterns based on your document structure
+\AtBeginDocument{%
+    % For PARTS (Roman numerals up to VIII)
+    \settowidth{\@tempdima}{\normalsize VIII\hspace{1em}}%
+    \edef\tocpartnumwidth{\the\@tempdima}%
+    %
+    % For CHAPTERS (up to 9)
+    \settowidth{\tocchapternumwidth}{\small 9\hspace{0.2em}}%
+    %
+    % For SECTIONS (up to 9.10 based on your document)
+    \settowidth{\tocsectionnumwidth}{\footnotesize 9.10\hspace{0.2em}}%
+    %
+    % For SUBSECTIONS (up to 9.10.9)
+    \settowidth{\tocsubsectionnumwidth}{\footnotesize 9.10.9\hspace{0.2em}}%
+    %
+    % For SUBSUBSECTIONS (up to 9.10.9.9)
+    \settowidth{\tocsubsubsectionnumwidth}{\footnotesize 9.10.9.9\hspace{0.2em}}%
+    %
+    % Minimum width enforcement - reduced for tighter spacing
+    \ifdim\tocchapternumwidth<1em \setlength{\tocchapternumwidth}{1em}\fi
+    \ifdim\tocsectionnumwidth<1em \setlength{\tocsectionnumwidth}{1em}\fi
+    \ifdim\tocsubsectionnumwidth<1em \setlength{\tocsubsectionnumwidth}{1em}\fi
+    \ifdim\tocsubsubsectionnumwidth<1em \setlength{\tocsubsubsectionnumwidth}{1em}\fi
+}
+
+% =====================================================
+% PART STYLE
+% =====================================================
 \etocsetstyle{part}
 {\begingroup\parindent0pt \nobreak}
 {\pagebreak[3]\bigskip}
-{\normalsize\rmfamily\centering \color{toccolorpart} %\scshape
+{\normalsize\rmfamily\centering \color{toccolorpart}%
     \etocifnumbered{
         Part \etocnumber{} --
-    }{
-}\MakeUppercase{\etocthename}\par\vspace{1em}}
+    }{%
+}\MakeUppercase{\etocthename}\par\vspace{\tocpartsep}}
 {\endgroup}
 
+% =====================================================
+% CHAPTER STYLE
+% =====================================================
 \etocsetstyle{chapter}
 {\begingroup}
-{\parindent0pt \color{black}\small} % Pre-code
+{\parindent0pt \color{black}\small}
 {\etocifnumbered{%
-        \leftskip0em\rightskip.5cm\parfillskip-\rightskip
-        \etocnumber\hspace{0.5em} \MakeUppercase{\etocthename}\hfill
-        \etocpage\par
+        \leftskip0em\rightskip\tocrightmargin\parfillskip-\rightskip
+        \makebox[\tocchapternumwidth][l]{\etocnumber\hfill}%
+        \MakeUppercase{\etocthename}\hfill
+        \makebox[2.5em][r]{\etocpage}\par
     }{%
+        \leftskip0em\rightskip\tocrightmargin\parfillskip-\rightskip
         \MakeUppercase{\etocthename}\hfill \etocpage\par
 }}
-{\endgroup} % Post-code
+{\endgroup}
 
+% =====================================================
+% SECTION STYLE
+% =====================================================
 \etocsetstyle{section}
 {\begingroup\leftskip0em\parindent0pt}
-{\footnotesize} % Pre-code
+{\footnotesize}
 {\etocifnumbered{%
-        \leftskip1.5em\rightskip.5cm\parfillskip-\rightskip
-        \etocnumber\hspace{0.3em}
-        \hangindent2em\etocname\mydotfill
-        \etocpage\par
+        \leftskip\tocchapternumwidth\rightskip\tocrightmargin\parfillskip-\rightskip
+        \makebox[\tocsectionnumwidth][l]{\etocnumber\hfill}%
+        \hangindent\dimexpr\tocchapternumwidth+\tocsectionnumwidth\relax
+        \etocname\mydotfill
+        \makebox[2.5em][r]{\etocpage}\par
     }{%
+        \leftskip\tocchapternumwidth\rightskip\tocrightmargin\parfillskip-\rightskip
         \etocname\hfill \etocpage\par
 }}
-{\endgroup} % Post-code
+{\endgroup}
 
+% =====================================================
+% SUBSECTION STYLE
+% =====================================================
 \etocsetstyle{subsection}
-{\begingroup \leftskip1em \parfillskip 0pt plus 1fil\relax \nobreak}
+{\begingroup \leftskip\tocchapternumwidth \parfillskip 0pt plus 1fil\relax \nobreak}
 {\footnotesize\rmfamily\mdseries}
 {\etocifnumbered{%
-        \leftskip3.5em\rightskip.5cm\parfillskip-\rightskip
-        \etocnumber\hspace{0.3em}
-        \hangindent2em\etocname\mydotfill  \etocpage\par
+        \leftskip\dimexpr\tocchapternumwidth+\tocsectionnumwidth\relax
+        \rightskip\tocrightmargin\parfillskip-\rightskip
+        \makebox[\tocsubsectionnumwidth][l]{\etocnumber\hfill}%
+        \hangindent\dimexpr\tocchapternumwidth+\tocsectionnumwidth+\tocsubsectionnumwidth\relax
+        \etocname\mydotfill
+        \makebox[2.5em][r]{\etocpage}\par
     }{%
+        \leftskip\dimexpr\tocchapternumwidth+\tocsectionnumwidth\relax
+        \rightskip\tocrightmargin\parfillskip-\rightskip
         \etocname\hfill \etocpage\par
 }}
 {\endgroup}
 
+% =====================================================
+% SUBSUBSECTION STYLE
+% =====================================================
 \etocsetstyle{subsubsection}
-{\begingroup \leftskip3em \parfillskip 0pt plus 1fil\relax \nobreak}
+{\begingroup \leftskip\dimexpr\tocchapternumwidth+\tocsectionnumwidth\relax \parfillskip 0pt plus 1fil\relax \nobreak}
 {\footnotesize\rmfamily\mdseries}
 {\etocifnumbered{%
-        \leftskip6.3em\rightskip.5cm\parfillskip-\rightskip
-        \etocnumber\hspace{0.3em}
-        \hangindent2em\etocname\mydotfill  \etocpage\par
+        \leftskip\dimexpr\tocchapternumwidth+\tocsectionnumwidth+\tocsubsectionnumwidth\relax
+        \rightskip\tocrightmargin\parfillskip-\rightskip
+        \makebox[\tocsubsubsectionnumwidth][l]{\etocnumber\hfill}%
+        \hangindent\dimexpr\tocchapternumwidth+\tocsectionnumwidth+\tocsubsectionnumwidth+\tocsubsubsectionnumwidth\relax
+        \etocname\mydotfill
+        \makebox[2.5em][r]{\etocpage}\par
     }{%
+        \leftskip\dimexpr\tocchapternumwidth+\tocsectionnumwidth+\tocsubsectionnumwidth\relax
+        \rightskip\tocrightmargin\parfillskip-\rightskip
         \etocname\hfill \etocpage\par
 }}
 {\endgroup}
 
-%\etocsetstyle{appendix}
+% =====================================================
+% OPTIONAL: PARAGRAPH AND SUBPARAGRAPH STYLES
+% =====================================================
+% Uncomment if you use \paragraph and \subparagraph in TOC
+
+% \etocsetstyle{paragraph}
+% {\begingroup \leftskip\dimexpr\tocchapternumwidth+\tocsectionnumwidth+\tocsubsectionnumwidth\relax \parfillskip 0pt plus 1fil\relax \nobreak}
+% {\footnotesize\rmfamily\mdseries\itshape}
+% {\etocifnumbered{%
+%         \leftskip\dimexpr\tocchapternumwidth+\tocsectionnumwidth+\tocsubsectionnumwidth+\tocsubsubsectionnumwidth\relax
+%         \rightskip\tocrightmargin\parfillskip-\rightskip
+%         \makebox[3em][l]{\etocnumber\hfill}%
+%         \hangindent\dimexpr\tocchapternumwidth+\tocsectionnumwidth+\tocsubsectionnumwidth+\tocsubsubsectionnumwidth+3em\relax
+%         \etocname\mydotfill
+%         \makebox[2.5em][r]{\etocpage}\par
+%     }{%
+%         \leftskip\dimexpr\tocchapternumwidth+\tocsectionnumwidth+\tocsubsectionnumwidth+\tocsubsubsectionnumwidth\relax
+%         \rightskip\tocrightmargin\parfillskip-\rightskip
+%         \etocname\hfill \etocpage\par
+% }}
+% {\endgroup}
+
+% =====================================================
+% OPTIONAL: APPENDIX STYLE (if different from chapters)
+% =====================================================
+% \etocsetstyle{appendix}
+% {\begingroup}
+% {\parindent0pt \color{black}\small}
+% {\leftskip0em\rightskip\tocrightmargin\parfillskip-\rightskip
+%  Appendix \makebox[\tocchapternumwidth][l]{\etocnumber\hfill}%
+%  \MakeUppercase{\etocthename}\hfill
+%  \makebox[2.5em][r]{\etocpage}\par}
+% {\endgroup}
+
+% =====================================================
+% CONFIGURATION OPTIONS
+% =====================================================
+
+% Define toccolorpart if not already defined
+\providecolor{toccolorpart}{rgb}{0.2,0.2,0.6} % Default: dark blue
+
+% Optional: Adjust spacing between TOC entries
+% \setlength{\etocbeforechapterskip}{0.5em}
+% \setlength{\etocbeforesectionskip}{0.3em}
+% \setlength{\etocbeforesubsectionskip}{0.2em}
+
+% Optional: Set TOC depth (what levels to include)
+% \setcounter{tocdepth}{3} % Include up to subsubsection
+
+% =====================================================
+% USAGE NOTES
+% =====================================================
+% 1. Place this code in your preamble after loading etoc package
+% 2. Adjust the pattern numbers in \AtBeginDocument based on your document:
+%    - If you have 15 chapters, change 99 to 15
+%    - If sections go up to 3.12, keep 99.99
+%    - If subsections go up to 3.12.5, keep 99.99.99
+% 3. The code assumes you're using standard LaTeX sectioning commands
+% 4. Make sure to define or remove \color{toccolorpart} based on your needs
+
+% =====================================================
+% EXAMPLE OF CUSTOM ADJUSTMENTS
+% =====================================================
+% For a document with specific requirements, uncomment and modify:
+
+% % For a thesis with exactly 6 chapters and sections up to 6.15:
+% \AtBeginDocument{%
+%   \settowidth{\tocchapternumwidth}{\small 6\hspace{0.5em}}%
+%   \settowidth{\tocsectionnumwidth}{\footnotesize 6.15\hspace{0.5em}}%
+%   \settowidth{\tocsubsectionnumwidth}{\footnotesize 6.15.9\hspace{0.5em}}%
+%   \settowidth{\tocsubsubsectionnumwidth}{\footnotesize 6.15.9.9\hspace{0.5em}}%
+% }
+
+% % For a book with appendices A-Z:
+% \AtBeginDocument{%
+%   \settowidth{\tocchapternumwidth}{\small Z\hspace{0.5em}}%
+%   % ... rest of the settings
+% }
