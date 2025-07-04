@@ -8,20 +8,29 @@
 
 \titleformat{\part}%command
     [display]%shape
-    {\normalfont\centering\Large}%format
+    {\normalfont\centering\large}%format
     {\thispagestyle{empty}\color{titlecolorchapter}\partname~\MakeUppercase{\thepart}}%label
     {1em}%sep
     {\color{titlecolorchapter}\MakeUppercase}%beforcode
     []
 % Chapter number on inside
     % Chapter font
-\newcommand{\chapterNumber}{\fontsize{90pt}{0}\selectfont\usefont{OT1}{Alegreya-OsF}{m}{n}}
-
+    \newfontfamily\alegchapter{Alegreya}[
+    Numbers=OldStyle,
+    UprightFont=*-Regular,  % Ensure regular weight
+    BoldFont=*-Bold,
+    ItalicFont=*-Italic,
+    BoldItalicFont=*-BoldItalic,
+]
+\newcommand{\chapterNumber}{%
+    \alegchapter\mdseries\upshape\fontsize{108pt}{120pt}\selectfont
+}
 \titleformat{\chapter}[display]%{<commmand>}[<shape>]
-    {\normalfont\bfseries\large} %<format>
-    %{\MakeUppercase{\chaptertitlename}}{10pt} %{<label>}{<sep>}
-    {\vspace*{-3\baselineskip}\makebox[\linewidth][r]{\color{titlecolorchapter}\chapterNumber\thechapter}}{11pt}%{<label>}{<sep>}
-    {\raggedright\MakeUppercase} %{<beforcode>}
+    {\normalfont} %<format>
+    {\vspace*{-3\baselineskip}\makebox[\linewidth][r]{\color{titlecolorchapter}\chapterNumber\thechapter}}{15pt}%{<label>}{<sep>}
+    {\raggedright\bfseries\large\MakeUppercase} %{<beforcode>}
     [\normalsize\vspace*{.8\baselineskip}\titlerule] %[<aftercode>]
 
 
+    \titleformat{\section}
+    {\normalfont\large\bfseries}{\thesection}{1em}{}

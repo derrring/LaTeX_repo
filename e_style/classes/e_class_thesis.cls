@@ -12,14 +12,14 @@
 % Pass any options given to this class (e.g., 'twoside', 'a4paper') to the base 'book' class.
 \DeclareOption*{\PassOptionsToClass{\CurrentOption}{book}}
 \ProcessOptions\relax
-% Load the book class with 12pt as the default, based on your original file.
-\LoadClass[12pt]{book}
+\LoadClass{book}
 
 % --- 2. Load the common style package ---
 % This single command loads all your modular style components (packages, commands, colors, etc.).
 \RequirePackage{e_standard_doc}
 \RequirePackage{e_frontbackmatter_formal} % Load the front and back matter package
 \RequirePackage{e_title_caligraphy_chap}
+
 
 % --- 3. Define user-facing commands for thesis metadata ---
 
@@ -32,7 +32,6 @@
 % This section contains styling for chapters and ToC from general.tex
 
 %-----------------------------------------------------------------------
-
 
 
 \endinput

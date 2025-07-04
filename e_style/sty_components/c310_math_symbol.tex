@@ -16,33 +16,72 @@
 %% Delimiters
 %----------------------------------------------------------------------
 % offered by \usepackage{mathtools}
-\newcommand{\ensemble}[1]{\left\{ #1 \right\}}         % for braces
-\newcommand{\bracks}[1]{\left[#1\right]}        % for brackets
-\newcommand{\parens}[1]{\left(#1\right)}        % for parentheses
-\newcommand{\innerp}[1]{\left\langle#1\right\rangle}    % for scalar product
-% Problematic: the \ensemble{} should allow linebreak within math mode.
-% Potential solution :
-% https://tex.stackexchange.com/questions/78670/how-to-achieve-line-break-in-simple-formula-mode
-% as well as
-% https://tex.stackexchange.com/questions/119675/why-allowbreak-is-not-working
-% to be used within a \left \right pair to allow line break after comma
-\def\middlebreak {\nulldelimiterspace0pt
-\right.\allowbreak\mskip 0mu plus .5mu \nulldelimiterspace0pt\left.}%
+% Improved delimiter definitions using mathtools
+\usepackage{mathtools}
 
-\newcommand{\bra}[1]{\left\langle#1\right\rvert}        % for bras
-\newcommand{\ket}[1]{\left\lvert#1\right\rangle}        % for kets
-\newcommand{\braket}[2]{\left\langle#1\middle\vert#2\right\rangle}
-% for brakets
-\newcommand{\abs}[1]{\left\lvert#1\right\rvert}        % for absolute value
-\newcommand{\ceil}[1]{\left\lceil#1\right\rceil}        % for ceiling
-\newcommand{\floor}[1]{\left\lfloor#1\right\rfloor}        % for floor
-\newcommand{\negpart}[1]{\left[#1\right]_{-}}        % for negative part
-\newcommand{\pospart}[1]{\left[#1\right]_{+}}    % for positive part
-\newcommand{\norm}[1]{\left\lVert#1\right\rVert}        % for norm
-\newcommand{\trinorm}[1]{{\left\vert\kern-0.25ex\left\vert\kern-0.25ex\left\vert
-        #1
-    \right\vert\kern-0.25ex\right\vert\kern-0.25ex\right\vert}
-} % for triple vertical norm
+% Basic paired delimiters - these auto-scale with * version
+\DeclarePairedDelimiter{\parens}{(}{)}
+\DeclarePairedDelimiter{\bracks}{[}{]}
+\DeclarePairedDelimiter{\abs}{\lvert}{\rvert}
+\DeclarePairedDelimiter{\norm}{\lVert}{\rVert}
+\DeclarePairedDelimiter{\ceil}{\lceil}{\rceil}
+\DeclarePairedDelimiter{\floor}{\lfloor}{\rfloor}
+
+% Angle brackets for inner products
+\DeclarePairedDelimiter{\innerp}{\langle}{\rangle}
+
+% Quantum mechanics notation
+\DeclarePairedDelimiter{\ket}{\lvert}{\rangle}
+\DeclarePairedDelimiter{\bra}{\langle}{\rvert}
+
+% Braket with middle separator
+\DeclarePairedDelimiterX{\braket}[2]{\langle}{\rangle}{#1 \delimsize\vert #2}
+\DeclarePairedDelimiterX\braketop[3]{\langle}{\rangle}%
+{#1\,\delimsize\vert\,\mathopen{}#2\,\delimsize\vert\,\mathopen{}#3}
+
+% Set notation with conditional (like your \ensemble)
+\providecommand\given{}
+\newcommand\SetSymbol[1][]{%
+    \nonscript\:#1 \vert
+    \allowbreak
+    \nonscript\:
+    \mathopen{}
+}
+\DeclarePairedDelimiterX\ensemble[1]\{\}{%
+    \renewcommand\given{\SetSymbol[\delimsize]}
+    #1
+}
+
+% Better approach for parts:
+\newcommand{\pospart}[1]{\bracks*{#1}_{+}}
+\newcommand{\negpart}[1]{\bracks*{#1}_{-}}
+
+% Triple norm with better spacing
+\DeclarePairedDelimiterX{\trinorm}[1]{\lvert\kern-0.25ex\lvert\kern-0.25ex\lvert}{\rvert\kern-0.25ex\rvert\kern-0.25ex\rvert}{#1}
+
+% Usage examples:
+% \parens{x}     - fixed size parentheses
+% \parens*{x}    - auto-scaling parentheses
+% \parens[\big]{x} - specific size
+
+% \abs{x}        - fixed size absolute value
+% \abs*{\frac{a}{b}} - auto-scaling
+
+% \braket{x}{y}  - braket notation
+% \braket*{\frac{a}{b}}{\frac{c}{d}} - auto-scaling braket
+
+% \set{x \given x > 0} - set with condition
+% \set*{x \given x > 0} - auto-scaling set
+
+% For line breaks in math mode (your \middlebreak issue):
+% Use \allowbreak or the breqn package for automatic breaking
+% Or use align/split environments for manual breaking
+
+% Example with custom break command:
+\newcommand{\mybreak}{\allowbreak\,}
+
+% Usage in expressions:
+% \parens*{a + b + c \mybreak + d + e + f}
 
 % Sets
 \newcommand{\mbbA}{\mathbb{A}}
@@ -391,10 +430,10 @@
 \newcommand{\curl}{\operatorname{curl\mathop{}}} % for curl
 \newcommand{\grad}{\operatorname{grad\mathop{}}} % for gradient%
 \newcommand{\tr}{\operatorname{tr\mathop{}}} % for trace
-\newcommand{\Lip}{\mathrm{Lip}} % for Lipschitz class
 \DeclareMathOperator{\proj}{\symbf{pr}}        % for projection
 \DeclareMathOperator{\prox}{\symrm{prox}}        % for proximal operator
 \DeclareMathOperator*{\infconv}{%for infimal convolution
+
 \mathbin{\ooalign{\raisebox{-.35ex}{$\wedge$}\cr\hidewidth\raisebox{.5ex}{\scalebox{.9}{+}}\hidewidth}}}
 
 % Other
@@ -421,7 +460,8 @@
 \newcommand{\Ker}{\mathrm{Ker\mathop{}}} % for kernel of a function
 \newcommand{\Img}{\mathrm{Im\mathop{}}} % for image of a function
 \newcommand{\Spec}{\mathrm{Spec}}
-
+\newcommand{\Fix}{\mathsf{Fix}} % for fixed points
+\newcommand{\Lip}{\mathsf{Lip}} % for Lipschitz class
 %----------------------------------------------------------------------
 %% Indices, Sequences and recursions
 %----------------------------------------------------------------------
@@ -435,11 +475,12 @@
 %----------------------------------------------------------------------
 %% Probability
 %----------------------------------------------------------------------
+\newcommand{\Law}{\mathsf{Law}} % for law of a random variable
 \newcommand{\Prob}{\mathbb{P}}
 \newcommand{\Var}{\operatorname{Var\mathop{}}} % for variance
 \newcommand{\Cov}{\operatorname{Cov\mathop{}}} % for covariance
 \newcommand{\iid}{\mathrm{i.i.d.}} % for independent and identically distributed
-\newcommand{\simiid}{\stackrel{\mathrm{i.i.d.}}{\sim}}
+\newcommand{\simiid}{\overset{\mathrm{i.i.d.}}{\sim}}
 
 \ExplSyntaxOn
 \cs_new_protected:Nn \__independence_symbol:Nn
@@ -492,7 +533,6 @@
 }
 
 %==============Category Theory================
-
 \newcommand{\Hom}{\mathbfup{Hom}} % for homomorphism
 \newcommand{\Iso}{\mathbfup{Iso}} % for isomorphism
 \newcommand{\Aut}{\mathbfup{Aut}} % for automorphism
