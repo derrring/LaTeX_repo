@@ -5,9 +5,20 @@
 %\displaywidowpenalty=10000 %comment out is better
 
 %packageometry save us from calculate parameters that affect each other
-\geometry{inner=2cm,outer=2cm,top=2cm,bottom=2cm}
+\geometry{
+    inner=2.5cm,       % Bit more margin
+    outer=2.5cm,
+    top=2.5cm,
+    bottom=2.5cm
+}
 %out margin in (ams)book class
-\setlength{\emergencystretch}{1.5em}
+\setlength{\emergencystretch}{2em}
+% Complementary settings
+\tolerance=500              % Allow more flexibility before emergency
+\pretolerance=200          % Try harder before hyphenating
+\hfuzz=0.3pt              % Small tolerance for overfull boxes
+\hyphenpenalty=50         % Encourage hyphenation when needed
+
 \setlength{\footskip}{19pt}
 % Adjust distance to footer (default is too large)
 \setlength{\abovetopsep}{1ex} %offred extra space above top rule of a table, by booktabs package

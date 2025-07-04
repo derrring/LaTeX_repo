@@ -10,7 +10,25 @@
 
 % --- 1. Process options and load the base 'book' class ---
 % Pass any options given to this class (e.g., 'twoside', 'a4paper') to the base 'book' class.
-\DeclareOption*{\PassOptionsToClass{\CurrentOption}{book}}
+\DeclareOption*{\PassOptionsToClass{\CurrentOption}{book}}  
+\DeclareOption{12pt}{%
+    \PassOptionsToClass{\CurrentOption}{book}
+    \AtEndOfClass{%
+        % Mimic 11pt class section sizes exactly
+        \titleformat{\section}
+            {\fontsize{14.4pt}{17.28pt}\selectfont\bfseries}{\thesection}{1em}{}
+            % Exactly matches 11pt class \Large
+
+        \titleformat{\subsection}
+            {\fontsize{12pt}{14.4pt}\selectfont\bfseries}{\thesubsection}{1em}{}
+            % Exactly matches 11pt class \large
+
+        \titleformat{\subsubsection}
+            {\fontsize{11pt}{13.2pt}\selectfont\bfseries}{\thesubsubsection}{1em}{}
+            % Exactly matches 11pt class \normalsize
+    }%
+}
+
 \ProcessOptions\relax
 \LoadClass{book}
 
@@ -28,8 +46,15 @@
 
 
 
+
 % --- 5. Define Thesis-specific Formatting ---
 % This section contains styling for chapters and ToC from general.tex
+\linespread{1.1}
+
+
+
+% Override only for 12pt option
+
 
 %-----------------------------------------------------------------------
 

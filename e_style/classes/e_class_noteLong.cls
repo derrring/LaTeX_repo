@@ -8,12 +8,27 @@
 \ProvidesClass{e_class_noteLong}[Lecture Notes Class]
 
 % --- Class Options ---
-% Process standard options for the article class (e.g., 10pt, 11pt, 12pt, a4paper)
-\DeclareOption*{\PassOptionsToClass{\CurrentOption}{book}}
-% Process given options
+\DeclareOption*{\PassOptionsToClass{\CurrentOption}{book}}  
+\DeclareOption{12pt}{%
+    \PassOptionsToClass{\CurrentOption}{book}
+    \AtEndOfClass{%
+        % Mimic 11pt class section sizes exactly
+        \titleformat{\section}
+            {\fontsize{14.4pt}{17.28pt}\selectfont\bfseries}{\thesection}{1em}{}
+            % Exactly matches 11pt class \Large
+
+        \titleformat{\subsection}
+            {\fontsize{12pt}{14.4pt}\selectfont\bfseries}{\thesubsection}{1em}{}
+            % Exactly matches 11pt class \large
+
+        \titleformat{\subsubsection}
+            {\fontsize{11pt}{13.2pt}\selectfont\bfseries}{\thesubsubsection}{1em}{}
+            % Exactly matches 11pt class \normalsize
+    }%
+}
+
 \ProcessOptions\relax
-% Load the base class
-\LoadClass[12pt]{book}
+\LoadClass{book}
 
 
 \RequirePackage{e_standard_doc}
