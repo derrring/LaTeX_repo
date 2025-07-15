@@ -47,14 +47,21 @@
     \newgeometry{left=1.5cm, right=1.5cm, top=2.5cm, bottom=2.5cm}
     \ifcsdef{chapter}{
         \setcounter{tocdepth}{1}
+        \begin{multicols}{2}
+            \printtoctitle{Brief Contents}
+            \addcontentsline{toc}{chapter}{Brief Contents}
+            \tableofcontents
+        \end{multicols}
     }
     {
         \setcounter{tocdepth}{2}
+        \begin{multicols}{2}
+            \printtoctitle{Brief Contents}
+            \addcontentsline{toc}{section}{Brief Contents}
+            \tableofcontents
+        \end{multicols}
     }
-    \begin{multicols}{2}
-        \printtoctitle{Brief Contents}
-        \tableofcontents
-    \end{multicols}
+
     \restoregeometry
     \setcounter{tocdepth}{3}
     \endgroup
@@ -67,10 +74,14 @@
     }{\clearpage}
     \ifcsdef{chapter}{
         \setcounter{tocdepth}{3}
+        \printtoctitle{Detailed Contents}
+        \addcontentsline{toc}{chapter}{Detailed Contents}
     }{
         \setcounter{tocdepth}{3}
+        \printtoctitle{Detailed Contents}
+        \addcontentsline{toc}{section}{Detailed Contents}
+
     }
-    \printtoctitle{Detailed Contents}
     \tableofcontents
     \endgroup
 }
@@ -79,8 +90,13 @@
 \newcommand{\mytoc}{%
     \begingroup
     \etocsettocstyle{\renewcommand{\contentsname}{Contents}}{}
-    \setcounter{tocdepth}{3}
+    \setcounter{tocdepth}{2}
     \printtoctitle{\contentsname}
+    \ifcsdef{chapter}{
+        \addcontentsline{toc}{chapter}{\contentsname}  % Add this line for book class
+    }{
+        \addcontentsline{toc}{section}{\contentsname}  % Add this line for article class
+    }
     \tableofcontents
     \endgroup
     \clearpage
@@ -123,13 +139,17 @@
 \newlength{\tocsectionnumwidth}
 \newlength{\tocsubsectionnumwidth}
 \newlength{\tocsubsubsectionnumwidth}
+\newlength{\tocnumwidthplus}
 
 % Set fixed lengths
 \setlength{\tocrightmargin}{0.5cm}
 \setlength{\tocpartsep}{1em}
+\setlength{\tocnumwidthplus}{0.5em} % Additional space after numbers
+
+% Additional space after numbers
 
 % =====================================================
-% METHOD 2: PRE-CALCULATED WIDTH BASED ON PATTERNS
+% PRE-CALCULATED WIDTH BASED ON PATTERNS
 % =====================================================
 % Adjust these patterns based on your document structure
 \AtBeginDocument{%
@@ -137,23 +157,18 @@
     \settowidth{\@tempdima}{\normalsize VIII\hspace{1em}}%
     \edef\tocpartnumwidth{\the\@tempdima}%
     %
-    % For CHAPTERS (up to 9)
-    \settowidth{\tocchapternumwidth}{\small 9\hspace{0.2em}}%
+    % For CHAPTERS (up to 99)
+    \settowidth{\tocchapternumwidth}{\small 99\hspace{0.5\tocnumwidthplus}}%
     %
-    % For SECTIONS (up to 9.10 based on your document)
-    \settowidth{\tocsectionnumwidth}{\footnotesize 9.10\hspace{0.2em}}%
+    % For SECTIONS - calculate the indentation needed
+    \settowidth{\tocsectionnumwidth}{\footnotesize 99.9\hspace{\tocnumwidthplus}}% Include space for alignment
     %
-    % For SUBSECTIONS (up to 9.10.9)
-    \settowidth{\tocsubsectionnumwidth}{\footnotesize 9.10.9\hspace{0.2em}}%
+    % For SUBSECTIONS - calculate the indentation needed
+    \settowidth{\tocsubsectionnumwidth}{\footnotesize 99.9.9\hspace{\tocnumwidthplus}}%
     %
-    % For SUBSUBSECTIONS (up to 9.10.9.9)
-    \settowidth{\tocsubsubsectionnumwidth}{\footnotesize 9.10.9.9\hspace{0.2em}}%
-    %
-    % Minimum width enforcement - reduced for tighter spacing
-    \ifdim\tocchapternumwidth<1em \setlength{\tocchapternumwidth}{1em}\fi
-    \ifdim\tocsectionnumwidth<1em \setlength{\tocsectionnumwidth}{1em}\fi
-    \ifdim\tocsubsectionnumwidth<1em \setlength{\tocsubsectionnumwidth}{1em}\fi
-    \ifdim\tocsubsubsectionnumwidth<1em \setlength{\tocsubsubsectionnumwidth}{1em}\fi
+    % For SUBSUBSECTIONS - calculate the indentation needed
+    \settowidth{\tocsubsubsectionnumwidth}{\footnotesize 99.9.9.9\hspace{\tocnumwidthplus}}%
+
 }
 
 % =====================================================
@@ -173,29 +188,34 @@
 % CHAPTER STYLE
 % =====================================================
 \etocsetstyle{chapter}
-{\begingroup}
-{\parindent0pt \color{black}\small}
+{\begingroup\color{black}}
+{\small\parindent0pt }
 {\etocifnumbered{%
         \leftskip0em\rightskip\tocrightmargin\parfillskip-\rightskip
-        \makebox[\tocchapternumwidth][l]{\etocnumber\hfill}%
+        % Print number naturally with consistent space after
+        \makebox[\tocchapternumwidth][l]{\etocnumber}\hspace{-0.25em}
+        % Calculate hanging indent for wrapped chapter titles
+        \hangindent\tocchapternumwidth
         \MakeUppercase{\etocthename}\hfill
-        \makebox[2.5em][r]{\etocpage}\par
+        \makebox[2.5em][r]{\footnotesize\etocpage}\par
     }{%
         \leftskip0em\rightskip\tocrightmargin\parfillskip-\rightskip
-        \MakeUppercase{\etocthename}\hfill \etocpage\par
+        \MakeUppercase{\etocthename}\hfill \footnotesize\etocpage\par
 }}
 {\endgroup}
-
 % =====================================================
-% SECTION STYLE
+% SECTION STYLE (with improved spacing)
 % =====================================================
 \etocsetstyle{section}
-{\begingroup\leftskip0em\parindent0pt}
-{\footnotesize}
+{\begingroup}
+{\footnotesize\parindent0pt}
 {\etocifnumbered{%
-        \leftskip\tocchapternumwidth\rightskip\tocrightmargin\parfillskip-\rightskip
-        \makebox[\tocsectionnumwidth][l]{\etocnumber\hfill}%
-        \hangindent\dimexpr\tocchapternumwidth+\tocsectionnumwidth\relax
+        \leftskip\tocchapternumwidth
+        \rightskip\tocrightmargin\parfillskip-\rightskip
+        % Print number naturally with consistent space after
+        \makebox[\tocsectionnumwidth][l]{\etocnumber}%%
+        % Calculate hanging indent based on actual number width
+        \hangindent\tocsectionnumwidth
         \etocname\mydotfill
         \makebox[2.5em][r]{\etocpage}\par
     }{%
@@ -205,36 +225,40 @@
 {\endgroup}
 
 % =====================================================
-% SUBSECTION STYLE
+% SUBSECTION STYLE (with improved spacing)
 % =====================================================
 \etocsetstyle{subsection}
-{\begingroup \leftskip\tocchapternumwidth \parfillskip 0pt plus 1fil\relax \nobreak}
-{\footnotesize\rmfamily\mdseries}
+{\begingroup }
+{\footnotesize\rmfamily\mdseries \parindent0pt}
 {\etocifnumbered{%
         \leftskip\dimexpr\tocchapternumwidth+\tocsectionnumwidth\relax
         \rightskip\tocrightmargin\parfillskip-\rightskip
-        \makebox[\tocsubsectionnumwidth][l]{\etocnumber\hfill}%
-        \hangindent\dimexpr\tocchapternumwidth+\tocsectionnumwidth+\tocsubsectionnumwidth\relax
+        % Print number naturally with consistent space after
+        \makebox[\tocsubsectionnumwidth][l]{\etocnumber}%
+        % Calculate hanging indent
+        \hangindent\tocsubsectionnumwidth
         \etocname\mydotfill
         \makebox[2.5em][r]{\etocpage}\par
     }{%
-        \leftskip\dimexpr\tocchapternumwidth+\tocsectionnumwidth\relax
+        \leftskip\dimexpr\tocsectionnumwidth\relax
         \rightskip\tocrightmargin\parfillskip-\rightskip
         \etocname\hfill \etocpage\par
 }}
 {\endgroup}
 
 % =====================================================
-% SUBSUBSECTION STYLE
+% SUBSUBSECTION STYLE (with improved spacing)
 % =====================================================
 \etocsetstyle{subsubsection}
-{\begingroup \leftskip\dimexpr\tocchapternumwidth+\tocsectionnumwidth\relax \parfillskip 0pt plus 1fil\relax \nobreak}
-{\footnotesize\rmfamily\mdseries}
+{\begingroup}
+{\footnotesize\rmfamily\mdseries \parindent0pt}
 {\etocifnumbered{%
         \leftskip\dimexpr\tocchapternumwidth+\tocsectionnumwidth+\tocsubsectionnumwidth\relax
         \rightskip\tocrightmargin\parfillskip-\rightskip
-        \makebox[\tocsubsubsectionnumwidth][l]{\etocnumber\hfill}%
-        \hangindent\dimexpr\tocchapternumwidth+\tocsectionnumwidth+\tocsubsectionnumwidth+\tocsubsubsectionnumwidth\relax
+        % Print number naturally with consistent space after
+        \makebox[\tocsubsubsectionnumwidth][l]{\etocnumber}%
+        % Calculate hanging indent
+        \hangindent\tocsubsubsectionnumwidth
         \etocname\mydotfill
         \makebox[2.5em][r]{\etocpage}\par
     }{%
@@ -243,40 +267,6 @@
         \etocname\hfill \etocpage\par
 }}
 {\endgroup}
-
-% =====================================================
-% OPTIONAL: PARAGRAPH AND SUBPARAGRAPH STYLES
-% =====================================================
-% Uncomment if you use \paragraph and \subparagraph in TOC
-
-% \etocsetstyle{paragraph}
-% {\begingroup \leftskip\dimexpr\tocchapternumwidth+\tocsectionnumwidth+\tocsubsectionnumwidth\relax \parfillskip 0pt plus 1fil\relax \nobreak}
-% {\footnotesize\rmfamily\mdseries\itshape}
-% {\etocifnumbered{%
-%         \leftskip\dimexpr\tocchapternumwidth+\tocsectionnumwidth+\tocsubsectionnumwidth+\tocsubsubsectionnumwidth\relax
-%         \rightskip\tocrightmargin\parfillskip-\rightskip
-%         \makebox[3em][l]{\etocnumber\hfill}%
-%         \hangindent\dimexpr\tocchapternumwidth+\tocsectionnumwidth+\tocsubsectionnumwidth+\tocsubsubsectionnumwidth+3em\relax
-%         \etocname\mydotfill
-%         \makebox[2.5em][r]{\etocpage}\par
-%     }{%
-%         \leftskip\dimexpr\tocchapternumwidth+\tocsectionnumwidth+\tocsubsectionnumwidth+\tocsubsubsectionnumwidth\relax
-%         \rightskip\tocrightmargin\parfillskip-\rightskip
-%         \etocname\hfill \etocpage\par
-% }}
-% {\endgroup}
-
-% =====================================================
-% OPTIONAL: APPENDIX STYLE (if different from chapters)
-% =====================================================
-% \etocsetstyle{appendix}
-% {\begingroup}
-% {\parindent0pt \color{black}\small}
-% {\leftskip0em\rightskip\tocrightmargin\parfillskip-\rightskip
-%  Appendix \makebox[\tocchapternumwidth][l]{\etocnumber\hfill}%
-%  \MakeUppercase{\etocthename}\hfill
-%  \makebox[2.5em][r]{\etocpage}\par}
-% {\endgroup}
 
 % =====================================================
 % CONFIGURATION OPTIONS
@@ -297,28 +287,20 @@
 % USAGE NOTES
 % =====================================================
 % 1. Place this code in your preamble after loading etoc package
-% 2. Adjust the pattern numbers in \AtBeginDocument based on your document:
-%    - If you have 15 chapters, change 99 to 15
-%    - If sections go up to 3.12, keep 99.99
-%    - If subsections go up to 3.12.5, keep 99.99.99
-% 3. The code assumes you're using standard LaTeX sectioning commands
-% 4. Make sure to define or remove \color{toccolorpart} based on your needs
+% 2. The spacing after section numbers is now consistent (1em) regardless of number width
+% 3. You can adjust the spacing by changing \hspace{1em} to:
+%    - \hspace{0.8em} for tighter spacing
+%    - \hspace{1.2em} for looser spacing
+% 4. The code assumes you're using standard LaTeX sectioning commands
+% 5. Make sure to define or remove \color{toccolorpart} based on your needs
 
 % =====================================================
 % EXAMPLE OF CUSTOM ADJUSTMENTS
 % =====================================================
-% For a document with specific requirements, uncomment and modify:
+% For different spacing preferences:
 
-% % For a thesis with exactly 6 chapters and sections up to 6.15:
-% \AtBeginDocument{%
-%   \settowidth{\tocchapternumwidth}{\small 6\hspace{0.5em}}%
-%   \settowidth{\tocsectionnumwidth}{\footnotesize 6.15\hspace{0.5em}}%
-%   \settowidth{\tocsubsectionnumwidth}{\footnotesize 6.15.9\hspace{0.5em}}%
-%   \settowidth{\tocsubsubsectionnumwidth}{\footnotesize 6.15.9.9\hspace{0.5em}}%
-% }
+% % For tighter number-title spacing:
+% Replace all instances of \hspace{1em} with \hspace{0.7em}
 
-% % For a book with appendices A-Z:
-% \AtBeginDocument{%
-%   \settowidth{\tocchapternumwidth}{\small Z\hspace{0.5em}}%
-%   % ... rest of the settings
-% }
+% % For wider number-title spacing:
+% Replace all instances of \hspace{1em} with \hspace{1.5em}

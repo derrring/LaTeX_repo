@@ -1,3 +1,4 @@
+
 %----------------------------------------------------------------------
 %% General
 %----------------------------------------------------------------------
@@ -17,7 +18,6 @@
 %----------------------------------------------------------------------
 % offered by \usepackage{mathtools}
 % Improved delimiter definitions using mathtools
-\usepackage{mathtools}
 
 % Basic paired delimiters - these auto-scale with * version
 \DeclarePairedDelimiter{\parens}{(}{)}
@@ -36,19 +36,18 @@
 
 % Braket with middle separator
 \DeclarePairedDelimiterX{\braket}[2]{\langle}{\rangle}{#1 \delimsize\vert #2}
-\DeclarePairedDelimiterX\braketop[3]{\langle}{\rangle}%
-{#1\,\delimsize\vert\,\mathopen{}#2\,\delimsize\vert\,\mathopen{}#3}
+\DeclarePairedDelimiterX\braketop[3]{\langle}{\rangle}{
+#1\,\delimsize\vert\,\mathopen{}#2\,\delimsize\vert\,\mathopen{}#3}
 
-% Set notation with conditional (like your \ensemble)
-\providecommand\given{}
+% Set notation with conditional (\ensemble)
 \newcommand\SetSymbol[1][]{%
-    \nonscript\:#1 \vert
+    \nonscript\: #1 \vert
     \allowbreak
     \nonscript\:
     \mathopen{}
 }
 \DeclarePairedDelimiterX\ensemble[1]\{\}{%
-    \renewcommand\given{\SetSymbol[\delimsize]}
+    \newcommand\given{\SetSymbol[\delimsize]}
     #1
 }
 
@@ -76,12 +75,6 @@
 % For line breaks in math mode (your \middlebreak issue):
 % Use \allowbreak or the breqn package for automatic breaking
 % Or use align/split environments for manual breaking
-
-% Example with custom break command:
-\newcommand{\mybreak}{\allowbreak\,}
-
-% Usage in expressions:
-% \parens*{a + b + c \mybreak + d + e + f}
 
 % Sets
 \newcommand{\mbbA}{\mathbb{A}}
@@ -114,122 +107,122 @@
 \newcommand{\mbbone}{\mathbb{1}}
 
 % Bold for \mathbf
-\newcommand{\mbfzero}{\symbf{0}}
-\newcommand{\mbfone}{\symbf{1}}
+\newcommand{\mbfzero}{\mathbf{0}}
+\newcommand{\mbfone}{\mathbf{1}}
 
-\newcommand{\mbfa}{\symbf{a}}
-\newcommand{\mbfb}{\symbf{b}}
-\newcommand{\mbfc}{\symbf{c}}
-\newcommand{\mbfd}{\symbf{d}}
-\newcommand{\mbfe}{\symbf{e}}
-\newcommand{\mbff}{\symbf{f}}
-\newcommand{\mbfg}{\symbf{g}}
-\newcommand{\mbfh}{\symbf{h}}
-\newcommand{\mbfi}{\symbf{i}}
-\newcommand{\mbfj}{\symbf{j}}
-\newcommand{\mbfk}{\symbf{k}}
-\newcommand{\mbfl}{\symbf{l}}
-\newcommand{\mbfm}{\symbf{m}}
-\newcommand{\mbfn}{\symbf{n}}
-\newcommand{\mbfo}{\symbf{o}}
-\newcommand{\mbfp}{\symbf{p}}
-\newcommand{\mbfq}{\symbf{q}}
-\newcommand{\mbfr}{\symbf{r}}
-\newcommand{\mbfs}{\symbf{s}}
-\newcommand{\mbft}{\symbf{t}}
-\newcommand{\mbfu}{\symbf{u}}
-\newcommand{\mbfv}{\symbf{v}}
-\newcommand{\mbfw}{\symbf{w}}
-\newcommand{\mbfx}{\symbf{x}}
-\newcommand{\mbfy}{\symbf{y}}
-\newcommand{\mbfz}{\symbf{z}}
+\newcommand{\mbfa}{\mathbf{a}}
+\newcommand{\mbfb}{\mathbf{b}}
+\newcommand{\mbfc}{\mathbf{c}}
+\newcommand{\mbfd}{\mathbf{d}}
+\newcommand{\mbfe}{\mathbf{e}}
+\newcommand{\mbff}{\mathbf{f}}
+\newcommand{\mbfg}{\mathbf{g}}
+\newcommand{\mbfh}{\mathbf{h}}
+\newcommand{\mbfi}{\mathbf{i}}
+\newcommand{\mbfj}{\mathbf{j}}
+\newcommand{\mbfk}{\mathbf{k}}
+\newcommand{\mbfl}{\mathbf{l}}
+\newcommand{\mbfm}{\mathbf{m}}
+\newcommand{\mbfn}{\mathbf{n}}
+\newcommand{\mbfo}{\mathbf{o}}
+\newcommand{\mbfp}{\mathbf{p}}
+\newcommand{\mbfq}{\mathbf{q}}
+\newcommand{\mbfr}{\mathbf{r}}
+\newcommand{\mbfs}{\mathbf{s}}
+\newcommand{\mbft}{\mathbf{t}}
+\newcommand{\mbfu}{\mathbf{u}}
+\newcommand{\mbfv}{\mathbf{v}}
+\newcommand{\mbfw}{\mathbf{w}}
+\newcommand{\mbfx}{\mathbf{x}}
+\newcommand{\mbfy}{\mathbf{y}}
+\newcommand{\mbfz}{\mathbf{z}}
 
-\newcommand{\mbfA}{\symbf{A}}
-\newcommand{\mbfB}{\symbf{B}}
-\newcommand{\mbfC}{\symbf{C}}
-\newcommand{\mbfD}{\symbf{D}}
-\newcommand{\mbfE}{\symbf{E}}
-\newcommand{\mbfF}{\symbf{F}}
-\newcommand{\mbfG}{\symbf{G}}
-\newcommand{\mbfH}{\symbf{H}}
-\newcommand{\mbfI}{\symbf{I}}
-\newcommand{\mbfJ}{\symbf{J}}
-\newcommand{\mbfK}{\symbf{K}}
-\newcommand{\mbfL}{\symbf{L}}
-\newcommand{\mbfM}{\symbf{M}}
-\newcommand{\mbfN}{\symbf{N}}
-\newcommand{\mbfO}{\symbf{O}}
-\newcommand{\mbfP}{\symbf{P}}
-\newcommand{\mbfQ}{\symbf{Q}}
-\newcommand{\mbfR}{\symbf{R}}
-\newcommand{\mbfS}{\symbf{S}}
-\newcommand{\mbfT}{\symbf{T}}
-\newcommand{\mbfU}{\symbf{U}}
-\newcommand{\mbfV}{\symbf{V}}
-\newcommand{\mbfW}{\symbf{W}}
-\newcommand{\mbfX}{\symbf{X}}
-\newcommand{\mbfY}{\symbf{Y}}
-\newcommand{\mbfZ}{\symbf{Z}}
+\newcommand{\mbfA}{\mathbf{A}}
+\newcommand{\mbfB}{\mathbf{B}}
+\newcommand{\mbfC}{\mathbf{C}}
+\newcommand{\mbfD}{\mathbf{D}}
+\newcommand{\mbfE}{\mathbf{E}}
+\newcommand{\mbfF}{\mathbf{F}}
+\newcommand{\mbfG}{\mathbf{G}}
+\newcommand{\mbfH}{\mathbf{H}}
+\newcommand{\mbfI}{\mathbf{I}}
+\newcommand{\mbfJ}{\mathbf{J}}
+\newcommand{\mbfK}{\mathbf{K}}
+\newcommand{\mbfL}{\mathbf{L}}
+\newcommand{\mbfM}{\mathbf{M}}
+\newcommand{\mbfN}{\mathbf{N}}
+\newcommand{\mbfO}{\mathbf{O}}
+\newcommand{\mbfP}{\mathbf{P}}
+\newcommand{\mbfQ}{\mathbf{Q}}
+\newcommand{\mbfR}{\mathbf{R}}
+\newcommand{\mbfS}{\mathbf{S}}
+\newcommand{\mbfT}{\mathbf{T}}
+\newcommand{\mbfU}{\mathbf{U}}
+\newcommand{\mbfV}{\mathbf{V}}
+\newcommand{\mbfW}{\mathbf{W}}
+\newcommand{\mbfX}{\mathbf{X}}
+\newcommand{\mbfY}{\mathbf{Y}}
+\newcommand{\mbfZ}{\mathbf{Z}}
 
-\newcommand{\mbfalpha}{\symbf{\alpha}}
-\newcommand{\mbfbeta}{\symbf{\beta}}
-\newcommand{\mbfgamma}{\symbf{\gamma}}
-\newcommand{\mbfdelta}{\symbf{\delta}}
-\newcommand{\mbfepsilon}{\symbf{\epsilon}}
-\newcommand{\mbfzeta}{\symbf{\zeta}}
-\newcommand{\mbfeta}{\symbf{\eta}}
-\newcommand{\mbftheta}{\symbf{\theta}}
-\newcommand{\mbfiota}{\symbf{\iota}}
-\newcommand{\mbfkappa}{\symbf{\kappa}}
-\newcommand{\mbflambda}{\symbf{\lambda}}
-\newcommand{\mbfmu}{\symbf{\mu}}
-\newcommand{\mbfnu}{\symbf{\nu}}
-\newcommand{\mbfxi}{\symbf{\xi}}
-\newcommand{\mbfpi}{\symbf{\pi}}
-\newcommand{\mbfrho}{\symbf{\rho}}
-\newcommand{\mbfsigma}{\symbf{\sigma}}
-\newcommand{\mbftau}{\symbf{\tau}}
-\newcommand{\mbfupsilon}{\symbf{\upsilon}}
-\newcommand{\mbfphi}{\symbf{\phi}}
-\newcommand{\mbfchi}{\symbf{\chi}}
-\newcommand{\mbfpsi}{\symbf{\psi}}
-\newcommand{\mbfomega}{\symbf{\omega}}
-\newcommand{\mbfvarepsilon}{\symbf{\varepsilon}}
-\newcommand{\mbfvartheta}{\symbf{\vartheta}}
-\newcommand{\mbfvarpi}{\symbf{\varpi}}
-\newcommand{\mbfvarrho}{\symbf{\varrho}}
-\newcommand{\mbfvarsigma}{\symbf{\varsigma}}
-\newcommand{\mbfvarphi}{\symbf{\varphi}}
+\newcommand{\mbfalpha}{\mathbf{\alpha}}
+\newcommand{\mbfbeta}{\mathbf{\beta}}
+\newcommand{\mbfgamma}{\mathbf{\gamma}}
+\newcommand{\mbfdelta}{\mathbf{\delta}}
+\newcommand{\mbfepsilon}{\mathbf{\epsilon}}
+\newcommand{\mbfzeta}{\mathbf{\zeta}}
+\newcommand{\mbfeta}{\mathbf{\eta}}
+\newcommand{\mbftheta}{\mathbf{\theta}}
+\newcommand{\mbfiota}{\mathbf{\iota}}
+\newcommand{\mbfkappa}{\mathbf{\kappa}}
+\newcommand{\mbflambda}{\mathbf{\lambda}}
+\newcommand{\mbfmu}{\mathbf{\mu}}
+\newcommand{\mbfnu}{\mathbf{\nu}}
+\newcommand{\mbfxi}{\mathbf{\xi}}
+\newcommand{\mbfpi}{\mathbf{\pi}}
+\newcommand{\mbfrho}{\mathbf{\rho}}
+\newcommand{\mbfsigma}{\mathbf{\sigma}}
+\newcommand{\mbftau}{\mathbf{\tau}}
+\newcommand{\mbfupsilon}{\mathbf{\upsilon}}
+\newcommand{\mbfphi}{\mathbf{\phi}}
+\newcommand{\mbfchi}{\mathbf{\chi}}
+\newcommand{\mbfpsi}{\mathbf{\psi}}
+\newcommand{\mbfomega}{\mathbf{\omega}}
+\newcommand{\mbfvarepsilon}{\mathbf{\varepsilon}}
+\newcommand{\mbfvartheta}{\mathbf{\vartheta}}
+\newcommand{\mbfvarpi}{\mathbf{\varpi}}
+\newcommand{\mbfvarrho}{\mathbf{\varrho}}
+\newcommand{\mbfvarsigma}{\mathbf{\varsigma}}
+\newcommand{\mbfvarphi}{\mathbf{\varphi}}
 
-\newcommand{\mbfAlpha}{\symbf{\Alpha}}
-\newcommand{\mbfBeta}{\symbf{\Beta}}
-\newcommand{\mbfGamma}{\symbf{\Gamma}}
-\newcommand{\mbfDelta}{\symbf{\Delta}}
-\newcommand{\mbfEpsilon}{\symbf{\Epsilon}}
-\newcommand{\mbfZeta}{\symbf{\Zeta}}
-\newcommand{\mbfEta}{\symbf{\Eta}}
-\newcommand{\mbfTheta}{\symbf{\Theta}}
-\newcommand{\mbfIota}{\symbf{\Iota}}
-\newcommand{\mbfKappa}{\symbf{\Kappa}}
-\newcommand{\mbfLambda}{\symbf{\Lambda}}
-\newcommand{\mbfMu}{\symbf{\Mu}}
-\newcommand{\mbfNu}{\symbf{\Nu}}
-\newcommand{\mbfXi}{\symbf{\Xi}}
-\newcommand{\mbfPi}{\symbf{\Pi}}
-\newcommand{\mbfRho}{\symbf{\Rho}}
-\newcommand{\mbfSigma}{\symbf{\Sigma}}
-\newcommand{\mbfTau}{\symbf{\Tau}}
-\newcommand{\mbfUpsilon}{\symbf{\Upsilon}}
-\newcommand{\mbfPhi}{\symbf{\Phi}}
-\newcommand{\mbfChi}{\symbf{\Chi}}
-\newcommand{\mbfPsi}{\symbf{\Psi}}
-\newcommand{\mbfOmega}{\symbf{\Omega}}
-\newcommand{\mbfVarepsilon}{\symbf{\Varepsilon}}
-\newcommand{\mbfVartheta}{\symbf{\Vartheta}}
-\newcommand{\mbfVarpi}{\symbf{\Varpi}}
-\newcommand{\mbfVarrho}{\symbf{\Varrho}}
-\newcommand{\mbfVarsigma}{\symbf{\Varsigma}}
-\newcommand{\mbfVarphi}{\symbf{\Varphi}}
+\newcommand{\mbfAlpha}{\mathbf{\Alpha}}
+\newcommand{\mbfBeta}{\mathbf{\Beta}}
+\newcommand{\mbfGamma}{\mathbf{\Gamma}}
+\newcommand{\mbfDelta}{\mathbf{\Delta}}
+\newcommand{\mbfEpsilon}{\mathbf{\Epsilon}}
+\newcommand{\mbfZeta}{\mathbf{\Zeta}}
+\newcommand{\mbfEta}{\mathbf{\Eta}}
+\newcommand{\mbfTheta}{\mathbf{\Theta}}
+\newcommand{\mbfIota}{\mathbf{\Iota}}
+\newcommand{\mbfKappa}{\mathbf{\Kappa}}
+\newcommand{\mbfLambda}{\mathbf{\Lambda}}
+\newcommand{\mbfMu}{\mathbf{\Mu}}
+\newcommand{\mbfNu}{\mathbf{\Nu}}
+\newcommand{\mbfXi}{\mathbf{\Xi}}
+\newcommand{\mbfPi}{\mathbf{\Pi}}
+\newcommand{\mbfRho}{\mathbf{\Rho}}
+\newcommand{\mbfSigma}{\mathbf{\Sigma}}
+\newcommand{\mbfTau}{\mathbf{\Tau}}
+\newcommand{\mbfUpsilon}{\mathbf{\Upsilon}}
+\newcommand{\mbfPhi}{\mathbf{\Phi}}
+\newcommand{\mbfChi}{\mathbf{\Chi}}
+\newcommand{\mbfPsi}{\mathbf{\Psi}}
+\newcommand{\mbfOmega}{\mathbf{\Omega}}
+\newcommand{\mbfVarepsilon}{\mathbf{\Varepsilon}}
+\newcommand{\mbfVartheta}{\mathbf{\Vartheta}}
+\newcommand{\mbfVarpi}{\mathbf{\Varpi}}
+\newcommand{\mbfVarrho}{\mathbf{\Varrho}}
+\newcommand{\mbfVarsigma}{\mathbf{\Varsigma}}
+\newcommand{\mbfVarphi}{\mathbf{\Varphi}}
 
 % Caligraphic, Fraktur, Script
 
@@ -394,19 +387,11 @@
 \newcommand{\msfY}{ \mathsf{Y} }
 \newcommand{\msfZ}{ \mathsf{Z} }
 
-% \mathsfit and \mathbmsfit
-
-\newcommand{\tens}[1]{\mathbmsfit{#1}}
-% entries of a tensor
-% Same font as tensor, without \bm wrapper
-\newcommand{\etens}[1]{\mathsfit{#1}}
-
 %----------------------------------------------------------------------
 \ifcsdef{chapter}{
     \numberwithin{equation}{chapter}
 }{
     \numberwithin{equation}{section}
-
 }
 
 %----------------------------------------------------------------------
@@ -418,7 +403,7 @@
 %----------------------------------------------------------------------
 \DeclareMathOperator*{\argmax}{arg\,max}        % for argmax
 \DeclareMathOperator*{\argmin}{arg\,min}        % for argmin
-\newcommand{\const}{ \mathrm{Const.} }
+\newcommand{\const}{ \mathrm{Const} }
 \newcommand{\Res}{\mathrm{Res\mathop{}}}    % for residue and
 % resultant if no ambiguity
 \newcommand{\Ind}{\mathrm{Ind\mathop{}}}    % for winding number
@@ -430,14 +415,14 @@
 \newcommand{\curl}{\operatorname{curl\mathop{}}} % for curl
 \newcommand{\grad}{\operatorname{grad\mathop{}}} % for gradient%
 \newcommand{\tr}{\operatorname{tr\mathop{}}} % for trace
-\DeclareMathOperator{\proj}{\symbf{pr}}        % for projection
+\DeclareMathOperator{\proj}{\mathbf{pr}}        % for projection
 \DeclareMathOperator{\prox}{\symrm{prox}}        % for proximal operator
 \DeclareMathOperator*{\infconv}{%for infimal convolution
-
-\mathbin{\ooalign{\raisebox{-.35ex}{$\wedge$}\cr\hidewidth\raisebox{.5ex}{\scalebox{.9}{+}}\hidewidth}}}
+    \mathbin{\ooalign{\raisebox{-.35ex}{$\wedge$}\cr\hidewidth\raisebox{.5ex}{\scalebox{.9}{+}}\hidewidth}}
+}
 
 % Other
-\newcommand{\diff}{\mathop{}\!\textrm{d}} % for differential
+\newcommand{\diff}{\mathop{}\!\mathrm{d}} % for differential
 
 % aligned inf and sup (use either of them)
 % Raised subscript in \verb|\sup|
@@ -448,6 +433,7 @@
 %----------------------------------------------------------------------
 %% Points and sets
 %----------------------------------------------------------------------
+\DeclareMathOperator{\dist}{dist}        % for distance
 \newcommand{\sgn}{\operatorname{sgn}}        % for sign
 \newcommand{\inj}{\hookrightarrow}        % for injections
 \newcommand{\surj}{\twoheadrightarrow}        % for surjections
@@ -455,13 +441,13 @@
 \newcommand{\supp}{\mathrm{supp\mathop{}}} % for support of a function
 \newcommand{\Intr}{\mathrm{Int\mathop{}}} % for interior
 \newcommand{\diam}{\mathrm{diam\mathop{}}} % for diameter
-\DeclareMathOperator{\dist}{dist}        % for distance
 \newcommand{\Dom}{\mathrm{Dom\mathop{}}} % for domain
 \newcommand{\Ker}{\mathrm{Ker\mathop{}}} % for kernel of a function
 \newcommand{\Img}{\mathrm{Im\mathop{}}} % for image of a function
 \newcommand{\Spec}{\mathrm{Spec}}
 \newcommand{\Fix}{\mathsf{Fix}} % for fixed points
 \newcommand{\Lip}{\mathsf{Lip}} % for Lipschitz class
+\newcommand{\TV}{\mathsf{TV}} % for total variation
 %----------------------------------------------------------------------
 %% Indices, Sequences and recursions
 %----------------------------------------------------------------------
@@ -526,26 +512,26 @@
     \IfValueT{#1}{_{#1}}%
     \IfValueT{#2}{^{#2}}%
     \IfValueTF{#3}{
-        \left[#4 \middle\vert #3\right]%
+        \left[#4 \delimsize\vert #3\right]%
     }{
         \left[#4\right]%
     }
 }
 
 %==============Category Theory================
-\newcommand{\Hom}{\mathbfup{Hom}} % for homomorphism
-\newcommand{\Iso}{\mathbfup{Iso}} % for isomorphism
-\newcommand{\Aut}{\mathbfup{Aut}} % for automorphism
-\newcommand{\End}{\mathbfup{End}} % for endomorphism
+\newcommand{\Hom}{\mathbf{Hom}} % for homomorphism
+\newcommand{\Iso}{\mathbf{Iso}} % for isomorphism
+\newcommand{\Aut}{\mathbf{Aut}} % for automorphism
+\newcommand{\End}{\mathbf{End}} % for endomorphism
 \newcommand{\catname}[1]{\mathsf{#1}} % for category
-\newcommand{\Mor}{\mathsf{Mor}} % for morphism
-\newcommand{\Obj}{\mathsf{Obj}} % for object
-\newcommand{\op}[1]{#1^{\textrm{op}}} % for opposite category
+\newcommand{\Mor}{\catname{Mor}} % for morphism
+\newcommand{\Obj}{\catname{Obj}} % for object
+\newcommand{\op}{\mathrm{op}} % for opposite category
 \newcommand{\Set}{\catname{Set}} % for category of sets
 \newcommand{\Grp}{\catname{Grp}} % for category of groups
-\newcommand{\Ring}{\catname{Ring}} % for category of rings
-\newcommand{\Mod}[1]{#1\text{-}\catname{Mod}} % for category of modules
-\newcommand{\Vect}[1]{#1\text{-}\catname{Vect}} % for category of vector spaces
+\newcommand{\Ann}{\catname{Ann}} % for category of rings
+\newcommand{\Mod}{\catname{Mod}} % for category of modules
+\newcommand{\Vect}{\catname{Vect}} % for category of vector spaces
 \newcommand{\Top}{\catname{Top}} % for category of topological spaces
 \newcommand{\Ab}{\catname{Ab}} % for category of abelian groups
 \newcommand{\Mon}{\catname{Mon}} % for category of monoids
@@ -557,8 +543,9 @@
 \newcommand{\Id}{\mathrm{Id}} % for identity morphism
 \newcommand{\id}{\mathrm{id}} % for identity morphism
 \newcommand{\im}[1]{\mathrm{im}\left( #1 \right)} % for image of a morphism
-\newcommand{\coker}{\mathrm{coker}} % for cokernel
-\newcommand{\coim}{\mathrm{coim}} % for coimage
+\newcommand{\coker}{\mathrm{coKer}} % for cokernel
+\newcommand{\coim}{\mathrm{coIm}} % for coimage
+\newcommand{\codim}{\mathrm{codim}} % for codimension
 \newcommand{\dom}{\mathrm{dom}} % for domain
 \newcommand{\cod}{\mathrm{cod}} % for codomain
 
