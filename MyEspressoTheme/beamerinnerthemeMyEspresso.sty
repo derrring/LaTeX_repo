@@ -35,13 +35,18 @@
       \hfil}%
   }%
 }
+%The enumitem package aggressively patches LaTeX's core list-making commands, which breaks the assumptions that  theme's \setbeamertemplate{enumerate item} code relies on. This conflict creates an infinite loop where the command to create the label (\labelenumi) ends up calling itself, quickly exhausting TeX's memory.
 \setbeamertemplate{enumerate subitem}{\alph{enumii}.}
+\setlength{\parskip}{10pt} 
+
+
+
 
 % Title page template
 \ExplSyntaxOn
 \setbeamertemplate{title~page}{%
   \bgroup
-   \setbeamertemplate{background}{}
+  \setbeamertemplate{background}{}
   \setbeamertemplate{navigation~symbols}{}
   \setbeamercolor{background~canvas}{bg=white}
   \begin{tikzpicture}[remember~picture,overlay]
@@ -217,7 +222,7 @@
 
 % Remark environment
 \NewDocumentEnvironment{remark}{o}{
-   \tcbset{%
+  \tcbset{%
     arc=0pt,outer arc=0pt,colback=MyEspressoRemarkColor!10,colframe=MyEspressoRemarkColor,
     boxsep=0pt,left=10pt,right=10pt,top=8pt,bottom=10pt, bottomtitle = 3pt, toptitle=3pt,
     boxrule=0pt
@@ -235,7 +240,7 @@
 
 \AtBeginEnvironment{definition}{%
   \setbeamercolor{block body}{fg=black,bg=gray!10}
-  \setbeamercolor{block title}{fg=MyEspresso@example,bg=MyEspresso@example!40}
+  \setbeamercolor{block title}{fg=MyEspresso@example!40!black,bg=MyEspresso@example!40!white}
 }
 
 \AtBeginEnvironment{corollary}{%

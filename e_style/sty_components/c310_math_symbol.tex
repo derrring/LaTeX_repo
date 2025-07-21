@@ -38,7 +38,9 @@
 \DeclarePairedDelimiterX{\braket}[2]{\langle}{\rangle}{#1 \delimsize\vert #2}
 \DeclarePairedDelimiterX\braketop[3]{\langle}{\rangle}{
 #1\,\delimsize\vert\,\mathopen{}#2\,\delimsize\vert\,\mathopen{}#3}
-
+\DeclareDocumentCommand{\given}{}{%
+    \mathrel{\vert}%
+}
 % Set notation with conditional (\ensemble)
 \newcommand\SetSymbol[1][]{%
     \nonscript\: #1 \vert
@@ -47,7 +49,7 @@
     \mathopen{}
 }
 \DeclarePairedDelimiterX\ensemble[1]\{\}{%
-    \newcommand\given{\SetSymbol[\delimsize]}
+    \renewcommand\given{\SetSymbol[\delimsize]}
     #1
 }
 

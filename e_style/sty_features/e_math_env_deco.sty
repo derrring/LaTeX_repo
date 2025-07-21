@@ -5,15 +5,22 @@
 
 \tcolorboxenvironment{proof}{% add a vertical bar to the left
     enhanced,breakable, frame hidden, colback=white,
-    borderline west={1mm}{0pt}{myproofcolor!75},
+    borderline west={1mm}{0pt}{myproofcolor!50},
     before skip=0em,after skip=.5em,
+}
+
+\tcolorboxenvironment{remark}{% add a vertical bar to the left
+    top=-1pt, bottom=-1pt,
+    enhanced,breakable, frame hidden, colback=white,
+    borderline west={1mm}{0pt}{myproofcolor},
+    %before skip=1em,after skip=.5em, 
 }
 
 \tcolorboxenvironment{definition}{
     enhanced,breakable, 
     frame hidden,
     colback=mydefinitioncolor!5!white,
-    borderline west={1mm}{0pt}{mydefinitioncolor!75!black},
+    borderline west={1mm}{0pt}{mydefinitioncolor!90!black},
     before skip=.5em,after skip=\parskip,width=\linewidth,
 }
 \tcolorboxenvironment{theorem}{
