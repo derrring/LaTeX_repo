@@ -1,4 +1,26 @@
 % sty_components/c101_layout.tex
+
+\RequirePackage{fontspec}
+% Set Latin fonts only
+\setmainfont{Noto Serif}[
+    UprightFont=*-Regular,
+    BoldFont=*-Bold,
+    ItalicFont=*-Italic,
+    BoldItalicFont=*-BoldItalic
+]
+
+\setsansfont{Noto Sans}[
+    UprightFont=*-Regular,
+    BoldFont=*-Bold,
+    ItalicFont=*-Italic,
+    BoldItalicFont=*-BoldItalic
+]
+
+\setmonofont{Source Code Pro}
+% Language setup
+\setdefaultlanguage{english}
+\setotherlanguages{german,french,russian}
+
 % Define a toggle for CJK support
 \newif\ifcjk
 \cjktrue % Default to CJK support enabled
@@ -26,32 +48,11 @@
 
 \else
 % For non-CJK documents
-\RequirePackage{fontspec}
 \RequirePackage{microtype}
-% Set Latin fonts only
-\setmainfont{Noto Serif}[
-    UprightFont=*-Regular,
-    BoldFont=*-Bold,
-    ItalicFont=*-Italic,
-    BoldItalicFont=*-BoldItalic
-]
 
-\setsansfont{Noto Sans}[
-    UprightFont=*-Regular,
-    BoldFont=*-Bold,
-    ItalicFont=*-Italic,
-    BoldItalicFont=*-BoldItalic
-]
-
-\setmonofont{Source Code Pro}
 \fi
 
-% Language setup
-\setdefaultlanguage{english}
-\setotherlanguages{german,french,russian}
-
 % Simplified math font setup - Choose ONE approach:
-
 % Option 1: Pure STIX2 (recommended for consistency)
 
 \setmathfont{STIX Two Math}[StylisticSet={01}] %range={"1D454,"1D488,"1D467}
