@@ -1,4 +1,22 @@
 % Redefine cite command to include space before
 % <http://tex.stackexchange.com/questions/11602/>
+
 \let\origcite\cite%
 \def\cite#1{\unskip~\origcite{#1}}
+
+\AtBeginDocument{%
+    \DeclareDelimFormat[cite]{nameyeardelim}{\adddot\addspace}
+    \DeclareDelimFormat[cite]{postnotedelim}{\addspace}
+    \DeclareDelimFormat[cite]{prenotedelim}{\addspace}
+
+    \DeclareCiteCommand{\cite}[\mkbibbrackets]
+    {\usebibmacro{prenote}}
+    {\usebibmacro{citeindex}%
+        \printtext[bibhyperlink]{%
+            \printnames{labelname}%
+            \printdelim{nameyeardelim}%
+            \printfield{labelyear}%
+    \printfield{extrayear}}}
+    {\multicitedelim}
+    {\usebibmacro{postnote}}
+}

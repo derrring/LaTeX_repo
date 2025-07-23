@@ -20,15 +20,14 @@
 % `fontspec` package
 
 %\RequirePackage{luaotfload}
-\RequirePackage{luatexja, fontspec, luatexja-fontspec, luatexja-ruby,
-polyglossia}
 %%  {fontspec}: set default non-cjk fonts;
 %%  {polyglossia}: set default language; exclude cjk;
+\RequirePackage{polyglossia}
+
 \RequirePackage{noto}
 \RequirePackage{sourcecodepro}
 \RequirePackage{fourier-orns}
 
-%\RequirePackage{microtype} %luatexja does not support microtype
 \RequirePackage[warnings-off={mathtools-colon,mathtools-overbracket},
 math-style=ISO,bold-style=ISO]{unicode-math}
 
@@ -82,7 +81,6 @@ math-style=ISO,bold-style=ISO]{unicode-math}
 \RequirePackage{graphicx}
 \RequirePackage{rotating}
 \RequirePackage{tikz,pgf}
-
 
 % Chapter quotes
 \RequirePackage[autostyle]{csquotes} % smart quotes
