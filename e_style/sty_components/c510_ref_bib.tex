@@ -1,7 +1,9 @@
 \let\origcite\cite%
 \def\cite#1{\unskip~\origcite{#1}}
+
+%\makeatletter must be placed before \AtBeginDocument, not inside it.
+\makeatletter
 \AtBeginDocument{%
-    \makeatletter
     % Check if using authoryear by testing for the style file name
     \ifdefstring{\blx@bbxfile}{authoryear}{%
         % This is authoryear style - apply full customization
@@ -27,13 +29,16 @@
         % without touching any internal macros
         \let\mkbibparens\mkbibbrackets
     }
-    \makeatother
 
+}
+\makeatother
+
+\AtBeginDocument{%
     % Other customizations
+
     \renewbibmacro{in:}{}
     \AtEveryBibitem{%
         \clearfield{day}%
         \clearfield{endday}%
     }
-
 }
