@@ -1,5 +1,4 @@
 
-
 % Vertical line
 \newcommand\verpar[2]{
     \par\vskip1ex
@@ -10,10 +9,13 @@
         ]
         \node (p1) [paragraph] {#2 \vspace{1pt}};
         \path ([xshift=-0.75\baselineskip] p1.south west) coordinate (p2)
-        -- node (p3) [sloped] {\color{myblue} \footnotesize #1} (p2 |- p1.north);
+        -- node (p3) [sloped] {\footnotesize #1} (p2 |- p1.north);
         \draw[very thick] (p2) -- (p3.west) (p3.east) -- (p2 |- p1.north);
     \end{tikzpicture}
 \vspace{5pt}}
+%#1: The label text (appears on the vertical line with rotation)
+%#2: The main paragraph content
+%usage: \verpar{label}{text}
 
 % Marble
 \newcommand{\colorcircle}[1]{\tikz\node[circle=3pt, draw=#1, fill=#1, inner sep=1.75pt] (d) at (0,0) {};}

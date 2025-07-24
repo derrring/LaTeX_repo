@@ -16,7 +16,7 @@ title=Note: #2,#1}
     \tcblistof[\chapter*]{columns}{List of Column Boxes}
 }
 
-\DeclareDocumentEnvironment{myquotation}{ m } % m for author as mandatory argument
+\DeclareDocumentEnvironment{myquotation}{ O{Anonymous} }
 {% Begin code
     \newcommand*\QuoteAuthor{#1}
     \begin{flushright}
@@ -28,3 +28,7 @@ title=Note: #2,#1}
         \end{minipage}
     \end{flushright}
 }
+% usage: \begin{myquotation}{Author Name} ... \end{myquotation}
+%\begin{myquotation}[Shakespeare]
+%To be or not to be, that is the question.
+%\end{myquotation}

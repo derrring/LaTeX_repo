@@ -1,22 +1,39 @@
-% Redefine cite command to include space before
-% <http://tex.stackexchange.com/questions/11602/>
-
 \let\origcite\cite%
 \def\cite#1{\unskip~\origcite{#1}}
-
 \AtBeginDocument{%
-    \DeclareDelimFormat[cite]{nameyeardelim}{\adddot\addspace}
-    \DeclareDelimFormat[cite]{postnotedelim}{\addspace}
-    \DeclareDelimFormat[cite]{prenotedelim}{\addspace}
+    \makeatletter
+    % Check if using authoryear by testing for the style file name
+    \ifdefstring{\blx@bbxfile}{authoryear}{%
+        % This is authoryear style - apply full customization
+        \renewbibmacro*{cite}{%
+            \printtext[bibhyperref]{%
+                \iffieldundef{shorthand}
+                {\ifthenelse{\ifnameundef{labelname}\OR\iffieldundef{labelyear}}
+                    {\usebibmacro{cite:label}%
+                    \setunit{\printdelim{nonameyeardelim}}}
+                    {\printnames{labelname}%
+                    \setunit{\printdelim{nameyeardelim}}}%
+                \usebibmacro{cite:labeldate+extradate}}
+        {\usebibmacro{cite:shorthand}}}}
 
-    \DeclareCiteCommand{\cite}[\mkbibbrackets]
-    {\usebibmacro{prenote}}
-    {\usebibmacro{citeindex}%
-        \printtext[bibhyperlink]{%
-            \printnames{labelname}%
-            \printdelim{nameyeardelim}%
-            \printfield{labelyear}%
-    \printfield{extrayear}}}
-    {\multicitedelim}
-    {\usebibmacro{postnote}}
+        \DeclareCiteCommand{\cite}[\mkbibbrackets]
+        {\usebibmacro{prenote}}
+        {\usebibmacro{citeindex}%
+        \usebibmacro{cite}}
+        {\multicitedelim}
+        {\usebibmacro{postnote}}
+    }{%
+        % Not authoryear - just change parentheses to brackets
+        % without touching any internal macros
+        \let\mkbibparens\mkbibbrackets
+    }
+    \makeatother
+
+    % Other customizations
+    \renewbibmacro{in:}{}
+    \AtEveryBibitem{%
+        \clearfield{day}%
+        \clearfield{endday}%
+    }
+
 }
