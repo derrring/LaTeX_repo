@@ -109,23 +109,16 @@
 % Additional theme-specific commands that need all components loaded
 
 % Progress gauge
-\newlength{\gauge@step}
+\newlength{\gauge@progress}
 \NewDocumentCommand{\myespresso@gauge}{o}{%
   \def\myespresso@gaugewidth{40pt}%
   \IfNoValueF{#1}{%
     \def\myespresso@gaugewidth{#1}%
   }%
-  \setlength{\gauge@step}{(\myespresso@gaugewidth-2pt)/10}%
-  \def\pourc{\numexpr(10*\insertframenumber/\insertmainframenumber)}%
-  \def\xj{\numexpr(4.95*\pourc)}%
+  \setlength{\gauge@progress}{(\myespresso@gaugewidth-2pt)*\insertframenumber/\insertmainframenumber}%
   \begin{tikzpicture}[x=0.7cm,y=0.7cm]%
     \draw[color=white] (0pt,-2pt)--(\myespresso@gaugewidth,-2pt)--(\myespresso@gaugewidth,4pt)--(0pt,4pt)--cycle;%
-    \foreach \i in {0,...,10}{%
-      \ifnum\i<\pourc%
-      \fill[color=white]
-      (\the\gauge@step*\i+1pt,-1pt)--(\the\gauge@step+\the\gauge@step*\i+1pt,-1pt)--(\the\gauge@step+\the\gauge@step*\i+1pt,3pt)--(0+\the\gauge@step*\i+1pt,3pt)--cycle;%
-      \fi%
-    }%
+    \fill[color=white] (1pt,-1pt)--(\the\gauge@progress+1pt,-1pt)--(\the\gauge@progress+1pt,3pt)--(1pt,3pt)--cycle;%
   \end{tikzpicture}%
 }
 
