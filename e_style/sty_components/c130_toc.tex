@@ -44,6 +44,7 @@
 \newcommand{\brieftoc}{%
     \begingroup
     \etocsettocstyle{}{\clearpage}%
+    \phantomsection  % Create anchor here
     \newgeometry{left=1.5cm, right=1.5cm, top=2.5cm, bottom=2.5cm}
     \ifcsdef{chapter}{
         \setcounter{tocdepth}{1}
@@ -72,6 +73,8 @@
     \begingroup
     \etocsettocstyle{
     }{\clearpage}
+    \phantomsection  % Create anchor here
+
     \ifcsdef{chapter}{
         \setcounter{tocdepth}{3}
         \printtoctitle{Detailed Contents}
@@ -90,6 +93,7 @@
 \newcommand{\mytoc}{%
     \begingroup
     \etocsettocstyle{\renewcommand{\contentsname}{Contents}}{}
+    \phantomsection  % Create anchor here
     \setcounter{tocdepth}{2}
     \printtoctitle{\contentsname}
     \ifcsdef{chapter}{
