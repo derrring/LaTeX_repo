@@ -35,5 +35,11 @@
     filecolor=mylinkcolor,
     linktoc=page,
 }
-
+\makeatletter
+\renewcommand{\theHtheorem}{\thetheorem}
+\renewcommand{\theHdefinition}{\thedefinition}
+\renewcommand{\theHlemma}{\thelemma}
+\renewcommand{\theHproposition}{\theproposition}
+\renewcommand{\theHcorollary}{\thecorollary}
+\makeatother
 \endinput

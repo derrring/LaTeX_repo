@@ -441,12 +441,11 @@
 \newcommand{\surj}{\twoheadrightarrow}        % for surjections
 \newcommand{\bij}{\leftrightarrow}        % for bijections
 \newcommand{\supp}{\mathrm{supp\mathop{}}} % for support of a function
-\newcommand{\Intr}{\mathrm{Int\mathop{}}} % for interior
+\newcommand{\Int}{\mathrm{Int\mathop{}}} % for interior
 \newcommand{\diam}{\mathrm{diam\mathop{}}} % for diameter
-\newcommand{\Dom}{\mathrm{Dom\mathop{}}} % for domain
-\newcommand{\Ker}{\mathrm{Ker\mathop{}}} % for kernel of a function
-\newcommand{\Img}{\mathrm{Im\mathop{}}} % for image of a function
-\newcommand{\Spec}{\mathrm{Spec}}
+\renewcommand{\ker}{\mathrm{ker\mathop{}}} % for kernel of a function
+\newcommand{\im}{\mathrm{im\mathop{}}} % for image of a function
+\newcommand{\Spec}{\mathsf{Spec}}
 \newcommand{\Fix}{\mathsf{Fix}} % for fixed points
 \newcommand{\Lip}{\mathsf{Lip}} % for Lipschitz class
 \newcommand{\TV}{\mathsf{TV}} % for total variation
@@ -457,9 +456,11 @@
 %----------------------------------------------------------------------
 %% Matrices and vectors
 %----------------------------------------------------------------------
+\newcommand{\Mat}{\mathsf{Mat}} % for matrices
 \newcommand{\diag}{\operatorname{diag}}
 \newcommand{\SPD}{\mbbS_{++}}        % for Symmetric Positive Definite Matrices
 \newcommand{\Rank}{\mathrm{Rank\mathop{}}}
+
 %----------------------------------------------------------------------
 %% Probability
 %----------------------------------------------------------------------
@@ -521,14 +522,14 @@
 }
 
 %==============Category Theory================
-\newcommand{\Hom}{\mathbf{Hom}} % for homomorphism
-\newcommand{\Iso}{\mathbf{Iso}} % for isomorphism
-\newcommand{\Aut}{\mathbf{Aut}} % for automorphism
-\newcommand{\End}{\mathbf{End}} % for endomorphism
+\newcommand{\op}{\mathrm{op}} % for opposite category
 \newcommand{\catname}[1]{\mathsf{#1}} % for category
+\newcommand{\Hom}{\catname{Hom}} % for homomorphism
+\newcommand{\Iso}{\catname{Iso}} % for isomorphism
+\newcommand{\Aut}{\catname{Aut}} % for automorphism
+\newcommand{\End}{\catname{End}} % for endomorphism
 \newcommand{\Mor}{\catname{Mor}} % for morphism
 \newcommand{\Obj}{\catname{Obj}} % for object
-\newcommand{\op}{\mathrm{op}} % for opposite category
 \newcommand{\Set}{\catname{Set}} % for category of sets
 \newcommand{\Grp}{\catname{Grp}} % for category of groups
 \newcommand{\Ann}{\catname{Ann}} % for category of rings
@@ -544,9 +545,8 @@
 \newcommand{\Nat}{\catname{Nat}} % for category of natural transformations
 \newcommand{\Id}{\mathrm{Id}} % for identity morphism
 \newcommand{\id}{\mathrm{id}} % for identity morphism
-\newcommand{\im}[1]{\mathrm{im}\left( #1 \right)} % for image of a morphism
-\newcommand{\coker}{\mathrm{coKer}} % for cokernel
-\newcommand{\coim}{\mathrm{coIm}} % for coimage
+\newcommand{\coker}{\mathrm{coker}} % for cokernel
+\newcommand{\coim}{\mathrm{coim}} % for coimage
 \newcommand{\codim}{\mathrm{codim}} % for codimension
 \newcommand{\dom}{\mathrm{dom}} % for domain
 \newcommand{\cod}{\mathrm{cod}} % for codomain

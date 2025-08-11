@@ -268,6 +268,39 @@
 }}
 {\endgroup}
 
+%======================================================
+% APPENDIX STYLE
+%======================================================
+% ====================================================================
+% == APPENDIX STYLING PATCH
+% ====================================================================
+% This code patches the \appendix command to automatically change the
+% ToC style for appendix chapters. It requires the 'etoolbox' package.
+% Make sure 'etoolbox' is loaded in your e_core.sty or e_standard_doc.sty
+% (It is already loaded via e_core.sty in your setup).
+
+\apptocmd{\appendix}{%
+    % Define and apply the new style for appendix chapters in the ToC.
+    \etocsetstyle{chapter}
+    {\begingroup\color{black}}
+    {\small\parindent0pt}
+    {%
+        \leftskip0em\rightskip\tocrightmargin\parfillskip-\rightskip
+        % Define the format for the appendix entry line.
+        % We combine "Appendix" with the chapter letter.
+        \makebox[\tocchapternumwidth][l]{\appendixname~\etocnumber}\hspace{-0.25em}%
+        \hangindent\tocchapternumwidth
+        \textsc{\etocthename}\hfill
+        \makebox[2.5em][r]{\footnotesize\etocpage}\par
+    }
+    {\endgroup}%
+}{%
+    % Code to execute on success (optional, can be left empty)
+}{%
+    % Code to execute on failure
+    \PackageWarning{TOCStyle}{Could not patch the \appendix command!}%
+}
+
 % =====================================================
 % CONFIGURATION OPTIONS
 % =====================================================
