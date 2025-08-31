@@ -1,0 +1,137 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% CV Espresso Deedy - Modern 2 Column
+% Compact CV Example (Strictly 1 page)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass[a4paper]{cv_espresso_deedy_2col}
+\usepackage{fancyhdr}
+
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\headrulewidth}{0pt}
+
+% Modern LaTeX3 Configuration
+\cvsetup{
+    theme = default,
+    fonts/main = Lato Light,
+    fonts/name = Lato Hairline,
+    fonts/namesec = Lato Light,
+    fonts/date = Raleway ExtraLight,
+    fonts/heading = Roboto Light,
+    fonts/subheading = Source Sans Pro Semibold,
+    fonts/location = Raleway Medium,
+    fonts/desc = Raleway Medium,
+    fonts/bold = Lato Bold,
+    fonts/sans = Raleway ExtraLight
+}
+
+\begin{document}
+
+\cvlastupdated
+
+\cvnamesection{Marcus}{Chen}{
+    \faPhone\ +1-415-555-0123 | \faEnvelope\ \href{mailto:marcus.chen@example.com}{marcus.chen@example.com} \\
+    \faLinkedin\ \href{https://linkedin.com/in/marcus-chen}{marcus-chen} | \faGithub\ \href{https://github.com/mchen}{mchen}
+}
+\cvlongrule
+
+\begin{paracol}{2}
+
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    %     LEFT COLUMN
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+    \begin{cvsection}{Education}
+        \cventry{Stanford University}{\\ MS Computer Science}{2019-2021 | Palo Alto, CA}{}
+        \cventry{UC Berkeley}{\\ BS EECS}{2015-2019 | Berkeley, CA}{}
+    \end{cvsection}
+
+    \cvsectionsep
+
+    \begin{cvsection}{Skills}
+        \cvskill{Languages}{Python \textbullet{} JavaScript \textbullet{} Go \textbullet{} SQL}
+        \cvskill{Frameworks}{React \textbullet{} Node.js \textbullet{} Django \textbullet{} PyTorch}
+        \cvskill{Tools}{Docker \textbullet{} AWS \textbullet{} Git \textbullet{} PostgreSQL}
+        \cvskill{Areas}{Machine Learning \textbullet{} Web Dev \textbullet{} DevOps}
+
+    \end{cvsection}
+
+    \cvsectionsep
+
+    \begin{cvsection}{Projects}
+
+        \cvtext{SmartChat AI}{Full-Stack App}{2023}{Built AI chatbot with 10k+ users using OpenAI API, React, and PostgreSQL}
+
+        \cvtext{PredictStock}{ML Model}{2023}{Developed stock prediction model achieving 78\% accuracy using LSTM networks}
+
+        \cvtext{CloudSync}{DevOps Tool}{2022}{Created automated deployment pipeline reducing deploy time by 60\%}
+    \end{cvsection}
+
+    \cvsectionsep
+
+    \begin{cvsection}{Awards}
+        \begin{cvitemlist}
+            \cvitem{2023}{Google Cloud Certified Professional}
+            \cvitem{2021}{Stanford Dean's List}
+            \cvitem{2019}{Berkeley EECS Outstanding Student}
+            \cvitem{2018}{ACM Programming Contest Winner}
+        \end{cvitemlist}
+
+    \end{cvsection}
+
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    %     RIGHT COLUMN
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+    \switchcolumn
+
+    \begin{cvsection}{Experience}
+        \cventry{Meta}{Software Engineer}{Jan 2023 - Present | Menlo Park, CA}{
+            \cvitem{Impact}{Built ML recommendation system serving 100M+ users daily}
+            \cvitem{Tech}{Python, PyTorch, Spark, Kubernetes}
+            \cvitem{Results}{Improved user engagement by 25\%}
+        }
+
+        \cventry{Google}{SWE Intern}{Jun - Aug 2022 | Mountain View, CA}{
+            \cvitem{Project}{Developed real-time analytics dashboard}
+            \cvitem{Stack}{Go, BigQuery, Angular}
+            \cvitem{Outcome}{Reduced query latency by 40\%}
+        }
+
+        \cventry{Uber}{Backend Intern}{Jun - Aug 2021 | San Francisco, CA}{
+            \cvitem{Feature}{Built fraud detection microservice}
+            \cvitem{Tech}{Python, Kafka, Redis}
+            \cvitem{Impact}{Prevented \$2M+ in fraudulent transactions}
+        }
+
+        \cventry{Startup Inc}{Full-Stack Dev}{2020-2021 | San Francisco, CA}{
+            \cvitem{Role}{Built entire web platform from scratch}
+            \cvitem{Stack}{React, Node.js, MongoDB}
+            \cvitem{Achievement}{Scaled to 50k+ active users}
+        }
+
+    \end{cvsection}
+
+    \cvsectionsep
+
+    \begin{cvsection}{Publications}
+        \cvtext{ICML 2023}{``Efficient Deep Learning for Mobile Devices''}{Co-author}{Novel compression techniques achieving 5x speedup with 1\% accuracy loss}
+
+        \cvtext{NeurIPS 2022}{``Federated Learning in Practice''}{First author}{Practical framework for privacy-preserving distributed ML}
+
+    \end{cvsection}
+
+    \cvsectionsep
+
+    \begin{cvsection}{Leadership}
+        \begin{cvitemlist}
+            \cvitem{Tech Lead}{Meta's ML Infrastructure Team (2024)}
+            \cvitem{Mentor}{Supervised 5+ junior engineers}
+            \cvitem{Speaker}{Presented at PyData Conference 2023}
+            \cvitem{Open Source}{Maintainer of popular Python library (3k+ stars)}
+        \end{cvitemlist}
+
+    \end{cvsection}
+
+\end{paracol}
+\end{document}

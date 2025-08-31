@@ -13,7 +13,7 @@ REPO_ROOT="$(dirname "$SCRIPT_DIR")"
 
 # --- Configuration ---
 # An array of source directories within your repository
-SOURCE_DIRS=("e_style" "MyEspressoTheme")
+SOURCE_DIRS=("e_style" "MyEspressoTheme" "MyCV")
 
 # --- Script Logic ---
 # Find the TEXMFHOME directory

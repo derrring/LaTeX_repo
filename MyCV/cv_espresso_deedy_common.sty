@@ -1,0 +1,535 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% CV Espresso Deedy Common Package
+% Common functionality for CV Espresso Deedy classes
+%
+% Based on the original Deedy Resume classes
+% Refactored into .sty + .cls architecture
+%
+% Author: Based on Deedy Resume template
+% License: MIT
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{cv_espresso_deedy_common}[2025/08/29 Common functionality for CV Espresso Deedy classes]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% PACKAGE OPTIONS
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Paper size options with adaptive margins
+\newif\if@cvletter
+\DeclareOption{letter}{\@cvlettertrue\PassOptionsToPackage{letterpaper}{geometry}}
+\DeclareOption{letterpaper}{\@cvlettertrue\PassOptionsToPackage{letterpaper}{geometry}}
+\DeclareOption{a4}{\@cvletterfalse\PassOptionsToPackage{a4paper}{geometry}}
+\DeclareOption{a4paper}{\@cvletterfalse\PassOptionsToPackage{a4paper}{geometry}}
+
+% Set default to a4paper (no option = a4paper)
+\@cvletterfalse
+\ProcessOptions\relax
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% REQUIRED PACKAGES
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Conditional geometry settings based on paper size
+\if@cvletter
+  \RequirePackage[letterpaper]{geometry}
+\else
+  \RequirePackage[a4paper]{geometry}
+\fi
+\RequirePackage[dvipsnames]{xcolor}
+\RequirePackage[hidelinks]{hyperref}
+\RequirePackage{titlesec}
+\RequirePackage[absolute]{textpos}
+\RequirePackage[UKenglish]{babel}
+\RequirePackage[UKenglish]{isodate}
+\RequirePackage{fontspec}
+
+% Load fonts from CTAN
+\RequirePackage{lato}
+\RequirePackage{raleway}
+\RequirePackage{sourcesanspro}
+\RequirePackage{roboto}
+
+% Additional enhancements
+\RequirePackage{fontawesome7}
+\RequirePackage{microtype}
+\RequirePackage{etoolbox}
+
+% Publications
+\RequirePackage{cite}
+\renewcommand\refname{\vskip -1.5cm}
+
+% ATS compatibility
+\RequirePackage{iftex}
+\ifPDFTeX
+    \input{glyphtounicode}
+    \pdfgentounicode=1
+\fi
+
+% LaTeX3 support for advanced key-value interface
+\RequirePackage{xparse}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% LATEX3 KEY-VALUE SYSTEM
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\ExplSyntaxOn
+
+% Internal variables for font storage
+\tl_new:N \l__cv_main_font_tl
+\tl_new:N \l__cv_sans_font_tl
+\tl_new:N \l__cv_name_font_tl
+\tl_new:N \l__cv_namesec_font_tl
+\tl_new:N \l__cv_date_font_tl
+\tl_new:N \l__cv_heading_font_tl
+\tl_new:N \l__cv_subheading_font_tl
+\tl_new:N \l__cv_desc_font_tl
+\tl_new:N \l__cv_location_font_tl
+\tl_new:N \l__cv_bold_font_tl
+
+% Internal variables for margins
+\dim_new:N \l__cv_hmargin_dim
+\dim_new:N \l__cv_vmargin_dim
+
+% Internal variables for colors  
+\tl_new:N \l__cv_color_primary_tl
+\tl_new:N \l__cv_color_headings_tl
+\tl_new:N \l__cv_color_subheadings_tl
+\tl_new:N \l__cv_color_date_tl
+
+
+
+% Set defaults
+\tl_set:Nn \l__cv_main_font_tl { Lato~Light }
+\tl_set:Nn \l__cv_sans_font_tl { Raleway~ExtraLight }
+\tl_set:Nn \l__cv_name_font_tl { Lato~Hairline }
+\tl_set:Nn \l__cv_namesec_font_tl { Lato~Light }
+\tl_set:Nn \l__cv_date_font_tl { Raleway~ExtraLight }
+\tl_set:Nn \l__cv_heading_font_tl { Roboto~Light }
+\tl_set:Nn \l__cv_subheading_font_tl { Source~Sans~Pro~Semibold }
+\tl_set:Nn \l__cv_desc_font_tl { Raleway~Medium }
+\tl_set:Nn \l__cv_location_font_tl { Raleway~Medium }
+\tl_set:Nn \l__cv_bold_font_tl { Lato~Bold }
+
+% Set default margins based on paper size
+\ExplSyntaxOff
+\if@cvletter
+  \ExplSyntaxOn
+  \dim_set:Nn \l__cv_hmargin_dim { 1.0in }
+  \dim_set:Nn \l__cv_vmargin_dim { 0.75in }
+  \ExplSyntaxOff
+\else
+  \ExplSyntaxOn
+  \dim_set:Nn \l__cv_hmargin_dim { 1.25cm }
+  \dim_set:Nn \l__cv_vmargin_dim { 0.75cm }
+  \ExplSyntaxOff
+\fi
+\ExplSyntaxOn
+
+\tl_set:Nn \l__cv_color_primary_tl { 2b2b2b }
+\tl_set:Nn \l__cv_color_headings_tl { 6A6A6A }
+\tl_set:Nn \l__cv_color_subheadings_tl { 333333 }
+\tl_set:Nn \l__cv_color_date_tl { 666666 }
+
+
+
+% Function to apply the configuration
+\cs_new:Npn \__cv_apply_configuration:
+{
+  % Apply margins only in preamble
+  \@ifundefined{@begindocumenthook}
+    {} % Not in preamble, skip geometry
+    {\geometry{hmargin=\l__cv_hmargin_dim, vmargin=\l__cv_vmargin_dim}}
+  
+  % Apply colors
+  \definecolor{primary}{HTML}{\l__cv_color_primary_tl}
+  \definecolor{headings}{HTML}{\l__cv_color_headings_tl}
+  \definecolor{subheadings}{HTML}{\l__cv_color_subheadings_tl}
+  \definecolor{date}{HTML}{\l__cv_color_date_tl}
+  
+  % Apply fonts
+  \setmainfont[Color=primary, AutoFakeBold, AutoFakeSlant]{\l__cv_main_font_tl}
+  \setsansfont[Scale=MatchLowercase]{\l__cv_sans_font_tl}
+  
+  % Update internal font commands
+  \renewcommand{\cvmainfont}{\fontspec[AutoFakeBold, AutoFakeSlant]{\l__cv_main_font_tl}}
+  \renewcommand{\cvnamefont}{\fontspec[AutoFakeBold, AutoFakeSlant]{\l__cv_name_font_tl}}
+  \renewcommand{\cvnamesecfont}{\fontspec[AutoFakeBold, AutoFakeSlant]{\l__cv_namesec_font_tl}}
+  \renewcommand{\cvdatefont}{\fontspec[AutoFakeBold, AutoFakeSlant]{\l__cv_date_font_tl}}
+  \renewcommand{\cvheadingfont}{\fontspec[AutoFakeBold, AutoFakeSlant]{\l__cv_heading_font_tl}}
+  \renewcommand{\cvsubheadingfont}{\fontspec[AutoFakeBold, AutoFakeSlant]{\l__cv_subheading_font_tl}}
+  \renewcommand{\cvdescfont}{\fontspec[AutoFakeBold, AutoFakeSlant]{\l__cv_desc_font_tl}}
+  \renewcommand{\cvlocationfont}{\fontspec[AutoFakeBold, AutoFakeSlant]{\l__cv_location_font_tl}}
+  \renewcommand{\cvboldfont}{\fontspec[AutoFakeBold, AutoFakeSlant]{\l__cv_bold_font_tl}}
+  
+  % Update cvbold command
+  \renewcommand{\cvbold}[1]{{\fontspec{\l__cv_bold_font_tl}[Scale=0.9] ##1}}
+}
+
+% User command for configuration using modern keyval approach
+\NewDocumentCommand{\cvsetup}{m}
+{
+  \__cv_process_keys:n { #1 }
+  \__cv_apply_configuration:
+}
+
+% Key processing function
+\cs_new:Npn \__cv_process_keys:n #1
+{
+  \clist_map_inline:nn { #1 }
+  {
+    \__cv_process_single_key:n { ##1 }
+  }
+}
+
+\cs_new:Npn \__cv_process_single_key:n #1
+{
+  \tl_set:Nn \l_tmpa_tl { #1 }
+  \regex_replace_once:nnN { \s* = \s* } { = } \l_tmpa_tl
+  \seq_set_split:NnV \l_tmpa_seq { = } \l_tmpa_tl
+  \int_compare:nNnTF { \seq_count:N \l_tmpa_seq } = { 2 }
+  {
+    \tl_set:Nx \l_tmpb_tl { \seq_item:Nn \l_tmpa_seq { 1 } }
+    \tl_set:Nx \l_tmpc_tl { \seq_item:Nn \l_tmpa_seq { 2 } }
+    \__cv_handle_key:VV \l_tmpb_tl \l_tmpc_tl
+  }
+  {
+    \msg_warning:nn { cv-espresso } { invalid-key-format }
+  }
+}
+
+% Key handler
+\cs_new:Npn \__cv_handle_key:nn #1 #2
+{
+  \str_case:nnF { #1 }
+  {
+    % Font keys
+    { fonts/main } { \tl_set:Nn \l__cv_main_font_tl { #2 } }
+    { fonts/sans } { \tl_set:Nn \l__cv_sans_font_tl { #2 } }
+    { fonts/name } { \tl_set:Nn \l__cv_name_font_tl { #2 } }
+    { fonts/namesec } { \tl_set:Nn \l__cv_namesec_font_tl { #2 } }
+    { fonts/date } { \tl_set:Nn \l__cv_date_font_tl { #2 } }
+    { fonts/heading } { \tl_set:Nn \l__cv_heading_font_tl { #2 } }
+    { fonts/subheading } { \tl_set:Nn \l__cv_subheading_font_tl { #2 } }
+    { fonts/desc } { \tl_set:Nn \l__cv_desc_font_tl { #2 } }
+    { fonts/location } { \tl_set:Nn \l__cv_location_font_tl { #2 } }
+    { fonts/bold } { \tl_set:Nn \l__cv_bold_font_tl { #2 } }
+    
+    % Margin keys
+    { margins/horizontal } { \dim_set:Nn \l__cv_hmargin_dim { #2 } }
+    { margins/vertical } { \dim_set:Nn \l__cv_vmargin_dim { #2 } }
+    { margins } { \dim_set:Nn \l__cv_hmargin_dim { #2 } \dim_set:Nn \l__cv_vmargin_dim { #2 } }
+    
+    % Color keys
+    { colors/primary } { \tl_set:Nn \l__cv_color_primary_tl { #2 } }
+    { colors/headings } { \tl_set:Nn \l__cv_color_headings_tl { #2 } }
+    { colors/subheadings } { \tl_set:Nn \l__cv_color_subheadings_tl { #2 } }
+    { colors/date } { \tl_set:Nn \l__cv_color_date_tl { #2 } }
+    
+    % Theme presets
+    { theme } { \__cv_set_theme:n { #2 } }
+    
+    % Paper size presets
+    { paper } { \__cv_set_paper:n { #2 } }
+  }
+  {
+    \msg_warning:nnn { cv-espresso } { unknown-key } { #1 }
+  }
+}
+
+\cs_generate_variant:Nn \__cv_handle_key:nn { VV }
+
+% Theme setter
+\cs_new:Npn \__cv_set_theme:n #1
+{
+  \str_case:nnF { #1 }
+  {
+    { default } {
+      \tl_set:Nn \l__cv_color_primary_tl { 2b2b2b }
+      \tl_set:Nn \l__cv_color_headings_tl { 6A6A6A }
+      \tl_set:Nn \l__cv_color_subheadings_tl { 333333 }
+      \tl_set:Nn \l__cv_color_date_tl { 666666 }
+    }
+    { blue } {
+      \tl_set:Nn \l__cv_color_primary_tl { 1e3a8a }
+      \tl_set:Nn \l__cv_color_headings_tl { 3b82f6 }
+      \tl_set:Nn \l__cv_color_subheadings_tl { 1e40af }
+      \tl_set:Nn \l__cv_color_date_tl { 6b7280 }
+    }
+    { green } {
+      \tl_set:Nn \l__cv_color_primary_tl { 166534 }
+      \tl_set:Nn \l__cv_color_headings_tl { 22c55e }
+      \tl_set:Nn \l__cv_color_subheadings_tl { 15803d }
+      \tl_set:Nn \l__cv_color_date_tl { 6b7280 }
+    }
+  }
+  {
+    \msg_warning:nnn { cv-espresso } { unknown-theme } { #1 }
+  }
+}
+
+% Paper size setter
+\cs_new:Npn \__cv_set_paper:n #1
+{
+  \str_case:nnF { #1 }
+  {
+    { a4 } {
+      \dim_set:Nn \l__cv_hmargin_dim { 1.25cm }
+      \dim_set:Nn \l__cv_vmargin_dim { 0.75cm }
+    }
+    { a4paper } {
+      \dim_set:Nn \l__cv_hmargin_dim { 1.25cm }
+      \dim_set:Nn \l__cv_vmargin_dim { 0.75cm }
+    }
+    { letter } {
+      \dim_set:Nn \l__cv_hmargin_dim { 1.0in }
+      \dim_set:Nn \l__cv_vmargin_dim { 0.75in }
+    }
+    { letterpaper } {
+      \dim_set:Nn \l__cv_hmargin_dim { 1.0in }
+      \dim_set:Nn \l__cv_vmargin_dim { 0.75in }
+    }
+  }
+  {
+    \msg_warning:nnn { cv-espresso } { unknown-paper } { #1 }
+  }
+}
+
+% Message definitions
+\msg_new:nnn { cv-espresso } { invalid-key-format }
+{
+  Invalid~key~format.~Expected~'key=value'.
+}
+\msg_new:nnn { cv-espresso } { unknown-key }
+{
+  Unknown~key~'#1'.
+}
+\msg_new:nnn { cv-espresso } { unknown-theme }
+{
+  Unknown~theme~'#1'.~Available~themes:~default,~blue,~green.
+}
+\msg_new:nnn { cv-espresso } { unknown-paper }
+{
+  Unknown~paper~size~'#1'.~Available~sizes:~a4,~a4paper,~letter,~letterpaper.
+}
+
+\ExplSyntaxOff
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% COLOR DEFINITIONS
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\definecolor{date}{HTML}{666666} 
+\definecolor{primary}{HTML}{2b2b2b} 
+\definecolor{headings}{HTML}{6A6A6A}
+\definecolor{subheadings}{HTML}{333333}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% BACKWARD COMPATIBILITY FONT COMMANDS
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Backward compatibility commands that update LaTeX3 variables
+\ExplSyntaxOn
+\NewDocumentCommand{\setcvmainfont}{m}
+{
+  \tl_set:Nn \l__cv_main_font_tl { #1 }
+  \__cv_apply_configuration:
+}
+\NewDocumentCommand{\setcvsansfont}{m}
+{
+  \tl_set:Nn \l__cv_sans_font_tl { #1 }
+  \__cv_apply_configuration:
+}
+\NewDocumentCommand{\setcvnamefont}{m}
+{
+  \tl_set:Nn \l__cv_name_font_tl { #1 }
+  \__cv_apply_configuration:
+}
+\NewDocumentCommand{\setcvnamesecfont}{m}
+{
+  \tl_set:Nn \l__cv_namesec_font_tl { #1 }
+  \__cv_apply_configuration:
+}
+\NewDocumentCommand{\setcvdatefont}{m}
+{
+  \tl_set:Nn \l__cv_date_font_tl { #1 }
+  \__cv_apply_configuration:
+}
+\NewDocumentCommand{\setcvheadingfont}{m}
+{
+  \tl_set:Nn \l__cv_heading_font_tl { #1 }
+  \__cv_apply_configuration:
+}
+\NewDocumentCommand{\setcvsubheadingfont}{m}
+{
+  \tl_set:Nn \l__cv_subheading_font_tl { #1 }
+  \__cv_apply_configuration:
+}
+\NewDocumentCommand{\setcvdescfont}{m}
+{
+  \tl_set:Nn \l__cv_desc_font_tl { #1 }
+  \__cv_apply_configuration:
+}
+\NewDocumentCommand{\setcvlocationfont}{m}
+{
+  \tl_set:Nn \l__cv_location_font_tl { #1 }
+  \__cv_apply_configuration:
+}
+\NewDocumentCommand{\setcvboldfont}{m}
+{
+  \tl_set:Nn \l__cv_bold_font_tl { #1 }
+  \__cv_apply_configuration:
+}
+\ExplSyntaxOff
+
+% Default font setup
+\defaultfontfeatures{Ligatures=TeX}
+
+% Provide fallback font definitions that always work
+\providecommand{\cvmainfont}{\rmfamily}
+\providecommand{\cvnamefont}{\rmfamily}
+\providecommand{\cvnamesecfont}{\rmfamily}
+\providecommand{\cvdatefont}{\rmfamily}
+\providecommand{\cvheadingfont}{\rmfamily}
+\providecommand{\cvsubheadingfont}{\rmfamily}
+\providecommand{\cvdescfont}{\rmfamily}
+\providecommand{\cvlocationfont}{\rmfamily}
+\providecommand{\cvboldfont}{\rmfamily}
+
+% Provide cvbold command - will be overridden by LaTeX3 configuration
+\providecommand{\cvbold}[1]{{\bfseries #1}}
+
+% LaTeX3 configuration is initialized only when \cvsetup is called
+% This allows backward compatibility with setcvmainfont etc. commands
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% TEXTPOS CONFIGURATION FOR DATE
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\setlength{\TPHorizModule}{1mm}
+\setlength{\TPVertModule}{1mm}
+\textblockorigin{0mm}{5mm}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% CORE CV COMMANDS
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Date command
+\newcommand{\cvlastupdated}{\begin{textblock}{60}(155,5)
+\color{date}\cvdatefont\fontsize{8pt}{10pt}\selectfont 
+Last Updated on \today
+\end{textblock}}
+
+% Backward compatibility alias
+\let\lastupdated\cvlastupdated
+
+% Name command - ruler controlled by user
+\newcommand{\cvnamesection}[3]{
+\centering{
+\fontsize{40pt}{60pt}
+\cvnamefont\selectfont #1 
+\cvnamesecfont\selectfont #2
+} \\[5pt]
+\centering{
+\color{headings}
+\cvdescfont\fontsize{11pt}{14pt}\selectfont #3}
+\vspace{5pt}
+}
+
+% Backward compatibility alias
+\let\namesection\cvnamesection
+
+% Ruler commands - create visual separators
+% Long ruler - full page width (same as namesection)
+\newcommand{\cvlongrule}[1][headings]{%
+\noindent\makebox[\linewidth]{\color{#1}\rule{\paperwidth}{0.4pt}}%
+}
+
+% Short ruler - adjusts to line width
+\newcommand{\cvshortrule}[1][headings]{%
+\vspace{-5pt}\noindent{\color{#1}\rule{\linewidth}{0.4pt}}%
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% SECTION FORMATTING
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Section spacing
+\titlespacing{\section}{0pt}{0pt}{0pt} 
+\titlespacing{\subsection}{0pt}{\parskip}{-\parskip}
+\titlespacing{\subsubsection}{0pt}{\parskip}{-\parskip}
+\newcommand{\cvsectionsep}{\vspace{8pt}}
+
+% Backward compatibility alias
+\let\sectionsep\cvsectionsep
+\newlength{\cvsubsectionskip}
+\setlength{\cvsubsectionskip}{4pt}
+
+% Headings command
+\titleformat{\section}{\color{headings}
+\cvheadingfont\fontsize{16pt}{24pt}\selectfont \raggedright\scshape}{}{0em}{}
+
+% Subheadings command
+\titleformat{\subsection}{\raggedright
+\color{subheadings}\cvsubheadingfont\fontsize{12pt}{12pt}\selectfont}{}{0em}{}
+
+\newcommand{\cvrunsubsection}[1]{
+\color{subheadings}\cvsubheadingfont\fontsize{12pt}{12pt}\selectfont {\scshape#1} \normalfont}
+
+% Backward compatibility alias
+\let\runsubsection\cvrunsubsection
+
+% Descriptors command
+\newcommand{\cvdescript}[1]{
+\color{subheadings}\raggedright\cvdescfont\fontsize{11pt}{13pt}\selectfont {\textsc{#1} \\} \normalfont}
+
+% Backward compatibility alias
+\let\descript\cvdescript
+
+% Location command
+\newcommand{\cvlocation}[1]{
+\color{headings}\raggedright\cvlocationfont\fontsize{10pt}{12pt}\selectfont {#1\\} \normalfont}
+
+% Backward compatibility alias
+\let\location\cvlocation
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% LIST ENVIRONMENTS
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Note: List environments are now defined in individual class files
+% This allows for class-specific customization of spacing and layout
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% CV ENTRY COMMANDS
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Note: \cvbold is now managed by LaTeX3 system and defined earlier
+
+% Enhanced CV commands for better structure
+\newenvironment{cvsection}[1]
+  {\section{#1}\raggedright}
+  {\par\addvspace{0.5ex}}
+
+% Note: \cventry and \cvtext are now defined in individual class files
+% This allows for class-specific implementations and list environments
+
+% cvitem command with class-specific spacing
+\newcommand{\cvitem}[2]{
+  \item{
+    \ifstrempty{#1}{#2}{{\cvbold{#1}: #2}} 
+    \@ifundefined{@cv@onecol}{%
+      % 2-column class behavior - tighter spacing
+      \vspace{-1pt}%
+    }{%
+      % 1-column class behavior - more spacing
+      \vspace{-2pt}%
+    }%
+  }
+}
+
+\newcommand{\cvskill}[2]{%
+  \ifstrempty{#1}{}{\subsection{\textsc{#1}}}
+  \color{headings}\raggedright\cvmainfont\fontsize{10pt}{12pt}\selectfont {#2\\} \normalfont
+}

@@ -96,7 +96,7 @@ def main():
     repo_root = Path(__file__).resolve().parent.parent
 
     # Source Directories
-    source_dirs = [repo_root / "e_style", repo_root / "MyEspressoTheme"]
+    source_dirs = [repo_root / "e_style", repo_root / "MyEspressoTheme", repo_root / "MyCV"]
 
     # Find and prepare destination
     texmf_home = get_texmf_home()

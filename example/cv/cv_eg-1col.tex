@@ -1,0 +1,224 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% CV Espresso Deedy - Modern 1 Column
+% Comprehensive CV Example (2-3 pages)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass[a4paper]{cv_espresso_deedy_1col}
+\usepackage{fancyhdr}
+
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\headrulewidth}{0pt}
+
+% Modern LaTeX3 Configuration
+\cvsetup{
+    theme = default,
+    fonts/main = Lato Light,
+    fonts/name = Lato Hairline,
+    fonts/namesec = Lato Light,
+    fonts/date = Raleway ExtraLight,
+    fonts/heading = Roboto Light,
+    fonts/subheading = Source Sans Pro Semibold,
+    fonts/location = Raleway Medium,
+    fonts/desc = Raleway Medium,
+    fonts/bold = Lato Bold,
+    fonts/sans = Raleway ExtraLight
+}
+
+\begin{document}
+
+\cvlastupdated
+
+\cvnamesection{Alexandra}{Sterling}{
+    \faLocationDot\ London, UK | \faPhone\ +44-20-7946-0958 | \faEnvelope\ \href{mailto:alexandra.sterling@example.com}{alexandra.sterling@example.com} \\ \faLinkedin\ \href{https://linkedin.com/in/alexandra-sterling}{alexandra-sterling} | \faGithub\ \href{https://github.com/asterling}{asterling}
+}
+
+\begin{cvsection}{education}
+    \cvshortrule
+    \begin{cventrylist}
+    \item \cvtabentry{Imperial College London}{London, UK}{PhD in Computer Science}{Oct. 2018 - Dec. 2022}
+        \begin{cvitemlist}
+            \cvitem{Thesis}{``Advanced Machine Learning Approaches for Real-Time Computer Vision in Autonomous Systems''}
+            \cvitem{Supervisor}{Prof. James Richardson, FRS}
+            \cvitem{Awards}{Imperial College President's PhD Scholarship (Full funding), Outstanding Research Achievement Award 2022}
+            \cvitem{Publications}{12 peer-reviewed papers, 3 first-author publications in Nature Machine Intelligence and ICML}
+        \end{cvitemlist}
+
+    \item \cvtabentry{University of Cambridge}{Cambridge, UK}{MPhil in Advanced Computer Science}{Oct. 2016 - Jun. 2018}
+        \begin{cvitemlist}
+            \cvitem{Distinction}{First Class Honours with Distinction (88\%)}
+            \cvitem{Thesis}{``Neural Network Optimization for Edge Computing Applications''}
+            \cvitem{Relevant Coursework}{Machine Learning, Computer Vision, Distributed Systems, Advanced Algorithms}
+        \end{cvitemlist}
+
+    \item \cvtabentry{University of Oxford}{Oxford, UK}{BA in Computer Science}{Oct. 2013 - Jun. 2016}
+        \begin{cvitemlist}
+            \cvitem{Honours}{First Class Honours (90\%)}
+            \cvitem{Awards}{Oxford Computing Laboratory Prize for Best Final Year Project}
+            \cvitem{Activities}{President of Oxford Women in Computer Science Society, Captain of University Programming Team}
+        \end{cvitemlist}
+    \end{cventrylist}
+\end{cvsection}
+
+\begin{cvsection}{professional experience}
+    \cvshortrule
+    \begin{cventrylist}
+    \item \cvtabentry{DeepMind Technologies}{London, UK}{Senior Research Scientist}{Jan. 2023 - Present}
+        \begin{cvitemlist}
+            \cvitem{Research Focus}{Leading research on multimodal AI systems combining computer vision and natural language processing}
+            \cvitem{Key Achievements}{Developed novel attention mechanisms improving model efficiency by 35\%, published 4 papers at top-tier venues}
+            \cvitem{Collaboration}{Working closely with Google Brain team on large-scale model deployment}
+            \cvitem{Mentorship}{Supervising 3 PhD interns and 2 postdoctoral researchers}
+        \end{cvitemlist}
+
+    \item \cvtabentry{Microsoft Research Cambridge}{Cambridge, UK}{Research Intern}{Jun. 2021 - Sep. 2021}
+        \begin{cvitemlist}
+            \cvitem{Project}{``Efficient Neural Architecture Search for Mobile Devices''}
+            \cvitem{Impact}{Developed automated neural architecture search pipeline reducing model size by 60\% while maintaining accuracy}
+            \cvitem{Publication}{Work accepted at NeurIPS 2021 with 200+ citations}
+            \cvitem{Technology Stack}{PyTorch, Azure ML, ONNX, TensorRT}
+        \end{cvitemlist}
+
+    \item \cvtabentry{Amazon Web Services}{Dublin, Ireland}{Applied Scientist Intern}{Jun. 2020 - Sep. 2020}
+        \begin{cvitemlist}
+            \cvitem{Team}{Amazon SageMaker AutoML}
+            \cvitem{Contribution}{Implemented distributed hyperparameter optimization algorithms for large-scale machine learning workloads}
+            \cvitem{Results}{Improved training time by 40\% for customer workloads, integrated into SageMaker production pipeline}
+            \cvitem{Skills}{Python, Scala, Apache Spark, Docker, Kubernetes}
+        \end{cvitemlist}
+
+    \item \cvtabentry{Google}{Mountain View, CA, USA}{Software Engineering Intern}{Jun. 2019 - Sep. 2019}
+        \begin{cvitemlist}
+            \cvitem{Team}{Google Photos Computer Vision}
+            \cvitem{Project}{Developed real-time image enhancement algorithms for mobile photography}
+            \cvitem{Impact}{Features shipped to 1+ billion users, improved photo quality metrics by 25\%}
+            \cvitem{Technology}{TensorFlow Lite, C++, Android NDK, OpenCV}
+        \end{cvitemlist}
+    \end{cventrylist}
+\end{cvsection}
+
+\begin{cvsection}{academic experience}
+    \cvshortrule
+    \begin{cventrylist}
+    \item \cvtext{Imperial College London}{Postdoctoral Research Associate}{Jan. 2023 - Present | London, UK}{Leading research on federated learning for healthcare applications. Collaborating with NHS trusts to develop privacy-preserving machine learning systems for medical imaging analysis. Managing a team of 4 researchers and £2.5M in research funding.}
+
+    \item \cvtext{University of Cambridge}{Teaching Associate}{Oct. 2018 - Dec. 2022 | Cambridge, UK}{Taught undergraduate and graduate courses in Machine Learning, Computer Vision, and Advanced Algorithms. Supervised 12 undergraduate dissertations and 6 MPhil theses. Received ``Outstanding Teaching Award'' for three consecutive years.}
+
+    \item \cvtext{Oxford Computing Laboratory}{Research Assistant}{Jun. 2015 - Sep. 2016 | Oxford, UK}{Worked with Prof. Sarah Mitchell on distributed computing systems. Contributed to research on consensus algorithms in Byzantine fault-tolerant systems. Co-authored 2 conference papers at PODC and DISC.}
+    \end{cventrylist}
+\end{cvsection}
+
+\begin{cvsection}{selected publications}
+    \cvshortrule
+    \begin{cventrylist}
+    \item \cvtext{Nature Machine Intelligence}{``Multimodal Federated Learning for Healthcare: Privacy, Efficiency, and Fairness''}{2024 | First Author}{Sterling, A., Chen, L., Patel, R., \& Johnson, M. A comprehensive framework for federated learning in sensitive healthcare environments, demonstrating superior performance while maintaining strict privacy guarantees. \textbf{Impact Factor: 25.4, Citations: 89}}
+
+    \item \cvtext{International Conference on Machine Learning (ICML)}{``Efficient Neural Architecture Search via Progressive Pruning''}{2023 | First Author}{Sterling, A., \& Richardson, J. Novel approach to neural architecture search reducing computational requirements by 70\% while maintaining state-of-the-art performance on ImageNet and COCO datasets. \textbf{Acceptance Rate: 27.9\%, Citations: 156}}
+
+    \item \cvtext{Conference on Neural Information Processing Systems (NeurIPS)}{``Adaptive Attention Mechanisms for Resource-Constrained Environments''}{2021 | Co-First Author}{Sterling, A., Kumar, P., \& Thompson, D. Breakthrough work on attention mechanisms for mobile and edge computing applications, enabling real-time inference on smartphones. \textbf{Spotlight Paper, Citations: 234}}
+
+    \item \cvtext{IEEE Conference on Computer Vision and Pattern Recognition (CVPR)}{``Real-Time Object Detection with Temporal Consistency''}{2020 | Second Author}{Liu, X., Sterling, A., \& Brown, K. Advanced object detection system achieving 60 FPS on standard hardware while maintaining temporal coherence in video streams. \textbf{Oral Presentation, Citations: 187}}
+    \end{cventrylist}
+\end{cvsection}
+
+\begin{cvsection}{awards and honors}
+    \cvshortrule
+    \vspace{5pt}
+    \small
+    \begin{tabular}{@{}rll@{}}
+        2024 & International & MIT Technology Review Innovators Under 35 \\
+        2023 & National & Royal Society University Research Fellowship \\
+        2022 & Imperial College & President's Award for Outstanding PhD Research \\
+        2021 & NeurIPS & Outstanding Paper Award (Top 0.1\% of submissions) \\
+        2020 & Google & PhD Fellowship in Machine Learning \\
+        2019 & IEEE & Young Professional Achievement Award \\
+        2018 & Cambridge & MPhil Thesis Prize for Best Research \\
+        2016 & Oxford & Computing Laboratory Prize for Final Year Project \\
+        2015 & ACM & Student Research Competition Winner (SIGMOD) \\
+        2014 & British Informatics & Olympiad Gold Medal \\
+    \end{tabular}
+    \normalsize
+\end{cvsection}
+
+\begin{cvsection}{technical skills}
+    \cvshortrule
+    \begin{cventrylist}
+    \item \cvtext{Programming Languages}{Expert Level}{Daily Use}{Python, C++, CUDA, JavaScript, TypeScript, Go, Rust, R, MATLAB, SQL}
+
+    \item \cvtext{Machine Learning \& AI}{Frameworks and Tools}{Production Experience}{PyTorch, TensorFlow, JAX, Hugging Face, scikit-learn, OpenCV, ONNX, TensorRT, MLflow, Weights \& Biases, Ray, Horovod}
+
+    \item \cvtext{Cloud \& Infrastructure}{Platforms and Services}{Enterprise Scale}{AWS (SageMaker, EC2, S3, Lambda), Google Cloud Platform (Vertex AI, Compute Engine), Azure (ML Studio), Docker, Kubernetes, Terraform, Apache Spark, Kafka}
+
+    \item \cvtext{Web Development}{Full Stack Capabilities}{Professional Projects}{React, Node.js, Django, FastAPI, PostgreSQL, MongoDB, Redis, GraphQL, RESTful APIs, Microservices Architecture}
+
+    \item \cvtext{Research Tools}{Academic and Industry}{Publication Quality}{LaTeX, Jupyter, Git, Linux, HPC clusters, SLURM, Singularity, Matplotlib, Plotly, D3.js, Tableau}
+    \end{cventrylist}
+\end{cvsection}
+
+\begin{cvsection}{professional service}
+    \cvshortrule
+    \begin{cventrylist}
+    \item \cvtext{Editorial Boards}{Journal Reviewer}{2022 - Present}{Reviewer for Nature Machine Intelligence, Journal of Machine Learning Research, IEEE Transactions on Pattern Analysis and Machine Intelligence, Computer Vision and Image Understanding}
+
+    \item \cvtext{Conference Organization}{Program Committee Member}{2021 - Present}{ICML (2023, 2024), NeurIPS (2022, 2023, 2024), ICLR (2023, 2024), CVPR (2022, 2023), ICCV (2023)}
+
+    \item \cvtext{Professional Societies}{Active Membership}{2019 - Present}{IEEE Computer Society, ACM SIGKDD, Association for the Advancement of Artificial Intelligence (AAAI), British Computer Society}
+
+    \item \cvtext{Industry Advisory}{Consulting Roles}{2023 - Present}{Technical advisor for 3 AI startups in London, Member of UK Government AI Safety Advisory Board, Expert witness for IP litigation cases}
+    \end{cventrylist}
+\end{cvsection}
+
+\begin{cvsection}{selected projects}
+    \cvshortrule
+    \begin{cventrylist}
+    \item \cvtext{HealthAI Platform}{Open-Source Medical AI Framework}{2023 - Present}{Leading development of open-source platform for federated medical AI. 50+ contributors, 2.3k GitHub stars, deployed in 15+ hospitals across Europe. Technologies: Python, PyTorch, Docker, Kubernetes, FHIR.}
+
+    \item \cvtext{EfficientVision}{Mobile Computer Vision Library}{2022 - 2023}{Created optimized computer vision library for mobile devices. Achieved 10x speedup over existing solutions. Downloaded 100k+ times, integrated into major mobile applications. Technologies: C++, TensorFlow Lite, ARM NEON, Metal Performance Shaders.}
+
+    \item \cvtext{CityFlow Analytics}{Smart City Traffic System}{2021 - 2022}{Developed real-time traffic analysis system using computer vision and IoT sensors. Deployed in London pilot program, reduced traffic congestion by 22\%. Technologies: Python, Apache Kafka, Redis, PostgreSQL, React, D3.js.}
+
+    \item \cvtext{Neural Architecture Compiler}{Automated ML Pipeline}{2020 - 2021}{Built automated system for neural architecture search and deployment. Reduced model development time from weeks to hours. Used internally at Microsoft Research. Technologies: Python, PyTorch, Docker, Azure, ONNX.}
+    \end{cventrylist}
+\end{cvsection}
+
+\begin{cvsection}{languages}
+    \cvshortrule
+    \cvskill{}{English (Native) \textbullet{} French (Fluent - DELF B2) \textbullet{} German (Conversational - Goethe B1) \textbullet{} Mandarin Chinese (Basic - HSK 3) \textbullet{} Spanish (Basic)}
+\end{cvsection}
+
+\begin{cvsection}{certifications}
+    \cvshortrule
+    \begin{cvitemlist}
+        \cvitem{AWS Certified Solutions Architect}{Professional Level (2023)}
+        \cvitem{Google Cloud Professional ML Engineer}{Certified (2023)}
+        \cvitem{Certified Kubernetes Administrator (CKA)}{CNCF Certification (2022)}
+        \cvitem{Deep Learning Specialization}{Coursera - Stanford University (2020)}
+        \cvitem{Chartered Engineer (CEng)}{Institution of Engineering and Technology (2024)}
+    \end{cvitemlist}
+\end{cvsection}
+
+\begin{cvsection}{invited talks and media}
+    \cvshortrule
+    \begin{cventrylist}
+    \item \cvtext{Keynote Speaker}{``The Future of Federated Learning in Healthcare''}{Jul. 2024 | ICML Workshop}{Delivered keynote address to audience of 500+ researchers and practitioners on privacy-preserving machine learning in medical applications.}
+
+    \item \cvtext{BBC Technology}{Featured Interview}{Mar. 2024 | BBC Radio 4}{Discussed implications of AI in healthcare on national radio program ``The Digital Human'', audience of 2+ million listeners.}
+
+    \item \cvtext{TED Talk}{``AI That Respects Privacy''}{Nov. 2023 | TEDx Cambridge}{Presented research on federated learning to general audience, video viewed 150k+ times on YouTube.}
+
+    \item \cvtext{Nature Podcast}{Expert Commentary}{Sep. 2023 | Nature Magazine}{Provided expert analysis on recent advances in neural architecture search for Nature's weekly podcast.}
+    \end{cventrylist}
+\end{cvsection}
+
+\begin{cvsection}{references}
+    \cvshortrule
+    \begin{cventrylist}
+    \item \cvtext{Prof. James Richardson, FRS}{PhD Supervisor, Imperial College London}{Email: j.richardson@imperial.ac.uk}{Professor of Computer Science and Director of the Centre for AI Research. Available upon request for detailed academic and research references.}
+
+    \item \cvtext{Dr. Sarah Chen}{Senior Director of Research, DeepMind}{Email: sarah.chen@deepmind.com}{Direct supervisor at DeepMind Technologies. Can provide insights into research leadership and technical contributions.}
+
+    \item \cvtext{Prof. Michael Thompson}{Professor, University of Cambridge}{Email: mt@cam.ac.uk}{Former teaching supervisor and current research collaborator. Available for references on teaching and academic service.}
+    \end{cventrylist}
+\end{cvsection}
+
+\end{document}
