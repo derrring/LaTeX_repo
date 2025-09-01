@@ -37,7 +37,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Set column separation and ratios
-\setlength{\columnsep}{1ex}
+\setlength{\columnsep}{2em}
 \setlength{\columnseprule}{0pt}
 \colseprulecolor{white}
 

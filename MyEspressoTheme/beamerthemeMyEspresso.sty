@@ -197,7 +197,8 @@
       at ([yshift=-40pt]current~page.center) (toc)
       {\color{white}\begin{minipage}{0.9\paperwidth}%
           \begin{multicols}{2}\hypersetup{linkcolor=white}\setcounter{tocdepth}{\themyespressotoc}\tableofcontents%
-          \end{multicols}\end{minipage}
+          \end{multicols}
+          \end{minipage}
       };
       \str_if_eq:VnTF{\l_sepframeimage_tl}{}{%
       }{
@@ -214,6 +215,7 @@
   \tl_clear:N \l_sepframeimage_tl
 }
 \ExplSyntaxOff
+
 
 % Thanks frame
 \NewDocumentCommand{\thanksframe}{o m}{

@@ -16,12 +16,12 @@
 % PACKAGE OPTIONS
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% Paper size options with adaptive margins
+% Paper size options - handled by LaTeX3 system
 \newif\if@cvletter
-\DeclareOption{letter}{\@cvlettertrue\PassOptionsToPackage{letterpaper}{geometry}}
-\DeclareOption{letterpaper}{\@cvlettertrue\PassOptionsToPackage{letterpaper}{geometry}}
-\DeclareOption{a4}{\@cvletterfalse\PassOptionsToPackage{a4paper}{geometry}}
-\DeclareOption{a4paper}{\@cvletterfalse\PassOptionsToPackage{a4paper}{geometry}}
+\DeclareOption{letter}{\@cvlettertrue}
+\DeclareOption{letterpaper}{\@cvlettertrue}
+\DeclareOption{a4}{\@cvletterfalse}
+\DeclareOption{a4paper}{\@cvletterfalse}
 
 % Set default to a4paper (no option = a4paper)
 \@cvletterfalse
@@ -31,12 +31,9 @@
 % REQUIRED PACKAGES
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% Conditional geometry settings based on paper size
-\if@cvletter
-  \RequirePackage[letterpaper]{geometry}
-\else
-  \RequirePackage[a4paper]{geometry}
-\fi
+% Load geometry package without paper size options
+% Paper size and margins will be set by LaTeX3 system
+\RequirePackage{geometry}
 \RequirePackage[dvipsnames]{xcolor}
 \RequirePackage[hidelinks]{hyperref}
 \RequirePackage{titlesec}
@@ -112,20 +109,9 @@
 \tl_set:Nn \l__cv_location_font_tl { Raleway~Medium }
 \tl_set:Nn \l__cv_bold_font_tl { Lato~Bold }
 
-% Set default margins based on paper size
-\ExplSyntaxOff
-\if@cvletter
-  \ExplSyntaxOn
-  \dim_set:Nn \l__cv_hmargin_dim { 1.0in }
-  \dim_set:Nn \l__cv_vmargin_dim { 0.75in }
-  \ExplSyntaxOff
-\else
-  \ExplSyntaxOn
-  \dim_set:Nn \l__cv_hmargin_dim { 1.25cm }
-  \dim_set:Nn \l__cv_vmargin_dim { 0.75cm }
-  \ExplSyntaxOff
-\fi
-\ExplSyntaxOn
+% Default margins will be initialized after functions are defined
+
+% Initialize default paper size and margins (will be set after functions are defined)
 
 \tl_set:Nn \l__cv_color_primary_tl { 2b2b2b }
 \tl_set:Nn \l__cv_color_headings_tl { 6A6A6A }
@@ -137,10 +123,16 @@
 % Function to apply the configuration
 \cs_new:Npn \__cv_apply_configuration:
 {
-  % Apply margins only in preamble
+  % Apply paper size and margins only in preamble
   \@ifundefined{@begindocumenthook}
     {} % Not in preamble, skip geometry
-    {\geometry{hmargin=\l__cv_hmargin_dim, vmargin=\l__cv_vmargin_dim}}
+    {
+      \if@cvletter
+        \geometry{letterpaper, hmargin=\l__cv_hmargin_dim, vmargin=\l__cv_vmargin_dim}
+      \else
+        \geometry{a4paper, hmargin=\l__cv_hmargin_dim, vmargin=\l__cv_vmargin_dim}
+      \fi
+    }
   
   % Apply colors
   \definecolor{primary}{HTML}{\l__cv_color_primary_tl}
@@ -272,29 +264,46 @@
 % Paper size setter
 \cs_new:Npn \__cv_set_paper:n #1
 {
+  % Normalize aliases to base names
   \str_case:nnF { #1 }
   {
-    { a4 } {
-      \dim_set:Nn \l__cv_hmargin_dim { 1.25cm }
-      \dim_set:Nn \l__cv_vmargin_dim { 0.75cm }
-    }
-    { a4paper } {
-      \dim_set:Nn \l__cv_hmargin_dim { 1.25cm }
-      \dim_set:Nn \l__cv_vmargin_dim { 0.75cm }
-    }
-    { letter } {
-      \dim_set:Nn \l__cv_hmargin_dim { 1.0in }
-      \dim_set:Nn \l__cv_vmargin_dim { 0.75in }
-    }
-    { letterpaper } {
-      \dim_set:Nn \l__cv_hmargin_dim { 1.0in }
-      \dim_set:Nn \l__cv_vmargin_dim { 0.75in }
-    }
+    { a4 } { \__cv_set_paper_normalized:n { a4paper } }
+    { a4paper } { \__cv_set_paper_normalized:n { a4paper } }
+    { letter } { \__cv_set_paper_normalized:n { letterpaper } }
+    { letterpaper } { \__cv_set_paper_normalized:n { letterpaper } }
   }
   {
     \msg_warning:nnn { cv-espresso } { unknown-paper } { #1 }
   }
 }
+
+% Internal function for normalized paper sizes
+\cs_new:Npn \__cv_set_paper_normalized:n #1
+{
+  \str_case:nnF { #1 }
+  {
+    { a4paper } {
+      \@cvletterfalse
+      \dim_set:Nn \l__cv_hmargin_dim { 1cm }
+      \dim_set:Nn \l__cv_vmargin_dim { 0.75cm }
+    }
+    { letterpaper } {
+      \@cvlettertrue
+      \dim_set:Nn \l__cv_hmargin_dim { 1.0in }
+      \dim_set:Nn \l__cv_vmargin_dim { 0.75in }
+    }
+  }
+  {
+    \msg_error:nnn { cv-espresso } { internal-error } { #1 }
+  }
+}
+
+% Initialize default paper size and margins now that functions are defined
+\if@cvletter
+  \__cv_set_paper:n { letter }
+\else  
+  \__cv_set_paper:n { a4 }
+\fi
 
 % Message definitions
 \msg_new:nnn { cv-espresso } { invalid-key-format }
@@ -313,6 +322,10 @@
 {
   Unknown~paper~size~'#1'.~Available~sizes:~a4,~a4paper,~letter,~letterpaper.
 }
+\msg_new:nnn { cv-espresso } { internal-error }
+{
+  Internal~error~in~paper~size~processing:~'#1'.
+}
 
 \ExplSyntaxOff
 
@@ -320,10 +333,8 @@
 % COLOR DEFINITIONS
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\definecolor{date}{HTML}{666666} 
-\definecolor{primary}{HTML}{2b2b2b} 
-\definecolor{headings}{HTML}{6A6A6A}
-\definecolor{subheadings}{HTML}{333333}
+% Colors are now handled dynamically by LaTeX3 system in __cv_apply_configuration:
+% Default colors are initialized and can be customized via \cvsetup{} or theme presets
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % BACKWARD COMPATIBILITY FONT COMMANDS
