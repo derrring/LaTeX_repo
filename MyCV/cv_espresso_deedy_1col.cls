@@ -45,10 +45,9 @@
   \cvdescript{#2}
   \cvlocation{#3}
   \ifstrempty{#4}{}{%
-    \vspace{2pt}%
+    \vspace{1pt}%
     #4%
   }%
-    \vspace{2pt}
 }
 
 % Define cventry for 1-column layout (no automatic \item)
@@ -62,26 +61,27 @@
       #4%
     \end{cvitemlist}%
   }%
-  \vspace{2pt}
+  \vspace{1pt}
 }
 
 % New tabular-based entry command (no \item inside definition)
 % Parameters: #1=Company/Institution, #2=Location, #3=Position/Degree, #4=Date
-\newcommand{\cvtabentry}[4]{%
-  \raisebox{1.5ex}[0pt][0pt]{%
-  \begin{minipage}[t]{0.65\linewidth}
-      \color{subheadings}\cvsubheadingfont\fontsize{12pt}{12pt}\selectfont{\scshape #1} \\
-      \color{subheadings}\cvdescfont\fontsize{11pt}{13pt}\selectfont{\textit{#3}}
-    \end{minipage}%
-    \hfill%
-    \begin{minipage}[t]{0.35\linewidth}
-      \raggedleft%
-      \color{headings}\cvlocationfont\fontsize{10pt}{12pt}\selectfont #2  \\
-      \color{headings}\cvlocationfont\fontsize{10pt}{12pt}\selectfont{\textit{#4}}
-    \end{minipage}%
-  }
-  \vspace{1pt}
-  }
+  \newcommand{\cvtabentry}[4]{%
+    \raisebox{1.5ex}{%
+    \begin{minipage}[t]{0.55\linewidth}
+        \color{subheadings}\cvsubheadingfont\fontsize{12pt}{12pt}\selectfont{\scshape #1}%
+        \ifboolexpr{not test {\ifblank{#3}} or not test {\ifblank{#4}}}{ \\
+  \color{subheadings}\cvdescfont\fontsize{11pt}{13pt}\selectfont{\textit{#3}}}{}
+      \end{minipage}%
+      \hfill%
+      \begin{minipage}[t]{0.45\linewidth}
+        \raggedleft%
+        \color{headings}\cvlocationfont\fontsize{10pt}{12pt}\selectfont #2%
+        \ifboolexpr{not test {\ifblank{#3}} or not test {\ifblank{#4}}}{ \\
+  \color{headings}\cvlocationfont\fontsize{10pt}{12pt}\selectfont{\textit{#4}}}{}
+      \end{minipage}%
+    }
+    }
 
 
 
@@ -95,5 +95,5 @@
   {\end{itemize}}
 
 \newenvironment{cvitemlist}
-  {\begin{itemize}[leftmargin=*,itemsep=2pt,parsep=1pt,topsep=0pt,partopsep=0pt]}
+  {\begin{itemize}[leftmargin=*,itemsep=1pt,parsep=1pt,topsep=0pt,partopsep=0pt]}
   {\end{itemize}}
