@@ -1,0 +1,82 @@
+\documentclass[12pt]{e_class_thesis}
+
+\title{Sample Thesis Document}
+\author{Graduate Student}
+\date{\today}
+
+% --- Document Starts ---
+\begin{document}
+
+\maketitle
+\mytoc
+
+\chapter{Introduction}
+
+This document demonstrates the thesis document class, designed for longer academic works such as master's theses, doctoral dissertations, and comprehensive research reports. The template provides a structured framework for extensive academic writing.
+
+\begin{special_columns}{Thesis Template Features}
+    The thesis class provides comprehensive support for multi-chapter documents, including proper chapter formatting, cross-referencing, and academic citation standards.
+\end{special_columns}
+
+\section{Research Context}
+
+Academic research requires careful presentation of complex ideas and mathematical formulations. Our template supports sophisticated typesetting for expressions like:
+
+\begin{align}
+    \mathcal{L}(\theta) &= \sum_{i=1}^{n} \log p(x_i|\theta) \\
+    \hat{\theta}_{MLE} &= \arg\max_{\theta} \mathcal{L}(\theta)
+\end{align}
+
+\section{Methodology}
+
+The methodology section demonstrates various formatting capabilities:
+
+\subsection{Experimental Design}
+\begin{enumerate}
+    \item Hypothesis formulation and theoretical framework
+    \item Data collection and preprocessing procedures
+    \item Statistical analysis and validation methods
+    \item Results interpretation and discussion
+\end{enumerate}
+
+\chapter{Literature Review}
+
+This chapter would typically contain an extensive review of relevant literature, properly cited and organized thematically.
+
+\section{Theoretical Foundations}
+
+Complex mathematical derivations and proofs can be presented clearly:
+
+$$\frac{\partial}{\partial \theta} \mathcal{L}(\theta) = \sum_{i=1}^{n} \frac{\partial}{\partial \theta} \log p(x_i|\theta) = 0$$
+
+\section{Current Research Trends}
+
+Modern research in this field focuses on several key areas, each requiring detailed mathematical treatment and empirical validation.
+
+\chapter{Methodology and Results}
+
+\section{Data Analysis}
+
+Statistical results and their interpretation form a crucial part of thesis work. Our template ensures proper formatting for tables, figures, and mathematical expressions.
+
+\section{Discussion}
+
+The discussion section integrates findings with existing literature and theoretical frameworks.
+
+\chapter{Conclusions and Future Work}
+
+\section{Summary of Contributions}
+
+This thesis has demonstrated several key contributions:
+\begin{itemize}
+    \item Novel theoretical framework development
+    \item Empirical validation of proposed methods
+    \item Practical applications and implementations
+    \item Future research directions
+\end{itemize}
+
+\section{Future Directions}
+
+Future research should explore extensions of this work to related domains and investigate scalability considerations for larger datasets.
+
+\end{document}

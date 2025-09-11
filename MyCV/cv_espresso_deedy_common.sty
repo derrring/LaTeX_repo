@@ -529,7 +529,7 @@ Last Updated on \today
 % cvitem command with class-specific spacing
 \newcommand{\cvitem}[2]{
   \item{
-    \ifstrempty{#1}{#2}{{\cvbold{#1}: #2}} 
+    \ifstrempty{#1}{#2}{{\cvbold{#1} #2}} 
     \@ifundefined{@cv@onecol}{%
       % 2-column class behavior - tighter spacing
       \vspace{-1pt}%
