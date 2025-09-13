@@ -9,16 +9,16 @@
 % \titleformat provided by titlesec package
 \titleformat{\section}[block]
 {\normalfont\bfseries\large}
-{\rule{\textwidth}{1.5pt} \newline \vspace{1ex} }{0pt}
-{\thesection\quad \MakeUppercase}
-[\vspace{-2ex}\rule{\textwidth}{1.5pt}]
+{ }{0pt}
+{\rule{\textwidth}{1.5pt}\\[1ex]\thesection\quad \MakeUppercase}
+[\rule{\textwidth}{1.5pt}]
 
 
 \titleformat{name=\section,numberless}[block] %for unnumbered(starred*) sections
 {\normalfont\bfseries\large}
-{\rule{\textwidth}{1.5pt} \newline \vspace{1ex} }{0pt}
-{\MakeUppercase}
-[\vspace{-2ex}\rule{\textwidth}{1.5pt}]
+{}{0pt}
+{\rule{\textwidth}{1.5pt}\\[1ex]\MakeUppercase}
+[\rule{\textwidth}{1.5pt}]
 
 
 \titlespacing*{\section}{0pt}{0pt}{20pt} % Left, before, after spacing

@@ -98,12 +98,14 @@ math-style=ISO,bold-style=ISO]{unicode-math}
 \input{sty_components/c310_math_symbol.tex}    % Math symbols
 %\input{sty_components/c320_math_env.tex}       % Math environments (theorems)
 \input{sty_components/c410_hyphenation.tex}    % Hyphenation rules
-% Conditionally load bibliography tweaks only if biblatex is loaded
+% --- 3. Conditional Loading of Conflict-Prone Packages ---
 \makeatletter
-\@ifpackageloaded{biblatex}{%
-    \input{sty_components/c510_ref_bib.tex}            % Bibliography tweaks
-}{}
-\makeatother 
+\AtEndPreamble{%
+    \@ifpackageloaded{biblatex}{%
+        \input{sty_components/c510_ref_bib.tex}
+    }{}
+}
+\makeatother
 
 % --- 3. Final Universal Setup ---
 
