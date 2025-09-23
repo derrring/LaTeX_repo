@@ -469,7 +469,7 @@
 %% Probability
 %----------------------------------------------------------------------
 \newcommand{\Law}{\mathsf{Law}} % for law of a random variable
-\newcommand{\Prob}{\mathbb{P}}
+\newcommand{\Prob}{ \mathbb{P} }
 \newcommand{\Var}{\operatorname{Var\mathop{}}} % for variance
 \newcommand{\Cov}{\operatorname{Cov\mathop{}}} % for covariance
 \newcommand{\iid}{\mathrm{i.i.d.}} % for independent and identically distributed
@@ -524,6 +524,15 @@
         \left[#4\right]%
     }
 }
+
+%usage examples:
+%\expect{X}               -> E[X]
+%\expect_{X}{Y}           -> E_X[Y]
+%\expect^{X}{Y}           -> E^X[Y]
+%\expect_{X}^{Y}{Z}       -> E_X^Y[Z]
+%\expect_{X}^{Y}[Z]{W}    -> E_X^Y[W | Z]
+%\expect[Z]{W}           -> E[W | Z]
+%\expect^{Y}[Z]{W}       -> E^Y[W | Z]
 
 %==============Category Theory================
 \newcommand{\op}{\mathrm{op}} % for opposite category

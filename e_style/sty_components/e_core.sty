@@ -21,16 +21,14 @@
 
 %\RequirePackage{luaotfload}
 %%  {fontspec}: set default non-cjk fonts;
-%%  {polyglossia}: set default language; exclude cjk;
-\RequirePackage{polyglossia}
+%%  {polyglossia}: set default language; exclude cjk, but has some conflict with luatexja
+%\RequirePackage{polyglossia}
 
 \RequirePackage{noto}
 \RequirePackage{sourcecodepro}
 \RequirePackage{fourier-orns}
 
-\RequirePackage[warnings-off={mathtools-colon,mathtools-overbracket},
-math-style=ISO,bold-style=ISO]{unicode-math}
-
+\RequirePackage[warnings-off={mathtools-colon,mathtools-overbracket}]{unicode-math}
 
 %=======================================================================
 %====================== layout setting ===============================
@@ -45,8 +43,6 @@ math-style=ISO,bold-style=ISO]{unicode-math}
 \RequirePackage{pdfpages}
 % Colors and customizations
 \RequirePackage[table,x11names,dvipsnames]{xcolor}
-
-
 
 %===========================================================================
 % Figures, tables, and captions
@@ -67,8 +63,6 @@ math-style=ISO,bold-style=ISO]{unicode-math}
 \RequirePackage{lscape}
 \RequirePackage{multicol,paracol,multirow,makecell,booktabs,array}
 
-
-
 % tcolorbox
 \RequirePackage{tcolorbox}
 
@@ -81,9 +75,6 @@ math-style=ISO,bold-style=ISO]{unicode-math}
 \RequirePackage{graphicx}
 \RequirePackage{rotating}
 \RequirePackage{tikz,pgf}
-
-% Chapter quotes
-\RequirePackage[autostyle]{csquotes} % smart quotes
 
 % Big delimiters for matrices and other structures
 \RequirePackage{bigdelim}

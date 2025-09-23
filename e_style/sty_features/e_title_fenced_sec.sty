@@ -10,15 +10,15 @@
 \titleformat{\section}[block]
 {\normalfont\bfseries\large}
 { }{0pt}
-{\rule{\textwidth}{1.5pt}\\[1ex]\thesection\quad \MakeUppercase}
-[\rule{\textwidth}{1.5pt}]
+{\noindent\rule{\dimexpr\linewidth-2.08pt\relax}{1.5pt}\\[1ex]\thesection\quad\MakeUppercase}
+[\noindent\rule{\dimexpr\linewidth-2.08pt\relax}{1.5pt}]
 
 
 \titleformat{name=\section,numberless}[block] %for unnumbered(starred*) sections
 {\normalfont\bfseries\large}
 {}{0pt}
-{\rule{\textwidth}{1.5pt}\\[1ex]\MakeUppercase}
-[\rule{\textwidth}{1.5pt}]
+{\noindent\rule{\dimexpr\linewidth-2.08pt\relax}{1.5pt}\\[1ex]\MakeUppercase}
+[\noindent\rule{\dimexpr\linewidth-2.08pt\relax}{1.5pt}]
 
 
 \titlespacing*{\section}{0pt}{0pt}{20pt} % Left, before, after spacing

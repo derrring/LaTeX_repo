@@ -1,60 +1,70 @@
-% sty_components/c101_layout.tex
+% ===================================================================
+% c111_fonts.tex -- Final Corrected Logic
+% ===================================================================
 
+% 1. DEFINE CLASS OPTIONS & SWITCH
+% -------------------------------------------------------------------
+\newif\ifcjk
+\cjkfalse % Default to CJK support DISABLED
+\DeclareOption{cjk}{\cjktrue}
+\DeclareOption{nocjk}{\cjkfalse}
+\ProcessOptions\relax
+
+% 2. LOAD FONT SPEC AND ALWAYS-ON PACKAGES
+% -------------------------------------------------------------------
 \RequirePackage{fontspec}
-% Set Latin fonts only
+\RequirePackage{microtype}
+\RequirePackage{silence}
+% 3. CONDITIONAL LOADING OF LANGUAGE & DEPENDENT PACKAGES
+% -------------------------------------------------------------------
+\ifcjk
+% --- CJK MODE ---
+\WarningFilter{luatexja}{LuaTeX-ja's patch against the microtype package}
+
+% 1. Load luatexja for Japanese support.
+\RequirePackage[pass]{luatexja}
+\RequirePackage{luatexja-fontspec, luatexja-ruby}
+
+% 2. Load csquotes immediately after. It will now correctly detect the language.
+\RequirePackage{csquotes}
+
+% 3. Set Japanese fonts.
+\setmainjfont[BoldFont={Source Han Serif Bold}]{Source Han Serif}
+\setsansjfont[BoldFont={Source Han Sans Bold}]{Source Han Sans}
+\setmonojfont{HanaMinA}
+\else
+% --- NON-CJK MODE ---
+% 1. Load polyglossia for multi-language support.
+\RequirePackage{polyglossia}
+\setdefaultlanguage{english}
+\setotherlanguages{german,french,russian}
+
+% 2. Load csquotes immediately after. It will now correctly detect the language.
+\RequirePackage[autostyle]{csquotes}
+\fi
+
+% 4. SET MAIN LATIN FONTS (applies to both modes)
+% -------------------------------------------------------------------
 \setmainfont{Noto Serif}[
     UprightFont=*-Regular,
     BoldFont=*-Bold,
     ItalicFont=*-Italic,
     BoldItalicFont=*-BoldItalic
 ]
-
 \setsansfont{Noto Sans}[
     UprightFont=*-Regular,
     BoldFont=*-Bold,
     ItalicFont=*-Italic,
     BoldItalicFont=*-BoldItalic
 ]
-
 \setmonofont{Source Code Pro}
-% Language setup
-\setdefaultlanguage{english}
-\setotherlanguages{german,french,russian}
 
-% Define a toggle for CJK support
-\newif\ifcjk
-\cjktrue % Default to CJK support enabled
-% Define class options
-\DeclareOption{cjk}{\cjktrue}
-\DeclareOption{nocjk}{\cjkfalse}
-\ProcessOptions\relax
-
-% Conditionally load CJK support
-\ifcjk
-% Load CJK packages
-\RequirePackage{luatexja, luatexja-fontspec, luatexja-ruby}
-\RequirePackage{silence}
-\WarningFilter{luatexja}{LuaTeX-ja's patch against the microtype package}
-% Set CJK-specific fonts
-\setmainjfont[
-    BoldFont={Source Han Serif Bold},
-]{Source Han Serif}
-
-\setsansjfont[
-    BoldFont={Source Han Sans Bold},
-]{Source Han Sans}
-
-\setmonojfont{HanaMinA}
-
-\else
-% For non-CJK documents
-\RequirePackage{microtype}
-
-\fi
-
-% Simplified math font setup - Choose ONE approach:
-% Option 1: Pure STIX2 (recommended for consistency)
-
-\setmathfont{STIX Two Math}[StylisticSet={01}] %range={"1D454,"1D488,"1D467}
-\setmathfont{TeX Gyre Termes Math}[range={bb, scr, bfscr}]
-\setmathfont{Latin Modern Math}[range={cal, bfcal}]
+% 5. MATH FONT SETUP (DELAYED TO AVOID OVERWRITES)
+% -------------------------------------------------------------------
+\AtBeginDocument{%
+    \setmathfont{STIX Two Math}[StylisticSet={01}]
+    \setmathfont{TeX Gyre Termes Math}[range={bb, scr, bfscr}]
+    \setmathfont{Latin Modern Math}[range={cal, bfcal}]
+    \mathversion{normal}
+}
+% --- End of File ---

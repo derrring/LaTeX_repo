@@ -17,12 +17,12 @@
 \@e@twelveptfalse % Initialize the switch to false
 
 % Process options passed to the class
-\DeclareOption*{\PassOptionsToClass{\CurrentOption}{book}}
+\DeclareOption*{\PassOptionsToClass{\CurrentOption}{article}}
 
 % When the '12pt' option is found, pass it to the base class
 % and set our custom switch to true.
 \DeclareOption{12pt}{%
-    \PassOptionsToClass{\CurrentOption}{book}
+    \PassOptionsToClass{\CurrentOption}{article}
     \@e@twelvepttrue
 }
 
