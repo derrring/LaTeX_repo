@@ -20,11 +20,9 @@
 
 % --- 3. Apply Settings that CONFLICT with Beamer ---
 
-
 \input{sty_components/c110_layout.tex}
 \input{sty_components/c130_toc.tex}
 \input{sty_components/c320_math_env.tex}
-
 
 \hypersetup{
     colorlinks=true,
@@ -34,6 +32,7 @@
     anchorcolor=mylinkcolor,
     filecolor=mylinkcolor,
     linktoc=page,
+    hypertexnames=false,  % Fix duplicate destinations for section-numbered counters
 }
 \makeatletter
 \renewcommand{\theHtheorem}{\thetheorem}
