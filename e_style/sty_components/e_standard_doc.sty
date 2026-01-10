@@ -32,7 +32,11 @@
     anchorcolor=mylinkcolor,
     filecolor=mylinkcolor,
     linktoc=page,
-    hypertexnames=false,  % Fix duplicate destinations for section-numbered counters
+    % NOTE: hypertexnames=true (default) for semantic PDF anchors
+    % Duplicate destinations prevented by explicit \theH* redefinitions:
+    % - Equations: see c310_math_symbol.tex (\theHequation)
+    % - Theorems: see below (\theHtheorem, etc.)
+    % This preserves external linking capability (e.g., doc.pdf#equation.3.7)
 }
 \makeatletter
 \renewcommand{\theHtheorem}{\thetheorem}

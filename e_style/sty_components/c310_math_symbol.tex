@@ -390,10 +390,18 @@
 \newcommand{\msfZ}{ \mathsf{Z} }
 
 %----------------------------------------------------------------------
+% Equation numbering with hyperref anchor fix
+% Visual display: equations show as "2.1", "2.2", "3.1", etc.
+% Hyperref anchors: unique IDs like "equation.2.1", "equation.3.1"
+% This prevents duplicate destination warnings while preserving semantic linking
 \ifcsdef{chapter}{
     \numberwithin{equation}{chapter}
+    % Ensure hyperref anchors include chapter prefix for uniqueness
+    \renewcommand{\theHequation}{\thechapter.\arabic{equation}}
 }{
     \numberwithin{equation}{section}
+    % Ensure hyperref anchors include section prefix for uniqueness
+    \renewcommand{\theHequation}{\thesection.\arabic{equation}}
 }
 
 %----------------------------------------------------------------------
@@ -514,15 +522,18 @@
 % as a mathematical operator. The `e{_^}` argument specifier from xparse
 % is now at the beginning of the argument list to change the syntax order.
 %-------------------------------------------------------------------------------
-\NewDocumentCommand{\expect}{e{_^} O{} m}{
+\NewDocumentCommand{\expect}{e{_^} o m}{
+    % e{_^}: #1=subscript, #2=superscript (both optional embellishments)
+    % o: #3=condition (truly optional, for conditional expectation)
+    % m: #4=expression (mandatory)
     \operatorname{\mathbb{E}}%
     \IfValueT{#1}{_{#1}}%
     \IfValueT{#2}{^{#2}}%
-    \IfValueTF{#3}{
-        \left[#4 \delimsize\vert #3\right]%
-    }{
+    \IfValueTF{#3}{%
+        \left[#4 \,\middle\vert\, #3\right]%
+    }{%
         \left[#4\right]%
-    }
+    }%
 }
 
 %usage examples:
