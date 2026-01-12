@@ -97,3 +97,4 @@
 \newenvironment{cvitemlist}
   {\begin{itemize}[leftmargin=*,itemsep=1pt,parsep=1pt,topsep=0pt,partopsep=0pt]}
   {\end{itemize}}
+\endinput

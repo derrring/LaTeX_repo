@@ -1,17 +1,15 @@
 % Main theme file for MyEspresso
-\mode<presentation>
+% Based on the Amurmaple theme by Maxime CHUPIN
 
+\NeedsTeXFormat{LaTeX2e}
 \ProvidesPackage{beamerthemeMyEspresso}
-% MyEspresso theme for Beamer
-% Idea from the origianl Amurmaple theme
-% Paris Dauphine University
-% Maintainer: Maxime CHUPIN <
+
+\mode<presentation>
 
 \RequirePackage{e_core}
 \setbeamercovered{dynamic} %overlays not yet revealed will faintly appear
 
 % Theme options
-\def\myespresso@sidebarwidth{58pt}  % Default sidebar width
 \newif\ifbeamer@me@nogauge
 \beamer@me@nogaugetrue
 \DeclareOptionBeamer{nogauge}{\beamer@me@nogaugefalse}
@@ -32,7 +30,7 @@
 \DeclareOptionBeamer{myespressoblack}{\beamer@me@myespressoblacktrue}
 \newif\ifbeamer@me@sidebar
 \beamer@me@sidebarfalse
-\def\myespresso@sidebarwidth{58pt}
+\def\myespresso@sidebarwidth{60pt}  % Default sidebar width
 \DeclareOptionBeamer{sidebarwidth}{\def\myespresso@sidebarwidth{#1}}
 \DeclareOptionBeamer{sidebar}{\beamer@me@sidebartrue}
 \newif\ifbeamer@me@toplogo
@@ -275,3 +273,4 @@
 }
 
 \mode<all>
+\endinput
