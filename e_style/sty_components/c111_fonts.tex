@@ -113,9 +113,9 @@
 % 7. 12PT SECTION HEADING SIZE ADJUSTMENTS
 % -------------------------------------------------------------------
 % When 12pt option is used, adjust section heading sizes accordingly.
-% This runs after titlesec has set its defaults.
+% Uses begindocument/end hook to ensure titlesec is fully initialized.
 \makeatletter
-\AtBeginDocument+{%
+\AddToHook{begindocument/end}{%
     \if@e@twelvept
         \titleformat{\section}
             {\fontsize{14.4pt}{17.28pt}\selectfont\bfseries}{\thesection}{1em}{}
