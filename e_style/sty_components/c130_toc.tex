@@ -1,9 +1,7 @@
 % TOC
 \setcounter{secnumdepth}{3}
 
-% ====================================================================
-% == Table of Contents Commands
-% ====================================================================
+% --- Table of Contents Commands ---
 
 % --- Custom command to print a ToC title ---
 % This is your excellent helper command. It contains all the conditional
@@ -129,9 +127,7 @@
 %\etocsettocstyle{⟨before_toc⟩}{⟨after_toc⟩}
 %\etocsetstyle{⟨levelname⟩}{⟨start⟩}{⟨prefix⟩}{⟨contents⟩}{⟨finish⟩}
 
-% =====================================================
-% COMPREHENSIVE TOC STYLING WITH AUTO-WIDTH ADJUSTMENT
-% =====================================================
+% --- Comprehensive TOC Styling with Auto-Width Adjustment ---
 
 % Custom dot fill definition
 \def\mydotfill{\unskip\nobreak\leaders\hbox{\hss\ . \hss}\hfill\nobreak\relax}
@@ -152,9 +148,7 @@
 
 % Additional space after numbers
 
-% =====================================================
-% PRE-CALCULATED WIDTH BASED ON PATTERNS
-% =====================================================
+% --- Pre-calculated Width Based on Patterns ---
 % Adjust these patterns based on your document structure
 % Uses begindocument/end to ensure fonts are fully loaded for accurate width calculations
 \AddToHook{begindocument/end}{%
@@ -175,9 +169,7 @@
     \settowidth{\tocsubsubsectionnumwidth}{\footnotesize 99.9.9.9\hspace{\tocnumwidthplus}}%
 }
 
-% =====================================================
-% PART STYLE
-% =====================================================
+% --- Part Style ---
 \etocsetstyle{part}
 {\begingroup\parindent0pt \nobreak}
 {\pagebreak[3]\bigskip}
@@ -188,9 +180,7 @@
 }\MakeUppercase{\etocthename}\par\vspace{\tocpartsep}}
 {\endgroup}
 
-% =====================================================
-% CHAPTER STYLE
-% =====================================================
+% --- Chapter Style ---
 \etocsetstyle{chapter}
 {\begingroup\color{black}}
 {\small\parindent0pt }
@@ -207,9 +197,7 @@
         \textsc{\etocthename}\hfill \footnotesize\etocpage\par
 }}
 {\endgroup}
-% =====================================================
-% SECTION STYLE (with improved spacing)
-% =====================================================
+% --- Section Style ---
 \etocsetstyle{section}
 {\begingroup}
 {\footnotesize\parindent0pt}
@@ -228,9 +216,7 @@
 }}
 {\endgroup}
 
-% =====================================================
-% SUBSECTION STYLE (with improved spacing)
-% =====================================================
+% --- Subsection Style ---
 \etocsetstyle{subsection}
 {\begingroup }
 {\footnotesize\rmfamily\mdseries \parindent0pt}
@@ -250,9 +236,7 @@
 }}
 {\endgroup}
 
-% =====================================================
-% SUBSUBSECTION STYLE (with improved spacing)
-% =====================================================
+% --- Subsubsection Style ---
 \etocsetstyle{subsubsection}
 {\begingroup}
 {\footnotesize\rmfamily\mdseries \parindent0pt}
@@ -272,14 +256,8 @@
 }}
 {\endgroup}
 
-%======================================================
-% APPENDIX STYLE
-%======================================================
-% ====================================================================
-% == APPENDIX STYLING PATCH
-% ====================================================================
-% This code patches the \appendix command to automatically change the
-% ToC style for appendix chapters. It requires the 'etoolbox' package.
+% --- Appendix Style ---
+% Patches \appendix to change ToC style for appendix chapters.
 % Make sure 'etoolbox' is loaded in your e_core.sty or e_standard_doc.sty
 % (It is already loaded via e_core.sty in your setup).
 
@@ -305,9 +283,7 @@
     \PackageWarning{TOCStyle}{Could not patch the \appendix command!}%
 }
 
-% =====================================================
-% CONFIGURATION OPTIONS
-% =====================================================
+% --- Configuration Options ---
 
 % Define toccolorpart if not already defined
 \providecolor{toccolorpart}{rgb}{0.2,0.2,0.6} % Default: dark blue
@@ -320,9 +296,7 @@
 % Optional: Set TOC depth (what levels to include)
 % \setcounter{tocdepth}{3} % Include up to subsubsection
 
-% =====================================================
-% USAGE NOTES
-% =====================================================
+% --- Usage Notes ---
 % 1. Place this code in your preamble after loading etoc package
 % 2. The spacing after section numbers is now consistent (1em) regardless of number width
 % 3. You can adjust the spacing by changing \hspace{1em} to:
@@ -331,9 +305,7 @@
 % 4. The code assumes you're using standard LaTeX sectioning commands
 % 5. Make sure to define or remove \color{toccolorpart} based on your needs
 
-% =====================================================
-% EXAMPLE OF CUSTOM ADJUSTMENTS
-% =====================================================
+% --- Example of Custom Adjustments ---
 % For different spacing preferences:
 
 % % For tighter number-title spacing:
