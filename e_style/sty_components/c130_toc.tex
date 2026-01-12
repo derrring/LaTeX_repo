@@ -156,7 +156,7 @@
 % PRE-CALCULATED WIDTH BASED ON PATTERNS
 % =====================================================
 % Adjust these patterns based on your document structure
-\AtBeginDocument{%
+\AtBeginDocument+{%
     % For PARTS (Roman numerals up to VIII)
     \settowidth{\@tempdima}{\normalsize VIII\hspace{1em}}%
     \edef\tocpartnumwidth{\the\@tempdima}%
