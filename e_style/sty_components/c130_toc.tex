@@ -156,7 +156,8 @@
 % PRE-CALCULATED WIDTH BASED ON PATTERNS
 % =====================================================
 % Adjust these patterns based on your document structure
-\AtBeginDocument+{%
+% Uses begindocument/end to ensure fonts are fully loaded for accurate width calculations
+\AddToHook{begindocument/end}{%
     % For PARTS (Roman numerals up to VIII)
     \settowidth{\@tempdima}{\normalsize VIII\hspace{1em}}%
     \edef\tocpartnumwidth{\the\@tempdima}%
@@ -172,7 +173,6 @@
     %
     % For SUBSUBSECTIONS - calculate the indentation needed
     \settowidth{\tocsubsubsectionnumwidth}{\footnotesize 99.9.9.9\hspace{\tocnumwidthplus}}%
-
 }
 
 % =====================================================
