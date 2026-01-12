@@ -40,7 +40,7 @@
 % --- Delayed Font Size Adjustment ---
 % This code runs right before the document begins, after all packages
 % and title styles have been loaded.
-\AtBeginDocument+{
+\AtBeginDocument{%
     % Check if our 12pt switch is true
     \if@e@twelvept
         % If it is, apply the specific font sizes. This will now
