@@ -1,6 +1,6 @@
 % =================================================================
-% e_class_notes.cls
-% A LaTeX class for article and reports, based on user-provided style files.
+% e_class_noteShort.cls
+% A LaTeX class for short notes with decorated math environments.
 % Version 1.0
 % =================================================================
 

@@ -83,7 +83,8 @@ When `cjk` option is enabled:
 
 - LuaLaTeX (recommended) or XeLaTeX
 - `--shell-escape` flag (for minted code listings)
-- Fonts: Noto Serif/Sans, Source Code Pro, STIX Two Math
+- Text fonts: Noto Serif/Sans, Source Code Pro
+- Math fonts: STIX Two Math, New Computer Modern Math, XITS Math, IBM Plex Math
 - For CJK: Source Han Serif/Sans, HanaMinA/B
 
 ## Examples

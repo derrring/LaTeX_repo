@@ -1,6 +1,6 @@
 % =================================================================
-% e_class_notes.cls
-% A LaTeX class for thesis, based on user-provided style files.
+% e_class_thesis.cls
+% A LaTeX class for theses and dissertations.
 % Version 1.0
 % =================================================================
 
