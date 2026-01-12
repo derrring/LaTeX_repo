@@ -2,14 +2,20 @@
 % c111_fonts.tex -- Final Corrected Logic
 % ===================================================================
 
-% 1. CJK SWITCH (may be pre-defined by class)
+% 1. CLASS OPTION SWITCHES (may be pre-defined by class)
 % -------------------------------------------------------------------
 % Only define if not already defined by the document class
 % Using LaTeX's \@ifundefined to safely check for conditional
 \makeatletter
+% CJK switch
 \@ifundefined{ifcjk}{
     \newif\ifcjk
     \cjkfalse % Default to CJK support DISABLED
+}{}
+% 12pt switch (for section heading size adjustments)
+\@ifundefined{if@e@twelvept}{
+    \newif\if@e@twelvept
+    \@e@twelveptfalse % Default to standard sizes
 }{}
 \makeatother
 % Note: Options are processed by the document class, not here
@@ -96,5 +102,22 @@
     % For explicit Latin emphasis within CJK text
     \newcommand{\emphLatin}[1]{\latinemph{#1}}
 \fi
+
+% 7. 12PT SECTION HEADING SIZE ADJUSTMENTS
+% -------------------------------------------------------------------
+% When 12pt option is used, adjust section heading sizes accordingly.
+% This runs after titlesec has set its defaults.
+\makeatletter
+\AtBeginDocument+{%
+    \if@e@twelvept
+        \titleformat{\section}
+            {\fontsize{14.4pt}{17.28pt}\selectfont\bfseries}{\thesection}{1em}{}
+        \titleformat{\subsection}
+            {\fontsize{12pt}{14.4pt}\selectfont\bfseries}{\thesubsection}{1em}{}
+        \titleformat{\subsubsection}
+            {\fontsize{11pt}{13.2pt}\selectfont\bfseries}{\thesubsubsection}{1em}{}
+    \fi
+}
+\makeatother
 
 % --- End of File ---
