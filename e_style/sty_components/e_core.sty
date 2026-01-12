@@ -15,27 +15,8 @@
 %===========================================================================
 %=================== font/encoding configuration ===========================
 %===========================================================================
-% File encoding
-%\RequirePackage[T1]{fontenc}   %% NOTE: This is now handled by the
-% `fontspec` package
-
-%\RequirePackage{luaotfload}
-%%  {fontspec}: set default non-cjk fonts;
-%%  {polyglossia}: set default language; exclude cjk, but has some conflict with luatexja
-%\RequirePackage{polyglossia}
-
-\RequirePackage{noto}
-\RequirePackage{sourcecodepro}
+% All font configuration (text, math, CJK) is centralized in c111_fonts.tex
 \RequirePackage{fourier-orns}
-
-\RequirePackage[warnings-off={mathtools-colon,mathtools-overbracket}]{unicode-math}
-
-% Set math fonts at end of preamble (after fontspec fully initialized)
-\AtEndPreamble{%
-    \setmathfont[StylisticSet=01]{STIX Two Math}%
-    \setmathfont[range={bb,scr,bfscr}]{TeX Gyre Termes Math}%
-    \setmathfont[range={cal,bfcal}]{Latin Modern Math}%
-}
 
 %=======================================================================
 %====================== layout setting ===============================

@@ -20,11 +20,14 @@
 \makeatother
 % Note: Options are processed by the document class, not here
 
-% 2. LOAD FONT SPEC AND ALWAYS-ON PACKAGES
+% 2. LOAD FONT PACKAGES
 % -------------------------------------------------------------------
 \RequirePackage{fontspec}
+\RequirePackage{noto}
+\RequirePackage{sourcecodepro}
 \RequirePackage{microtype}
 \RequirePackage{silence}
+\RequirePackage[warnings-off={mathtools-colon,mathtools-overbracket}]{unicode-math}
 % 3. CONDITIONAL LOADING OF LANGUAGE & DEPENDENT PACKAGES
 % -------------------------------------------------------------------
 \ifcjk
@@ -84,8 +87,12 @@
 
 % 5. MATH FONT SETUP
 % -------------------------------------------------------------------
-% Math fonts are now set in e_core.sty immediately after unicode-math loads.
-% This prevents timing issues with internal unicode-math symbol definitions.
+% Set math fonts at end of preamble (after all font packages fully initialized)
+\AtEndPreamble{%
+    \setmathfont[StylisticSet=01]{STIX Two Math}%
+    \setmathfont[range={bb,scr,bfscr}]{TeX Gyre Termes Math}%
+    \setmathfont[range={cal,bfcal}]{Latin Modern Math}%
+}
 
 % 6. CONDITIONAL EMPHASIS AND TEXT STYLING
 % -------------------------------------------------------------------
