@@ -1,7 +1,7 @@
-
-%\makeatletter must be placed before \AtBeginDocument, not inside it.
+% Biblatex customizations - must use \AtEndPreamble (not begindocument hooks)
+% because \renewbibmacro, \DeclareCiteCommand, \AtEveryBibitem are preamble-only.
 \makeatletter
-\AddToHook{begindocument/end}{%
+\AtEndPreamble{%
     % Check if using authoryear by testing for the style file name
     \ifdefstring{\blx@bbxfile}{authoryear}{%
         % This is authoryear style - apply full customization
@@ -31,7 +31,7 @@
 }
 \makeatother
 
-\AddToHook{begindocument/end}{%
+\AtEndPreamble{%
     % Other customizations
     \renewbibmacro{in:}{}
     \AtEveryBibitem{%
