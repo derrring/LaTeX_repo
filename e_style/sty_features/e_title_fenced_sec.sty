@@ -1,24 +1,34 @@
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesPackage{e_title_fenced_sec}[Title Fenced Section Style]
 
+% ====================================================================
+% == Fenced Section Title Style ==
+% ====================================================================
+% Creates section titles with horizontal rules above and below.
+% Uses titlesec's \titleformat command.
+%
+% DIMENSION CONSTANTS:
+%   - Rule width offset: 2.08pt subtracted from \linewidth to prevent
+%     overflow caused by rounding errors in TeX's fixed-point arithmetic.
+%     Without this, rules occasionally extend 1-2pt into margins.
+%   - Rule thickness: 1.5pt provides visible weight without being heavy.
+%   - Title gap: 1ex (\\[1ex]) provides breathing room between rule and text.
+%   - After spacing: 20pt between section title block and body text.
+% ====================================================================
 
-% ====================================================================
-% == Title  Styles  ==
-% ====================================================================
-% Control the appearance of the title in mainmatter
-% \titleformat provided by titlesec package
+% Numbered sections
 \titleformat{\section}[block]
 {\normalfont\bfseries\large}
 { }{0pt}
 {\noindent\rule{\dimexpr\linewidth-2.08pt\relax}{1.5pt}\\[1ex]\thesection\quad\MakeUppercase}
 [\noindent\rule{\dimexpr\linewidth-2.08pt\relax}{1.5pt}]
 
-
-\titleformat{name=\section,numberless}[block] %for unnumbered(starred*) sections
+% Unnumbered (starred) sections
+\titleformat{name=\section,numberless}[block]
 {\normalfont\bfseries\large}
 {}{0pt}
 {\noindent\rule{\dimexpr\linewidth-2.08pt\relax}{1.5pt}\\[1ex]\MakeUppercase}
 [\noindent\rule{\dimexpr\linewidth-2.08pt\relax}{1.5pt}]
 
-
-\titlespacing*{\section}{0pt}{0pt}{20pt} % Left, before, after spacing
+% Section spacing: {left}{before}{after}
+\titlespacing*{\section}{0pt}{0pt}{20pt}

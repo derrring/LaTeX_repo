@@ -2,13 +2,17 @@
 % c111_fonts.tex -- Final Corrected Logic
 % ===================================================================
 
-% 1. DEFINE CLASS OPTIONS & SWITCH
+% 1. CJK SWITCH (may be pre-defined by class)
 % -------------------------------------------------------------------
-\newif\ifcjk
-\cjkfalse % Default to CJK support DISABLED
-\DeclareOption{cjk}{\cjktrue}
-\DeclareOption{nocjk}{\cjkfalse}
-\ProcessOptions\relax
+% Only define if not already defined by the document class
+% Using LaTeX's \@ifundefined to safely check for conditional
+\makeatletter
+\@ifundefined{ifcjk}{
+    \newif\ifcjk
+    \cjkfalse % Default to CJK support DISABLED
+}{}
+\makeatother
+% Note: Options are processed by the document class, not here
 
 % 2. LOAD FONT SPEC AND ALWAYS-ON PACKAGES
 % -------------------------------------------------------------------
@@ -28,9 +32,22 @@
 % 2. Load csquotes immediately after. It will now correctly detect the language.
 \RequirePackage{csquotes}
 
-% 3. Set Japanese fonts.
-\setmainjfont[BoldFont={Source Han Serif Bold}]{Source Han Serif}
-\setsansjfont[BoldFont={Source Han Sans Bold}]{Source Han Sans}
+% 3. Set Japanese fonts with HanaMin fallback for rare characters.
+% HanaMinA: BMP including CJK Ext-A | HanaMinB: SIP including CJK Ext-B through I
+\setmainjfont[
+    BoldFont={Source Han Serif Bold},
+    AltFont={
+        {Range="3400-"4DBF, Font=HanaMinA},    % CJK Unified Ideographs Extension A
+        {Range="20000-"3FFFF, Font=HanaMinB}, % SIP: CJK Extensions B-I (rare/historical)
+    }
+]{Source Han Serif}
+\setsansjfont[
+    BoldFont={Source Han Sans Bold},
+    AltFont={
+        {Range="3400-"4DBF, Font=HanaMinA},
+        {Range="20000-"3FFFF, Font=HanaMinB},
+    }
+]{Source Han Sans}
 \setmonojfont{HanaMinA}
 \else
 % --- NON-CJK MODE ---
@@ -61,10 +78,27 @@
 
 % 5. MATH FONT SETUP (DELAYED TO AVOID OVERWRITES)
 % -------------------------------------------------------------------
-\AtBeginDocument{%
+\AtBeginDocument+{
     \setmathfont{STIX Two Math}[StylisticSet={01}]
     \setmathfont{TeX Gyre Termes Math}[range={bb, scr, bfscr}]
     \setmathfont{Latin Modern Math}[range={cal, bfcal}]
     \mathversion{normal}
 }
+
+% 6. CONDITIONAL EMPHASIS AND TEXT STYLING
+% -------------------------------------------------------------------
+\ifcjk
+    % CJK emphasis: boten (dots) via luatexja-ruby (already loaded above)
+    \ltjsetparameter{kanjiskip={0.1\zw plus 0.04\zw minus 0.04\zw}}
+
+    % Redefine \emph for CJK to use boten
+    \let\latinemph\emph
+    \renewcommand{\emph}[1]{
+        \kenten{#1}%
+    }
+
+    % For explicit Latin emphasis within CJK text
+    \newcommand{\emphLatin}[1]{\latinemph{#1}}
+\fi
+
 % --- End of File ---

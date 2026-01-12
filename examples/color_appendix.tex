@@ -1,0 +1,454 @@
+% Color Palette Appendix for Thesis
+% Documents Washi-Ink and Oceanic color systems
+% Include this file in a thesis appendix: \input{color_appendix.tex}
+
+\chapter{Color Palette Reference}\label{app:color}
+
+This appendix documents two complementary color systems designed to be \textbf{distinct} from each other:
+
+\begin{itemize}
+    \item \textbf{Washi-Ink} --- 19 colors, warm-dominant + cool extensions, traditional Japanese aesthetic
+    \item \textbf{Oceanic} --- 21 colors, cool-dominant (H: 180--240°), scientific/technical aesthetic
+\end{itemize}
+
+\noindent All 17 chromatic Washi colors have $\Delta E \geq 18$ to any Oceanic color, ensuring the palettes can be used together without confusion.
+
+% ==============================================================================
+\section{Washi-Ink (19 Colors)}
+% ==============================================================================
+
+\subsection*{Design Philosophy}
+
+\begin{quote}
+    \textit{``Warm earth tones on handmade paper''} \\
+    手漉き和紙の上の暖かい土色
+\end{quote}
+
+\noindent\textbf{Character:} Earthy, organic, traditional Japanese. Warm-dominant hues (H: 0--70°) with signature browns that Oceanic lacks. Saturation 27--85\% for rich, warm tones.
+
+\subsection*{1. Reds --- 赤系 (Aka)}
+\begin{itemize}
+    \item \textbf{\texttt{washiAka}} (\#B03030, H:0° S:57\%): 赤 True red
+    \item \textbf{\texttt{washiBeni}} (\#C04050, H:352° S:50\%): 紅 Crimson-pink
+\end{itemize}
+
+\subsection*{2. Oranges --- 橙系 (Daidai)}
+\begin{itemize}
+    \item \textbf{\texttt{washiKaki}} (\#C06030, H:20° S:60\%): 柿 Persimmon
+    \item \textbf{\texttt{washiKitsune}} (\#A06030, H:26° S:54\%): 狐 Fox orange
+\end{itemize}
+
+\subsection*{3. Browns --- 茶系 (Cha) \textit{--- UNIQUE to Washi}}
+\begin{itemize}
+    \item \textbf{\texttt{washiTobi}} (\#8B4513, H:25° S:76\%): 鳶 Kite/Saddle brown
+    \item \textbf{\texttt{washiKuri}} (\#5C4033, H:19° S:29\%): 栗 Chestnut
+    \item \textbf{\texttt{washiRikyucha}} (\#897858, H:39° S:22\%): 利休茶 Rikyu tea (Sen no Rikyū)
+\end{itemize}
+
+\subsection*{4. Golds --- 金系 (Kin)}
+\begin{itemize}
+    \item \textbf{\texttt{washiKarashi}} (\#D0A020, H:44° S:73\%): 芥子 Mustard
+    \item \textbf{\texttt{washiKincha}} (\#C09010, H:44° S:85\%): 金茶 Gold tea
+    \item \textbf{\texttt{washiYamabuki}} (\#F8B500, H:44° S:100\%): 山吹 Kerria yellow (vivid)
+\end{itemize}
+
+\subsection*{5. Yellow-Greens --- 萌黄系 (Moegi)}
+\begin{itemize}
+    \item \textbf{\texttt{washiUguisu}} (\#807020, H:50° S:60\%): 鶯 Warbler
+    \item \textbf{\texttt{washiMoegi}} (\#A0B040, H:69° S:47\%): 萌黄 Sprouting green
+\end{itemize}
+
+\subsection*{6. Pinks --- 桃系 (Momo)}
+\begin{itemize}
+    \item \textbf{\texttt{washiSakura}} (\#E0B0B0, H:0° S:44\%): 桜 Cherry blossom
+    \item \textbf{\texttt{washiBotan}} (\#C05080, H:338° S:50\%): 牡丹 Peony
+\end{itemize}
+
+\subsection*{7. Neutrals}
+\begin{itemize}
+    \item \textbf{\texttt{washiSumi}} (\#2A2018, H:27° S:27\%): 墨 Warm ink (brown-black)
+    \item \textbf{\texttt{washiShiro}} (\#F8F0E0, H:40° S:63\%): 白 Paper white (cream)
+\end{itemize}
+
+\subsection*{8. Cool Extensions --- 填補 H:100--320° gap}
+\textit{``Warm-feeling'' cool colors with traditional usage, filling the hue gap while maintaining ΔE ≥ 18 to Oceanic.}
+\begin{itemize}
+    \item \textbf{\texttt{washiKuromidori}} (\#102808, H:105° S:66\%): 黒緑 Black-green (dark pine forest)
+    \item \textbf{\texttt{washiEbizome}} (\#501858, H:292° S:57\%): 葡萄染 Grape dye (textile color)
+    \item \textbf{\texttt{washiShikon}} (\#460E44, H:302° S:66\%): 紫紺 Purple navy (warm-blue)
+\end{itemize}
+
+\section{Washi-Ink Visual Swatches}
+
+\begin{figure}[htbp]
+    \centering
+    \begin{tikzpicture}[
+            swatch/.style={minimum width=2.0cm, minimum height=1.2cm, align=center, font=\scriptsize\bfseries, rounded corners=2pt, draw=black!20, line width=0.3pt}
+        ]
+        % Row 1: Reds + Oranges (4)
+        \node[swatch, fill=washiAka, text=white] (r1) {Aka 赤\\{\tiny\#B03030}};
+        \node[swatch, fill=washiBeni, text=white, right=0.12cm of r1] (r2) {Beni 紅\\{\tiny\#C04050}};
+        \node[swatch, fill=washiKaki, text=white, right=0.12cm of r2] (r3) {Kaki 柿\\{\tiny\#C06030}};
+        \node[swatch, fill=washiKitsune, text=white, right=0.12cm of r3] (r4) {Kitsune 狐\\{\tiny\#A06030}};
+        \node[right=0.15cm of r4, font=\scriptsize\itshape, text=black!60] {Reds/Oranges};
+
+        % Row 2: Browns (3) + Golds (3)
+        \node[swatch, fill=washiTobi, text=white, below=0.12cm of r1] (b1) {Tobi 鳶\\{\tiny\#8B4513}};
+        \node[swatch, fill=washiKuri, text=white, right=0.12cm of b1] (b2) {Kuri 栗\\{\tiny\#5C4033}};
+        \node[swatch, fill=washiRikyucha, text=white, right=0.12cm of b2] (b3) {Rikyucha 利休茶\\{\tiny\#897858}};
+        \node[swatch, fill=washiKarashi, text=black!80, right=0.12cm of b3] (g1) {Karashi 芥子\\{\tiny\#D0A020}};
+        \node[right=0.15cm of g1, font=\scriptsize\itshape, text=black!60] {Browns/Golds};
+
+        % Row 3: Golds (2) + Yellow-Greens (2)
+        \node[swatch, fill=washiKincha, text=white, below=0.12cm of b1] (g2) {Kincha 金茶\\{\tiny\#C09010}};
+        \node[swatch, fill=washiYamabuki, text=black!70, right=0.12cm of g2] (g3) {Yamabuki 山吹\\{\tiny\#F8B500}};
+        \node[swatch, fill=washiUguisu, text=white, right=0.12cm of g3] (y1) {Uguisu 鶯\\{\tiny\#807020}};
+        \node[swatch, fill=washiMoegi, text=black!80, right=0.12cm of y1] (y2) {Moegi 萌黄\\{\tiny\#A0B040}};
+        \node[right=0.15cm of y2, font=\scriptsize\itshape, text=black!60] {Golds/Greens};
+
+        % Row 4: Pinks + Neutrals
+        \node[swatch, fill=washiSakura, text=black!70, below=0.12cm of g2] (p1) {Sakura 桜\\{\tiny\#E0B0B0}};
+        \node[swatch, fill=washiBotan, text=white, right=0.12cm of p1] (p2) {Botan 牡丹\\{\tiny\#C05080}};
+        \node[swatch, fill=washiSumi, text=white, right=0.12cm of p2] (n1) {Sumi 墨\\{\tiny\#2A2018}};
+        \node[swatch, fill=washiShiro, text=black!70, right=0.12cm of n1] (n2) {Shiro 白\\{\tiny\#F8F0E0}};
+        \node[right=0.15cm of n2, font=\scriptsize\itshape, text=black!60] {Pinks/Neutrals};
+
+        % Row 5: Cool Extensions (3 colors)
+        \node[swatch, fill=washiKuromidori, text=white, below=0.12cm of p1] (c1) {Kuromidori 黒緑\\{\tiny\#102808}};
+        \node[swatch, fill=washiEbizome, text=white, right=0.12cm of c1] (c2) {Ebizome 葡萄染\\{\tiny\#501858}};
+        \node[swatch, fill=washiShikon, text=white, right=0.12cm of c2] (c3) {Shikon 紫紺\\{\tiny\#460E44}};
+        \node[right=0.15cm of c3, font=\scriptsize\itshape, text=black!60] {Cool Extensions};
+    \end{tikzpicture}
+    \caption{Washi-Ink (19 colors). Warm-dominant palette with cool extensions filling H:100--320° gap.}
+    \label{fig:washi_swatches}
+\end{figure}
+
+\section{Washi-Ink Usage Guidelines}
+
+\subsection*{Recommended Subsets}
+
+\begin{itemize}
+    \item \textbf{4 colors} ($\Delta E \geq 35$): Aka, Karashi, Moegi, Sumi
+    \item \textbf{6 colors} ($\Delta E \geq 25$): Aka, Kaki, Tobi, Karashi, Moegi, Botan
+    \item \textbf{8 colors} (with markers): Aka, Beni, Kaki, Tobi, Karashi, Uguisu, Sakura, Sumi
+\end{itemize}
+
+\subsection*{Pairs to Avoid}
+
+Low perceptual distinctiveness ($\Delta E < 20$)---use secondary encoding:
+
+\begin{itemize}
+    \item Kaki + Kitsune ($\Delta E = 15$) --- similar oranges
+    \item Karashi + Kincha ($\Delta E = 12$) --- similar golds
+    \item Tobi + Kuri ($\Delta E = 18$) --- similar browns (but both dark)
+\end{itemize}
+
+\subsection*{Best For}
+
+\begin{tabular}{ll}
+    \toprule
+    \textbf{Use Case} & \textbf{Suitability} \\
+    \midrule
+    Art/humanities papers & Excellent --- traditional aesthetic \\
+    Cultural/historical content & Excellent --- Japanese authenticity \\
+    Presentations/posters & Good --- warm, inviting feel \\
+    Data charts ($\leq 6$ series) & Good with markers \\
+    Scientific papers & Use Oceanic instead \\
+    \bottomrule
+\end{tabular}
+
+% ==============================================================================
+\newpage
+\section{Oceanic Palette --- Morandi → Saturated → Crystal}
+
+The \textbf{Oceanic} palette provides 21 base colors × 3 tiers = 63 total colors. Nomenclature: \texttt{oceanicColor1/2/3}.
+
+\begin{description}
+    \item[Tier 1 (Morandi)] Muted base tones, low chroma --- for lines, text, subtle accents
+    \item[Tier 2 (Saturated)] \textbf{Same lightness}, higher chroma (C×1.6) --- emphasis, active states
+    \item[Tier 3 (Crystal)] Higher lightness (L+0.20), high chroma (C×1.4) --- backgrounds, fills
+\end{description}
+
+\textit{``Quiet → Vivid → Light+Vivid''} --- T2 is most saturated; T3 trades some chroma for lightness.
+
+\subsection*{Three-Tier Comparison}
+
+\begin{figure}[htbp]
+    \centering
+    \begin{tikzpicture}[
+            sw/.style={minimum width=1.5cm, minimum height=0.7cm, align=center, font=\tiny\bfseries, rounded corners=1pt, draw=black!15, line width=0.2pt},
+            lbl/.style={font=\tiny, text=black!50, minimum width=1.2cm, align=right}
+        ]
+        % Column headers
+        \node[font=\scriptsize\bfseries] at (1.5, 0.6) {Tier 1};
+        \node[font=\scriptsize\bfseries] at (3.1, 0.6) {Tier 2};
+        \node[font=\scriptsize\bfseries] at (4.7, 0.6) {Tier 3};
+        \node[font=\tiny, text=black!50] at (1.5, 0.2) {Morandi};
+        \node[font=\tiny, text=black!50] at (3.1, 0.2) {Saturated};
+        \node[font=\tiny, text=black!50] at (4.7, 0.2) {Crystal};
+
+        % --- BLUES ---
+        \node[lbl] at (0, -0.3) {Abyss};
+        \node[sw, fill=oceanicAbyss1, text=white] at (1.5, -0.3) {1};
+        \node[sw, fill=oceanicAbyss2, text=white] at (3.1, -0.3) {2};
+        \node[sw, fill=oceanicAbyss3, text=white] at (4.7, -0.3) {3};
+
+        \node[lbl] at (0, -1.1) {Current};
+        \node[sw, fill=oceanicCurrent1, text=white] at (1.5, -1.1) {1};
+        \node[sw, fill=oceanicCurrent2, text=white] at (3.1, -1.1) {2};
+        \node[sw, fill=oceanicCurrent3, text=white] at (4.7, -1.1) {3};
+
+        \node[lbl] at (0, -1.9) {Mist};
+        \node[sw, fill=oceanicMist1, text=black!70] at (1.5, -1.9) {1};
+        \node[sw, fill=oceanicMist2, text=white] at (3.1, -1.9) {2};
+        \node[sw, fill=oceanicMist3, text=black!70] at (4.7, -1.9) {3};
+
+        % --- GREENS ---
+        \node[lbl] at (0, -2.9) {Cyan};
+        \node[sw, fill=oceanicCyan1, text=white] at (1.5, -2.9) {1};
+        \node[sw, fill=oceanicCyan2, text=white] at (3.1, -2.9) {2};
+        \node[sw, fill=oceanicCyan3, text=black!70] at (4.7, -2.9) {3};
+
+        \node[lbl] at (0, -3.7) {Teal};
+        \node[sw, fill=oceanicTeal1, text=white] at (1.5, -3.7) {1};
+        \node[sw, fill=oceanicTeal2, text=white] at (3.1, -3.7) {2};
+        \node[sw, fill=oceanicTeal3, text=white] at (4.7, -3.7) {3};
+
+        \node[lbl] at (0, -4.5) {Sage};
+        \node[sw, fill=oceanicSage1, text=white] at (1.5, -4.5) {1};
+        \node[sw, fill=oceanicSage2, text=white] at (3.1, -4.5) {2};
+        \node[sw, fill=oceanicSage3, text=black!70] at (4.7, -4.5) {3};
+
+        \node[lbl] at (0, -5.3) {Moss};
+        \node[sw, fill=oceanicMoss1, text=white] at (1.5, -5.3) {1};
+        \node[sw, fill=oceanicMoss2, text=white] at (3.1, -5.3) {2};
+        \node[sw, fill=oceanicMoss3, text=black!70] at (4.7, -5.3) {3};
+
+        \node[lbl] at (0, -6.1) {Olive};
+        \node[sw, fill=oceanicOlive1, text=white] at (1.5, -6.1) {1};
+        \node[sw, fill=oceanicOlive2, text=white] at (3.1, -6.1) {2};
+        \node[sw, fill=oceanicOlive3, text=black!70] at (4.7, -6.1) {3};
+
+        % --- Second column: WARM + PINKS ---
+        \node[lbl] at (6.5, -0.3) {Citrus};
+        \node[sw, fill=oceanicCitrus1, text=black!70] at (8, -0.3) {1};
+        \node[sw, fill=oceanicCitrus2, text=black!70] at (9.6, -0.3) {2};
+        \node[sw, fill=oceanicCitrus3, text=black!70] at (11.2, -0.3) {3};
+
+        \node[lbl] at (6.5, -1.1) {Amber};
+        \node[sw, fill=oceanicAmber1, text=white] at (8, -1.1) {1};
+        \node[sw, fill=oceanicAmber2, text=white] at (9.6, -1.1) {2};
+        \node[sw, fill=oceanicAmber3, text=black!70] at (11.2, -1.1) {3};
+
+        \node[lbl] at (6.5, -1.9) {Coral};
+        \node[sw, fill=oceanicCoral1, text=white] at (8, -1.9) {1};
+        \node[sw, fill=oceanicCoral2, text=white] at (9.6, -1.9) {2};
+        \node[sw, fill=oceanicCoral3, text=black!70] at (11.2, -1.9) {3};
+
+        \node[lbl] at (6.5, -2.9) {Rose};
+        \node[sw, fill=oceanicRose1, text=white] at (8, -2.9) {1};
+        \node[sw, fill=oceanicRose2, text=white] at (9.6, -2.9) {2};
+        \node[sw, fill=oceanicRose3, text=black!70] at (11.2, -2.9) {3};
+
+        \node[lbl] at (6.5, -3.7) {Crimson};
+        \node[sw, fill=oceanicCrimson1, text=white] at (8, -3.7) {1};
+        \node[sw, fill=oceanicCrimson2, text=white] at (9.6, -3.7) {2};
+        \node[sw, fill=oceanicCrimson3, text=white] at (11.2, -3.7) {3};
+
+        \node[lbl] at (6.5, -4.5) {Magenta};
+        \node[sw, fill=oceanicMagenta1, text=white] at (8, -4.5) {1};
+        \node[sw, fill=oceanicMagenta2, text=white] at (9.6, -4.5) {2};
+        \node[sw, fill=oceanicMagenta3, text=black!70] at (11.2, -4.5) {3};
+
+        \node[lbl] at (6.5, -5.3) {Plum};
+        \node[sw, fill=oceanicPlum1, text=white] at (8, -5.3) {1};
+        \node[sw, fill=oceanicPlum2, text=white] at (9.6, -5.3) {2};
+        \node[sw, fill=oceanicPlum3, text=white] at (11.2, -5.3) {3};
+
+        \node[lbl] at (6.5, -6.1) {Violet};
+        \node[sw, fill=oceanicViolet1, text=white] at (8, -6.1) {1};
+        \node[sw, fill=oceanicViolet2, text=white] at (9.6, -6.1) {2};
+        \node[sw, fill=oceanicViolet3, text=black!70] at (11.2, -6.1) {3};
+
+        % Column headers for second block
+        \node[font=\scriptsize\bfseries] at (8, 0.6) {Tier 1};
+        \node[font=\scriptsize\bfseries] at (9.6, 0.6) {Tier 2};
+        \node[font=\scriptsize\bfseries] at (11.2, 0.6) {Tier 3};
+    \end{tikzpicture}
+    \caption{Oceanic chromatic colors (16 × 3 = 48). Left: Blues (3) + Greens (5). Right: Warm (5) + Pinks/Purples (3).}
+\end{figure}
+
+\begin{figure}[h]
+    \centering
+    \begin{tikzpicture}[
+            sw/.style={minimum width=1.5cm, minimum height=0.7cm, align=center, font=\tiny\bfseries, rounded corners=1pt, draw=black!15, line width=0.2pt},
+            lbl/.style={font=\tiny, text=black!50, minimum width=1.2cm, align=right}
+        ]
+        % Column headers
+        \node[font=\scriptsize\bfseries] at (1.5, 0.6) {Tier 1};
+        \node[font=\scriptsize\bfseries] at (3.1, 0.6) {Tier 2};
+        \node[font=\scriptsize\bfseries] at (4.7, 0.6) {Tier 3};
+
+        % --- NEUTRALS ---
+        \node[lbl] at (0, -0.3) {Cloud};
+        \node[sw, fill=oceanicCloud1, text=black!70] at (1.5, -0.3) {1};
+        \node[sw, fill=oceanicCloud2, text=black!70] at (3.1, -0.3) {2};
+        \node[sw, fill=oceanicCloud3, text=black!70] at (4.7, -0.3) {3};
+
+        \node[lbl] at (0, -1.1) {Sand};
+        \node[sw, fill=oceanicSand1, text=black!70] at (1.5, -1.1) {1};
+        \node[sw, fill=oceanicSand2, text=black!70] at (3.1, -1.1) {2};
+        \node[sw, fill=oceanicSand3, text=black!70] at (4.7, -1.1) {3};
+
+        \node[lbl] at (0, -1.9) {Foam};
+        \node[sw, fill=oceanicFoam1, text=black!70] at (1.5, -1.9) {1};
+        \node[sw, fill=oceanicFoam2, text=black!70] at (3.1, -1.9) {2};
+        \node[sw, fill=oceanicFoam3, text=black!70] at (4.7, -1.9) {3};
+
+        \node[lbl] at (0, -2.7) {Slate};
+        \node[sw, fill=oceanicSlate1, text=white] at (1.5, -2.7) {1};
+        \node[sw, fill=oceanicSlate2, text=white] at (3.1, -2.7) {2};
+        \node[sw, fill=oceanicSlate3, text=white] at (4.7, -2.7) {3};
+
+        \node[lbl] at (0, -3.5) {Ink};
+        \node[sw, fill=oceanicInk1, text=white] at (1.5, -3.5) {1};
+        \node[sw, fill=oceanicInk2, text=white] at (3.1, -3.5) {2};
+        \node[sw, fill=oceanicInk3, text=white] at (4.7, -3.5) {3};
+    \end{tikzpicture}
+    \caption{Oceanic neutrals (5 × 3 = 15). Cloud/Sand provide graduated backgrounds; Foam/Slate/Ink for structure.}
+\end{figure}
+
+\subsection*{Recommended Subsets}
+
+\begin{itemize}
+    \item \textbf{5 colors} ($\Delta E \geq 40.6$): Current, Sage, Coral, Foam, Ink
+    \item \textbf{6 colors} ($\Delta E \geq 38.9$): Current, Sage, Amber, Foam, Ink, Rose
+    \item \textbf{8 colors} ($\Delta E \approx 25$): Current, Moss, Sage, Coral, Crimson, Foam, Ink, Violet
+\end{itemize}
+
+\subsection*{Palette Comparison}
+
+\begin{tabular}{lll}
+    \toprule
+    \textbf{Aspect} & \textbf{Washi-Ink} & \textbf{Oceanic} \\
+    \midrule
+    Aesthetic & Japanese traditional & Scientific-maritime \\
+    Dominant hues & Warm (H: 0--70°) + cool ext. & Cool (H: 180--240°) \\
+    Total colors & 19 & 63 (21 base × 3 tiers) \\
+    Tier system & --- & Morandi / Saturated / Crystal \\
+    Color space & HSL & OKLCH (perceptually uniform) \\
+    Tier philosophy & --- & T2: same L, more C; T3: more L+C \\
+    Signature feature & Browns + Purples & Blues (Abyss, Current, Mist) \\
+    Cross-palette $\Delta E$ & $\geq 18$ for all chromatic & $\geq 18$ for all chromatic \\
+    Best for & Art, culture, presentations & Science, data, dashboards \\
+    \bottomrule
+\end{tabular}
+
+% ==============================================================================
+\newpage
+\section{Pairs to Avoid (Both Palettes)}
+
+Colors with $\Delta E < 20$ may be confused, especially in small sizes or by viewers with color vision deficiency. Use secondary encoding (patterns, markers, labels) when these pairs must appear together.
+
+\subsection*{Washi-Ink --- Pairs to Watch ($\Delta E < 20$)}
+
+\begin{figure}[h]
+    \centering
+    \begin{tikzpicture}[
+            pswatch/.style={minimum width=1.6cm, minimum height=1.1cm, align=center, font=\tiny\bfseries, rounded corners=1pt, draw=black!30, line width=0.3pt},
+            plabel/.style={font=\tiny, text=black!60}
+        ]
+        % Row 1: Golds cluster
+        \node[pswatch, fill=washiKarashi, text=black!80] (p1a) {Karashi};
+        \node[pswatch, fill=washiKincha, text=white, right=0cm of p1a] (p1b) {Kincha};
+        \node[plabel, right=0.2cm of p1b] {$\Delta E=12$};
+
+        \node[pswatch, fill=washiKaki, text=white, right=1.2cm of p1b] (p2a) {Kaki};
+        \node[pswatch, fill=washiKitsune, text=white, right=0cm of p2a] (p2b) {Kitsune};
+        \node[plabel, right=0.2cm of p2b] {$\Delta E=15$};
+
+        \node[pswatch, fill=washiTobi, text=white, right=1.2cm of p2b] (p3a) {Tobi};
+        \node[pswatch, fill=washiKuri, text=white, right=0cm of p3a] (p3b) {Kuri};
+        \node[plabel, right=0.2cm of p3b] {$\Delta E=18$};
+
+        % Row 2
+        \node[pswatch, fill=washiAka, text=white, below=0.25cm of p1a] (p4a) {Aka};
+        \node[pswatch, fill=washiBeni, text=white, right=0cm of p4a] (p4b) {Beni};
+        \node[plabel, right=0.2cm of p4b] {$\Delta E=19$};
+
+        \node[pswatch, fill=washiUguisu, text=white, right=1.2cm of p4b] (p5a) {Uguisu};
+        \node[pswatch, fill=washiMoegi, text=black!80, right=0cm of p5a] (p5b) {Moegi};
+        \node[plabel, right=0.2cm of p5b] {$\Delta E=21$};
+    \end{tikzpicture}
+    \caption{Washi-Ink closest pairs. Original 16 warm colors shown; cool extensions add 3 more.}
+\end{figure}
+
+\textit{Note: The core Washi palette (16 warm colors) is compact with good internal distinctiveness. The 3 cool extensions fill hue gaps while maintaining ΔE ≥ 18 to Oceanic.}
+
+\subsection*{Oceanic --- High-Risk Pairs ($\Delta E < 15$)}
+
+\begin{figure}[h]
+    \centering
+    \begin{tikzpicture}[
+            pswatch/.style={minimum width=1.6cm, minimum height=1.1cm, align=center, font=\tiny\bfseries, rounded corners=1pt, draw=black!30, line width=0.3pt},
+            plabel/.style={font=\tiny, text=black!60}
+        ]
+        % Row 1: Dark neutrals cluster
+        \node[pswatch, fill=oceanicAbyss1, text=white] (o1a) {Abyss1};
+        \node[pswatch, fill=oceanicSlate1, text=white, right=0cm of o1a] (o1b) {Slate1};
+        \node[plabel, right=0.2cm of o1b] {$\Delta E=9.6$};
+
+        \node[pswatch, fill=oceanicAbyss1, text=white, right=1.2cm of o1b] (o2a) {Abyss1};
+        \node[pswatch, fill=oceanicInk1, text=white, right=0cm of o2a] (o2b) {Ink1};
+        \node[plabel, right=0.2cm of o2b] {$\Delta E=13.1$};
+
+        \node[pswatch, fill=oceanicSlate1, text=white, right=1.2cm of o2b] (o3a) {Slate1};
+        \node[pswatch, fill=oceanicInk1, text=white, right=0cm of o3a] (o3b) {Ink1};
+        \node[plabel, right=0.2cm of o3b] {$\Delta E=15.0$};
+
+        % Row 2: Extension pairs
+        \node[pswatch, fill=oceanicCyan1, text=white, below=0.25cm of o1a] (o4a) {Cyan1};
+        \node[pswatch, fill=oceanicTeal1, text=white, right=0cm of o4a] (o4b) {Teal1};
+        \node[plabel, right=0.2cm of o4b] {$\Delta E=10.8$};
+
+        \node[pswatch, fill=oceanicViolet1, text=white, right=1.2cm of o4b] (o5a) {Violet1};
+        \node[pswatch, fill=oceanicPlum1, text=white, right=0cm of o5a] (o5b) {Plum1};
+        \node[plabel, right=0.2cm of o5b] {$\Delta E=12.5$};
+
+        \node[pswatch, fill=oceanicAmber1, text=white, right=1.2cm of o5b] (o6a) {Amber1};
+        \node[pswatch, fill=oceanicCitrus1, text=black!70, right=0cm of o6a] (o6b) {Citrus1};
+        \node[plabel, right=0.2cm of o6b] {$\Delta E=12.5$};
+
+        % Row 3: Green pairs
+        \node[pswatch, fill=oceanicSage1, text=white, below=0.25cm of o4a] (o7a) {Sage1};
+        \node[pswatch, fill=oceanicOlive1, text=white, right=0cm of o7a] (o7b) {Olive1};
+        \node[plabel, right=0.2cm of o7b] {$\Delta E=15.0$};
+
+        \node[pswatch, fill=oceanicSage1, text=white, right=1.2cm of o7b] (o8a) {Sage1};
+        \node[pswatch, fill=oceanicTeal1, text=white, right=0cm of o8a] (o8b) {Teal1};
+        \node[plabel, right=0.2cm of o8b] {$\Delta E=19.5$};
+
+        \node[pswatch, fill=oceanicCurrent1, text=white, right=1.2cm of o8b] (o9a) {Current1};
+        \node[pswatch, fill=oceanicViolet1, text=white, right=0cm of o9a] (o9b) {Violet1};
+        \node[plabel, right=0.2cm of o9b] {$\Delta E=16.3$};
+    \end{tikzpicture}
+    \caption{Oceanic worst pairs. Dark neutrals (Abyss/Slate/Ink) and extension-base pairs are closest.}
+\end{figure}
+
+\subsection*{Summary}
+
+\begin{center}
+    \begin{tikzpicture}
+        % Washi bar
+        \node[anchor=east] at (0, 0.5) {\scriptsize Washi-Ink};
+        \fill[washiKaki] (0.2, 0.3) rectangle (1.8, 0.7);
+        \node[anchor=west, font=\scriptsize\bfseries, text=white] at (0.4, 0.5) {5+ pairs};
+
+        % Oceanic bar
+        \node[anchor=east] at (0, -0.3) {\scriptsize Oceanic};
+        \fill[oceanicCurrent1] (0.2, -0.5) rectangle (2.4, -0.1);
+        \node[anchor=west, font=\scriptsize\bfseries, text=white] at (0.4, -0.3) {9 pairs};
+    \end{tikzpicture}
+\end{center}
+
+\textit{Washi-Ink (19 colors) and Oceanic (63 colors across 3 tiers) provide complementary aesthetics. All cross-palette ΔE ≥ 18 for chromatic colors.}

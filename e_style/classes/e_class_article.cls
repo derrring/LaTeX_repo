@@ -9,22 +9,30 @@
 
 % --- Class Options ---
 
-% Define a new switch to check if the 12pt option was used.
 % The \makeatletter and \makeatother must wrap the entire block
 % where commands with "@" are defined and used.
 \makeatletter
-\newif\if@e@twelvept
-\@e@twelveptfalse % Initialize the switch to false
 
-% Process options passed to the class
-\DeclareOption*{\PassOptionsToClass{\CurrentOption}{article}}
+% CJK switch - must be defined BEFORE loading packages
+\newif\ifcjk
+\cjkfalse % Default to CJK support DISABLED
+
+% 12pt switch
+\newif\if@e@twelvept
+\@e@twelveptfalse
+
+% Declare CJK options
+\DeclareOption{cjk}{\cjktrue}
+\DeclareOption{nocjk}{\cjkfalse}
 
 % When the '12pt' option is found, pass it to the base class
-% and set our custom switch to true.
-\DeclareOption{12pt}{%
+\DeclareOption{12pt}{
     \PassOptionsToClass{\CurrentOption}{article}
     \@e@twelvepttrue
 }
+
+% Pass unknown options to base class
+\DeclareOption*{\PassOptionsToClass{\CurrentOption}{article}}
 
 \ProcessOptions\relax
 \LoadClass{article}
@@ -32,7 +40,7 @@
 % --- Delayed Font Size Adjustment ---
 % This code runs right before the document begins, after all packages
 % and title styles have been loaded.
-\AtBeginDocument{%
+\AtBeginDocument+{
     % Check if our 12pt switch is true
     \if@e@twelvept
         % If it is, apply the specific font sizes. This will now
@@ -49,20 +57,10 @@
 \makeatother
 
 % --- 2. Load the common style package ---
-% This single command loads all your modular style components (packages, commands, colors, etc.).
 \RequirePackage{e_standard_doc}
-\RequirePackage{e_frontbackmatter_simple} % Load the front and back matter package
+\RequirePackage{e_frontbackmatter_simple}
 
-% --- 3. Define user-facing commands for article metadata ---
-
-% --- 4. Define commands and environments for document structure ---
-
-% --- 5. Define Article-specific Formatting ---
-% This section contains styling for sections and ToC
+% --- 3. Article-specific Formatting ---
 \linespread{1.1}
-
-% Override only for 12pt option
-
-%-----------------------------------------------------------------------
 
 \endinput

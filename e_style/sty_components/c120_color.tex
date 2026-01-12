@@ -145,3 +145,188 @@
 \colorlet{mycorollarycolor}{bleudefrance}
 \colorlet{mylemmacolor}{bleudefrance}
 \colorlet{myproofcolor}{slategray}
+
+% ==============================================================================
+% WASHI-INK PALETTE - Traditional Japanese Paper Aesthetic
+% ==============================================================================
+% 19 colors | Warm-dominant + Cool extensions | DISTINCT from Oceanic (all ΔE ≥ 18)
+% Design: Rich warm tones inspired by traditional washi paper and natural dyes
+% Character: Earthy, organic, traditional Japanese aesthetic
+% Updated 2026-01-06 | Added cool extensions (Shikon, Kuromidori, Ebizome)
+
+% --- REDS (Aka 赤 family) ---
+\definecolor{washiAka}{HTML}{B03030}           % 赤 True red H:0 S:57 L:44 #B03030
+\definecolor{washiBeni}{HTML}{C04050}          % 紅 Crimson-pink H:352 S:50 L:50 #C04050
+
+% --- ORANGES (Daidai 橙 family) ---
+\definecolor{washiKaki}{HTML}{C06030}          % 柿 Persimmon H:20 S:60 L:47 #C06030
+\definecolor{washiKitsune}{HTML}{A06030}       % 狐 Fox orange H:26 S:54 L:41 #A06030
+
+% --- BROWNS (Cha 茶 family) - UNIQUE to Washi (Oceanic has none) ---
+\definecolor{washiTobi}{HTML}{8B4513}          % 鳶 Kite/Saddle brown H:25 S:76 L:31 #8B4513
+\definecolor{washiKuri}{HTML}{5C4033}          % 栗 Chestnut H:19 S:29 L:28 #5C4033
+\definecolor{washiRikyucha}{HTML}{897858}      % 利休茶 Rikyu tea H:39 S:22 L:44 #897858
+
+% --- GOLDS (Kin 金 family) ---
+\definecolor{washiKarashi}{HTML}{D0A020}       % 芥子 Mustard H:44 S:73 L:47 #D0A020
+\definecolor{washiKincha}{HTML}{C09010}        % 金茶 Gold tea H:44 S:85 L:41 #C09010
+\definecolor{washiYamabuki}{HTML}{F8B500}      % 山吹 Kerria yellow H:44 S:100 L:49 #F8B500
+
+% --- YELLOW-GREENS (Moegi 萌黄 family) ---
+\definecolor{washiUguisu}{HTML}{807020}        % 鶯 Warbler H:50 S:60 L:31 #807020
+\definecolor{washiMoegi}{HTML}{A0B040}         % 萌黄 Sprouting green H:69 S:47 L:47 #A0B040
+
+% --- PINKS (Momo 桃 family) ---
+\definecolor{washiSakura}{HTML}{E0B0B0}        % 桜 Cherry blossom H:0 S:44 L:78 #E0B0B0
+\definecolor{washiBotan}{HTML}{C05080}         % 牡丹 Peony H:338 S:50 L:53 #C05080
+
+% --- NEUTRALS ---
+\definecolor{washiSumi}{HTML}{2A2018}          % 墨 Warm ink (brown-black) H:27 S:27 L:13 #2A2018
+\definecolor{washiShiro}{HTML}{F8F0E0}         % 白 Paper white (cream) H:40 S:63 L:93 #F8F0E0
+
+% --- COOL EXTENSIONS (填補 H:100-320° gap) ---
+% These are "warm-feeling" cool colors: purples and dark greens with traditional usage
+\definecolor{washiKuromidori}{HTML}{102808}    % 黒緑 Black-green (pine) H:105 S:66 L:9 #102808
+\definecolor{washiEbizome}{HTML}{501858}       % 葡萄染 Grape dye H:292 S:57 L:21 #501858
+\definecolor{washiShikon}{HTML}{460E44}        % 紫紺 Purple navy (warm-blue) H:302 S:66 L:16 #460E44
+
+
+% ==============================================================================
+% OCEANIC PALETTE - Morandi → Saturated → Crystal (OKLCH-based)
+% ==============================================================================
+% 21 base colors × 3 tiers = 63 total color definitions
+%
+% COLOR SPACE: OKLCH (perceptually uniform)
+%   L = lightness (0-1), C = chroma (0-0.4), H = hue (0-360)
+%
+% TIER PHILOSOPHY (Morandi → Saturated → Crystal):
+%   T1 (Morandi):   L₁, C₁         - Muted base tones, quiet harmony
+%   T2 (Saturated): L₁, C₁×1.6     - SAME brightness, MORE vivid
+%   T3 (Crystal):   L₁+0.20, C₁×1.4 - Lighter AND vivid
+%
+% SPECIAL FORMULAS:
+%   Dark anchors (Abyss, Current, Slate, Ink): T2=C×1.8, T3=L+0.25,C×1.6
+%   Neutrals (Foam, Cloud, Sand): T2=L+0.03,C×2-3 (low base C needs boost)
+%   Citrus: H=105° (lime) to separate from Amber (H=83°)
+%   Amber: Based on 山吹+栀子 Japanese gold tradition
+%
+% USAGE GUIDE:
+%   - Tier 1 (Morandi):   Lines, curves, text - subtle, professional
+%   - Tier 2 (Saturated): Emphasis, active states - rich, vivid
+%   - Tier 3 (Crystal):   Backgrounds, fills - light, clean, modern
+
+% ==============================================================================
+% TIER 1: DEEP OCEAN (Morandi base) - OKLCH L: 0.26-0.95
+% ==============================================================================
+% MORANDI PHILOSOPHY: Low chroma creates quiet, harmonious palette.
+% Like Giorgio Morandi's still lifes, visual interest comes from subtle value
+% relationships rather than saturation. These are the anchor colors for
+% lines, text, curves, and accents where contrast matters.
+
+% --- Blues ---
+\definecolor{oceanicAbyss1}{HTML}{112C46}      % OKLCH(0.29,0.058,250) | Pure blue anchor
+\definecolor{oceanicCurrent1}{HTML}{274762}    % OKLCH(0.39,0.059,245) | Blue current
+\definecolor{oceanicMist1}{HTML}{8FAABE}       % OKLCH(0.72,0.042,240) | HSL(206,27,65)
+
+% --- Greens ---
+\definecolor{oceanicCyan1}{HTML}{4A8B99}       % OKLCH(0.60,0.070,213) | HSL(191,35,45)
+\definecolor{oceanicTeal1}{HTML}{4A7A7A}       % OKLCH(0.55,0.052,196) | HSL(180,24,38)
+\definecolor{oceanicSage1}{HTML}{5A8A6A}       % OKLCH(0.59,0.072,154) | HSL(140,21,45)
+\definecolor{oceanicMoss1}{HTML}{6A9A5A}       % OKLCH(0.64,0.105,138) | HSL(105,26,48)
+\definecolor{oceanicOlive1}{HTML}{7A8A5A}      % OKLCH(0.61,0.071,123) | HSL(80,21,45)
+
+% --- Warm ---
+\definecolor{oceanicCitrus1}{HTML}{ADA85C}     % OKLCH(0.72,0.098,105) | H=105° lime
+\definecolor{oceanicAmber1}{HTML}{E5C27D}      % OKLCH(0.83,0.096,83) | H=83° 山吹+栀子
+\definecolor{oceanicCoral1}{HTML}{C4866B}      % OKLCH(0.68,0.086,44) | HSL(18,43,59)
+\definecolor{oceanicRose1}{HTML}{A56B7A}       % OKLCH(0.59,0.076,3) | HSL(344,24,53)
+
+% --- Reds/Pinks/Purples ---
+\definecolor{oceanicCrimson1}{HTML}{9A4A4A}    % OKLCH(0.51,0.107,22) | HSL(0,35,45)
+\definecolor{oceanicMagenta1}{HTML}{8A5A7A}    % OKLCH(0.53,0.077,340) | HSL(320,21,45)
+\definecolor{oceanicPlum1}{HTML}{6B5A7A}       % OKLCH(0.50,0.054,309) | HSL(272,15,42)
+\definecolor{oceanicViolet1}{HTML}{7B6B9D}     % OKLCH(0.56,0.078,299) | HSL(259,20,52)
+
+% --- Neutrals ---
+\definecolor{oceanicFoam1}{HTML}{C8D6D6}       % OKLCH(0.87,0.015,180) | Seafoam neutral
+\definecolor{oceanicCloud1}{HTML}{E8EEF0}      % OKLCH(0.95,0.007,220) | Sky neutral
+\definecolor{oceanicSand1}{HTML}{E5DCC8}       % OKLCH(0.90,0.029,88) | Warm neutral
+\definecolor{oceanicSlate1}{HTML}{3A4555}      % OKLCH(0.39,0.031,258) | Dark anchor
+\definecolor{oceanicInk1}{HTML}{1A2530}        % OKLCH(0.26,0.026,249) | Dark anchor
+
+% ==============================================================================
+% TIER 2: SATURATED - Same Lightness, Higher Chroma
+% ==============================================================================
+% Keep same brightness as T1, but increase vividness. Rich, saturated versions
+% of the Morandi base. Ideal for emphasis, active states, key elements.
+% Standard: C×1.6 | Dark anchors: C×1.8 | Neutrals: L+0.03, C×2-3
+
+% --- Blues ---
+\definecolor{oceanicAbyss2}{HTML}{002A5B}      % OKLCH(0.29,0.104,250) - same L, C×1.8
+\definecolor{oceanicCurrent2}{HTML}{004778}    % OKLCH(0.39,0.106,245) - same L, C×1.8
+\definecolor{oceanicMist2}{HTML}{80ACCC}       % OKLCH(0.72,0.067,240) - same L, C×1.6
+
+% --- Greens ---
+\definecolor{oceanicCyan2}{HTML}{0090A8}       % OKLCH(0.60,0.111,213) - same L, C×1.6
+\definecolor{oceanicTeal2}{HTML}{217F80}       % OKLCH(0.55,0.084,196) - same L, C×1.6
+\definecolor{oceanicSage2}{HTML}{3B915E}       % OKLCH(0.59,0.115,154) - same L, C×1.6
+\definecolor{oceanicMoss2}{HTML}{599F3F}       % OKLCH(0.64,0.150,138) - same L, C×1.6
+\definecolor{oceanicOlive2}{HTML}{758E3A}      % OKLCH(0.61,0.114,123) - same L, C×1.6
+
+% --- Warm ---
+\definecolor{oceanicCitrus2}{HTML}{B3A80F}     % OKLCH(0.72,0.150,105) - same L, C×1.6
+\definecolor{oceanicAmber2}{HTML}{F6BD39}      % OKLCH(0.83,0.154,83) - same L, C×1.6
+\definecolor{oceanicCoral2}{HTML}{DB784B}      % OKLCH(0.68,0.137,44) - same L, C×1.6
+\definecolor{oceanicRose2}{HTML}{B95C77}       % OKLCH(0.59,0.122,3) - same L, C×1.6
+
+% --- Reds/Pinks/Purples ---
+\definecolor{oceanicCrimson2}{HTML}{AB383E}    % OKLCH(0.51,0.150,22) - same L, C×1.6
+\definecolor{oceanicMagenta2}{HTML}{994C82}    % OKLCH(0.53,0.123,340) - same L, C×1.6
+\definecolor{oceanicPlum2}{HTML}{705488}       % OKLCH(0.50,0.086,309) - same L, C×1.6
+\definecolor{oceanicViolet2}{HTML}{7F63B4}     % OKLCH(0.56,0.125,299) - same L, C×1.6
+
+% --- Neutrals ---
+\definecolor{oceanicFoam2}{HTML}{BCDCD4}       % OKLCH(0.87,0.035,180) - L+0.03, C×2.5
+\definecolor{oceanicCloud2}{HTML}{DFF2F8}      % OKLCH(0.95,0.021,220) - L+0.02, C×3.0
+\definecolor{oceanicSand2}{HTML}{F0DCAA}       % OKLCH(0.90,0.068,88) - L+0.03, C×2.0
+\definecolor{oceanicSlate2}{HTML}{324562}      % OKLCH(0.39,0.056,258) - same L, C×1.8
+\definecolor{oceanicInk2}{HTML}{102539}        % OKLCH(0.26,0.047,249) - same L, C×1.8
+
+% ==============================================================================
+% TIER 3: CRYSTAL - Higher Lightness + High Chroma
+% ==============================================================================
+% Light and vibrant. Combines increased brightness with maintained saturation.
+% Ideal for backgrounds, highlights, and clean modern aesthetics.
+% Standard: L+0.20, C×1.4 | Dark anchors: L+0.25, C×1.6
+
+% --- Blues ---
+\definecolor{oceanicAbyss3}{HTML}{4171A2}      % OKLCH(0.54,0.093,250) - L+0.25, C×1.6
+\definecolor{oceanicCurrent3}{HTML}{5791C1}    % OKLCH(0.64,0.094,245) - L+0.25, C×1.6
+\definecolor{oceanicMist3}{HTML}{C7EAFF}       % OKLCH(0.92,0.058,240) - L+0.20, C×1.4
+
+% --- Greens ---
+\definecolor{oceanicCyan3}{HTML}{6BCEE3}       % OKLCH(0.80,0.098,213) - L+0.20, C×1.4
+\definecolor{oceanicTeal3}{HTML}{72BBBB}       % OKLCH(0.75,0.073,196) - L+0.20, C×1.4
+\definecolor{oceanicSage3}{HTML}{85CE9E}       % OKLCH(0.79,0.100,154) - L+0.20, C×1.4
+\definecolor{oceanicMoss3}{HTML}{A2DC8F}       % OKLCH(0.84,0.120,138) - L+0.20, C×1.4
+\definecolor{oceanicOlive3}{HTML}{B3CB83}      % OKLCH(0.81,0.099,123) - L+0.20, C×1.4
+
+% --- Warm ---
+\definecolor{oceanicCitrus3}{HTML}{F0E987}     % OKLCH(0.92,0.120,105) - L+0.20, C×1.4
+\definecolor{oceanicAmber3}{HTML}{FFE37F}      % OKLCH(0.94,0.130,83) - L+0.11, C×1.35
+\definecolor{oceanicCoral3}{HTML}{FFC3A6}      % OKLCH(0.88,0.120,44) - L+0.20, C×1.4
+\definecolor{oceanicRose3}{HTML}{F69EB5}       % OKLCH(0.79,0.107,3) - L+0.20, C×1.4
+
+% --- Reds/Pinks/Purples ---
+\definecolor{oceanicCrimson3}{HTML}{E28180}    % OKLCH(0.71,0.120,22) - L+0.20, C×1.4
+\definecolor{oceanicMagenta3}{HTML}{D58DBD}    % OKLCH(0.73,0.108,340) - L+0.20, C×1.4
+\definecolor{oceanicPlum3}{HTML}{AB91C2}       % OKLCH(0.70,0.076,309) - L+0.20, C×1.4
+\definecolor{oceanicViolet3}{HTML}{BBA2EE}     % OKLCH(0.76,0.109,299) - L+0.20, C×1.4
+
+% --- Neutrals ---
+\definecolor{oceanicFoam3}{HTML}{D6E7E7}       % OKLCH(0.92,0.018,197) - L+0.05, C×1.2
+\definecolor{oceanicCloud3}{HTML}{ECF3F6}      % OKLCH(0.96,0.008,220) - L+0.01, C×1.2
+\definecolor{oceanicSand3}{HTML}{F7ECD4}       % OKLCH(0.95,0.034,87) - L+0.05, C×1.2
+\definecolor{oceanicSlate3}{HTML}{7A8DA8}      % OKLCH(0.64,0.046,258) - L+0.25, C×1.5
+\definecolor{oceanicInk3}{HTML}{54687B}        % OKLCH(0.51,0.039,249) - L+0.25, C×1.5
+
