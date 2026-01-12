@@ -90,8 +90,9 @@
 % Set math fonts at end of preamble (after all font packages fully initialized)
 \AtEndPreamble{%
     \setmathfont[StylisticSet=01]{STIX Two Math}%
-    \setmathfont[range={bb,scr,bfscr}]{TeX Gyre Termes Math}%
-    \setmathfont[range={cal,bfcal}]{Latin Modern Math}%
+    \setmathfont[range={bb}]{TeX Gyre Termes Math}%
+    \setmathfont[range={scr,bfscr}, Scale=MatchUppercase]{XITS Math}%
+    \setmathfont[range={cal,bfcal}]{IBM Plex Math}%
 }
 
 % 6. CONDITIONAL EMPHASIS AND TEXT STYLING
