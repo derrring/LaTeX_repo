@@ -8,18 +8,15 @@
 % Uses titlesec's \titleformat command.
 %
 % DIMENSION CONSTANTS:
-%   - Rule width offset: 2.08pt subtracted from \linewidth to prevent
-%     overflow caused by rounding errors in TeX's fixed-point arithmetic.
-%     Without this, rules occasionally extend 1-2pt into margins.
 %   - Rule thickness: 1.5pt provides visible weight without being heavy.
-%   - Title gap: 1ex (\\[1ex]) provides breathing room between rule and text.
+%   - Title gap: 1ex provides breathing room between rule and text.
 %   - After spacing: 20pt between section title block and body text.
 % ====================================================================
 
 % Numbered sections
 \titleformat{\section}[block]
 {\normalfont\bfseries\large}
-{ }{0pt}
+{}{0pt}
 {\noindent\rule{\dimexpr\linewidth-2.08pt\relax}{1.5pt}\\[1ex]\thesection\quad\MakeUppercase}
 [\noindent\rule{\dimexpr\linewidth-2.08pt\relax}{1.5pt}]
 

@@ -93,9 +93,11 @@
 % Set math fonts at end of preamble (after all font packages fully initialized)
 \AtEndPreamble{%
     \setmathfont[StylisticSet=01]{STIX Two Math}%
+    \setmathfont[version=bold, StylisticSet=01, FakeBold=1.5]{STIX Two Math}%
     \setmathfont[range={bb}]{New Computer Modern Math}%
     \setmathfont[range={scr,bfscr}, Scale=MatchUppercase]{XITS Math}%
     \setmathfont[range={cal,bfcal}]{IBM Plex Math}%
+    \setmathfont[range={bfcal}, FakeBold=1.5]{IBM Plex Math}%
     \setmathfont[range={frak,bffrak}]{New Computer Modern Math}%
 }
 
@@ -119,11 +121,19 @@
 % -------------------------------------------------------------------
 % When 12pt option is used, adjust section heading sizes accordingly.
 % Uses begindocument/end hook to ensure titlesec is fully initialized.
+%
+% NOTE: Feature packages (e_title_fenced_sec, e_title_fenced_chap)
+% define their own \titleformat for the levels they style. This hook
+% must NOT overwrite those. We skip \section if e_title_fenced_sec is
+% loaded, and \chapter if e_title_fenced_chap is loaded, so that
+% feature-package formatting is preserved.
 \makeatletter
 \AddToHook{begindocument/end}{%
     \if@e@twelvept
-        \titleformat{\section}
-            {\fontsize{14.4pt}{17.28pt}\selectfont\bfseries}{\thesection}{1em}{}
+        \@ifpackageloaded{e_title_fenced_sec}{}{%
+            \titleformat{\section}
+                {\fontsize{14.4pt}{17.28pt}\selectfont\bfseries}{\thesection}{1em}{}%
+        }
         \titleformat{\subsection}
             {\fontsize{12pt}{14.4pt}\selectfont\bfseries}{\thesubsection}{1em}{}
         \titleformat{\subsubsection}
