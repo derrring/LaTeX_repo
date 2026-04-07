@@ -17,6 +17,26 @@
 %#2: The main paragraph content
 %usage: \verpar{label}{text}
 
+% Bourbaki dangerous bend symbol (Knuth's manfnt at 10pt)
+% \dbend: display/margin symbol (too tall for inline use).
+% \dmark{text}: warning paragraph with \dbend in left margin.
+% Uses NFSS registration (not \font primitive) for LuaLaTeX compatibility.
+% For inline use, consider fourier-orns: \caution (Bourbaki dangerous bend),
+% \warning (exclamation triangle), \noway (prohibition sign).
+\DeclareFontFamily{U}{manfnt}{}
+\DeclareFontShape{U}{manfnt}{m}{n}{<-> manfnt}{}
+\ifdefined\dbend
+    \renewcommand{\dbend}{{\usefont{U}{manfnt}{m}{n}\char127}}
+\else
+    \newcommand{\dbend}{{\usefont{U}{manfnt}{m}{n}\char127}}
+\fi
+\newcommand{\dmark}[1]{%
+    \par\smallskip\noindent
+    \llap{\dbend\enspace}%
+    #1%
+    \par\smallskip
+}
+
 % Marble
 \newcommand{\colorcircle}[1]{\tikz\node[circle=3pt, draw=#1, fill=#1, inner sep=1.75pt] (d) at (0,0) {};}
 \newcommand{\colorstar}[1]{\tikz\node[star=3pt, draw=#1, fill=#1, inner sep=1.75pt] (d) at (0,0) {};}
