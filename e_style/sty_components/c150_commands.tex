@@ -40,19 +40,21 @@
 % --- Inline warning symbols (direct font access, no fourier-orns package) ---
 % Uses FourierOrns-Regular.otf glyphs directly via fontspec.
 % Professional font glyphs: scale with text size, safe in optional arguments.
-% \caution: Bourbaki dangerous bend (triangle + zigzag)
-% \warning: alert triangle (triangle + exclamation mark)
+% \danger:  Bourbaki dangerous bend (triangle + zigzag)
+% \caution: alert triangle (triangle + exclamation mark)
 % \noway:   prohibition sign (circle + horizontal bar)
 \newfontface\eFourierOrns{FourierOrns-Regular.otf}
 \providecommand\texorpdfstring[2]{#1}% fallback if hyperref not yet loaded
+% \danger is overwritten by unicode-math at \AtBeginDocument (\chardef U+2621).
+% We force our definition after unicode-math's hook.
+\AtBeginDocument{%
+    \DeclareRobustCommand*{\danger}{\raisebox{0.65\depth}{{\eFourierOrns 2}}}%
+}
 \ifdefined\caution\else
-\newcommand*{\caution}{\texorpdfstring{{\eFourierOrns 2}}{/!\textbackslash}}
-\fi
-\ifdefined\warning\else
-\newcommand*{\warning}{\texorpdfstring{{\eFourierOrns 1}}{!}}
+\newcommand*{\caution}{\raisebox{0.65\depth}{{\eFourierOrns 1}}}
 \fi
 \ifdefined\noway\else
-\newcommand*{\noway}{\texorpdfstring{{\eFourierOrns 0}}{X}}
+\newcommand*{\noway}{\raisebox{0.65\depth}{{\eFourierOrns 0}}}
 \fi
 
 % Marble
