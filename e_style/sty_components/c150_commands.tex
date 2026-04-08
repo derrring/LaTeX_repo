@@ -37,34 +37,22 @@
     \par\smallskip
 }
 
-% --- Inline warning symbols (self-contained tikz, no fourier-orns dependency) ---
+% --- Inline warning symbols (direct font access, no fourier-orns package) ---
+% Uses FourierOrns-Regular.otf glyphs directly via fontspec.
+% Professional font glyphs: scale with text size, safe in optional arguments.
 % \caution: Bourbaki dangerous bend (triangle + zigzag)
 % \warning: alert triangle (triangle + exclamation mark)
-% \noway:   prohibition sign (circle + diagonal bar)
+% \noway:   prohibition sign (circle + horizontal bar)
+\newfontface\eFourierOrns{FourierOrns-Regular.otf}
+\providecommand\texorpdfstring[2]{#1}% fallback if hyperref not yet loaded
 \ifdefined\caution\else
-\newcommand*{\caution}{\raisebox{0.3ex}{%
-    \tikz[baseline=0ex, scale=0.08, line width=0.55pt, line cap=round, line join=round]{
-        \draw (0,3.2) -- (-2.8,-1.6) -- (2.8,-1.6) -- cycle;
-        \draw (-0.9,-0.1) -- (-0.3,-0.9) -- (0.3,0.9) -- (0.9,0.1);
-    }%
-}}
+\newcommand*{\caution}{\texorpdfstring{{\eFourierOrns 2}}{/!\textbackslash}}
 \fi
 \ifdefined\warning\else
-\newcommand*{\warning}{\raisebox{0.3ex}{%
-    \tikz[baseline=0ex, scale=0.08, line width=0.55pt, line cap=round, line join=round]{
-        \draw (0,3.2) -- (-2.8,-1.6) -- (2.8,-1.6) -- cycle;
-        \draw (0,1.6) -- (0,-0.1);
-        \fill (0,-0.65) circle (0.28);
-    }%
-}}
+\newcommand*{\warning}{\texorpdfstring{{\eFourierOrns 1}}{!}}
 \fi
 \ifdefined\noway\else
-\newcommand*{\noway}{\raisebox{0.25ex}{%
-    \tikz[baseline=0ex, scale=0.08, line width=0.55pt, line cap=round, line join=round]{
-        \draw (0,0.8) circle (2.0);
-        \draw (-1.41,-0.61) -- (1.41,2.21);
-    }%
-}}
+\newcommand*{\noway}{\texorpdfstring{{\eFourierOrns 0}}{X}}
 \fi
 
 % Marble

@@ -2,19 +2,12 @@
 \ProvidesPackage{e_math_env_deco}[E Math Environment Decoration]
 %----------  wrap/decorate !EXISTED! theorem-like environments ----------------
 %------------------------realized by tcolorbox-------------------------
-
-\tcolorboxenvironment{proof}{% add a vertical bar to the left
-    enhanced,breakable, frame hidden, colback=white,
-    borderline west={1mm}{0pt}{myproofcolor!50},
-    before skip=0em,after skip=.5em,
-}
-
-\tcolorboxenvironment{remark}{% add a vertical bar to the left
-    top=-1pt, bottom=-1pt,
-    enhanced,breakable, frame hidden, colback=white,
-    borderline west={1mm}{0pt}{myproofcolor},
-    %before skip=1em,after skip=.5em,
-}
+%
+% proof and remark are intentionally left UNDECORATED:
+%   - Semantically discursive (not statements to reference)
+%   - Readers identify proofs by "Proof." heading and QED symbol
+%   - Avoids tcolorbox minipage boxing, so \footnote works natively
+%   - Consistent with standard mathematical typesetting (Rudin, Serre, Bourbaki)
 
 \tcolorboxenvironment{definition}{
     enhanced,breakable,
