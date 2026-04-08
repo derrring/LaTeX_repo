@@ -87,4 +87,16 @@
 style=general_thm_style]{corollary}
 
 \declaretheorem[name=Remark,style=remark_style]{remark}
+
+% --- Unique hyperref anchors for counters that reset per section/chapter ---
+% Without this, hyperref creates duplicate destinations like 'example.1'
+% when example/exercise counters reset in each section (or chapter).
+\ifcsdef{chapter}{%
+    \renewcommand{\theHexample}{\thechapter.\arabic{example}}%
+    \renewcommand{\theHexercise}{\thechapter.\arabic{exercise}}%
+}{%
+    \renewcommand{\theHexample}{\thesection.\arabic{example}}%
+    \renewcommand{\theHexercise}{\thesection.\arabic{exercise}}%
+}
+
 \endinput
