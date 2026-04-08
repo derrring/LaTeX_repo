@@ -37,6 +37,36 @@
     \par\smallskip
 }
 
+% --- Inline warning symbols (self-contained tikz, no fourier-orns dependency) ---
+% \caution: Bourbaki dangerous bend (triangle + zigzag)
+% \warning: alert triangle (triangle + exclamation mark)
+% \noway:   prohibition sign (circle + diagonal bar)
+\ifdefined\caution\else
+\newcommand*{\caution}{\raisebox{0.3ex}{%
+    \tikz[baseline=0ex, scale=0.08, line width=0.55pt, line cap=round, line join=round]{
+        \draw (0,3.2) -- (-2.8,-1.6) -- (2.8,-1.6) -- cycle;
+        \draw (-0.9,-0.1) -- (-0.3,-0.9) -- (0.3,0.9) -- (0.9,0.1);
+    }%
+}}
+\fi
+\ifdefined\warning\else
+\newcommand*{\warning}{\raisebox{0.3ex}{%
+    \tikz[baseline=0ex, scale=0.08, line width=0.55pt, line cap=round, line join=round]{
+        \draw (0,3.2) -- (-2.8,-1.6) -- (2.8,-1.6) -- cycle;
+        \draw (0,1.6) -- (0,-0.1);
+        \fill (0,-0.65) circle (0.28);
+    }%
+}}
+\fi
+\ifdefined\noway\else
+\newcommand*{\noway}{\raisebox{0.25ex}{%
+    \tikz[baseline=0ex, scale=0.08, line width=0.55pt, line cap=round, line join=round]{
+        \draw (0,0.8) circle (2.0);
+        \draw (-1.41,-0.61) -- (1.41,2.21);
+    }%
+}}
+\fi
+
 % Marble
 \newcommand{\colorcircle}[1]{\tikz\node[circle=3pt, draw=#1, fill=#1, inner sep=1.75pt] (d) at (0,0) {};}
 \newcommand{\colorstar}[1]{\tikz\node[star=3pt, draw=#1, fill=#1, inner sep=1.75pt] (d) at (0,0) {};}
