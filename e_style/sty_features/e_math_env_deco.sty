@@ -1,7 +1,43 @@
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesPackage{e_math_env_deco}[E Math Environment Decoration]
 %----------  wrap/decorate !EXISTED! theorem-like environments ----------------
-%------------------------realized by tcolorbox-------------------------
+%-------- tcolorbox for theorem-like envs, tikz leftbar for proof/remark ------
+
+% --- proof and remark: tcolorbox visual + global footnotes ---
+% Keep tcolorbox wrapping for visual consistency (bar attachment to theorem).
+% Patch \footnote inside these environments: save footnotes during the box,
+% emit them after the box closes so they reach the page bottom.
+\RequirePackage{etoolbox}
+
+\makeatletter
+
+% --- Footnote saving mechanism ---
+\newcommand{\e@saved@footnotes}{}
+
+\newcommand{\e@begin@save@footnotes}{%
+    \global\let\e@saved@footnotes\@empty
+    \let\e@orig@footnote\footnote
+    \renewcommand{\footnote}[1]{%
+        \footnotemark
+        \edef\e@fn@mark{\the\c@footnote}%
+        \expandafter\g@addto@macro\expandafter\e@saved@footnotes
+            \expandafter{\expandafter\footnotetext\expandafter[\e@fn@mark]{##1}}%
+    }%
+}
+
+\newcommand{\e@end@save@footnotes}{%
+    \e@saved@footnotes
+    \global\let\e@saved@footnotes\@empty
+}
+
+% --- Apply to proof and remark ---
+\BeforeBeginEnvironment{proof}{\e@begin@save@footnotes}
+\AfterEndEnvironment{proof}{\e@end@save@footnotes}
+
+\BeforeBeginEnvironment{remark}{\e@begin@save@footnotes}
+\AfterEndEnvironment{remark}{\e@end@save@footnotes}
+
+\makeatother
 
 \tcolorboxenvironment{proof}{% add a vertical bar to the left
     enhanced,breakable, frame hidden, colback=white,
@@ -13,7 +49,7 @@
     top=-1pt, bottom=-1pt,
     enhanced,breakable, frame hidden, colback=white,
     borderline west={1mm}{0pt}{myproofcolor},
-    %before skip=1em,after skip=.5em, 
+    %before skip=1em,after skip=.5em,
 }
 
 \tcolorboxenvironment{definition}{
