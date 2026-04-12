@@ -75,6 +75,8 @@
     name=Example,style=remark_style]{example}
     \declaretheorem[numberwithin=chapter, name=Exercise,
     style=remark_style]{exercise}
+    \declaretheorem[numberwithin=chapter, name=Remark,
+    style=remark_style]{remark}
 }
 {
     \declaretheorem[numberwithin=section, name=Theorem,
@@ -83,6 +85,8 @@
     name=Example,style=remark_style]{example}
     \declaretheorem[numberwithin=section, name=Exercise,
     style=remark_style]{exercise}
+    % Article mode: remark is a flat global counter (1, 2, 3, ...).
+    \declaretheorem[name=Remark, style=remark_style]{remark}
 }
 \declaretheorem[sibling=theorem, name=Proposition, style=general_thm_style]{proposition}
 \declaretheorem[sibling=theorem, name=Definition, style=def_style,]{definition}
@@ -90,17 +94,17 @@
 \declaretheorem[sibling=theorem, name=Corollary,
 style=general_thm_style]{corollary}
 
-\declaretheorem[name=Remark,style=remark_style]{remark}
-
 % --- Unique hyperref anchors for counters that reset per section/chapter ---
 % Without this, hyperref creates duplicate destinations like 'example.1'
-% when example/exercise counters reset in each section (or chapter).
+% when example/exercise/remark counters reset in each section (or chapter).
 \ifcsdef{chapter}{%
     \renewcommand{\theHexample}{\thechapter.\arabic{example}}%
     \renewcommand{\theHexercise}{\thechapter.\arabic{exercise}}%
+    \renewcommand{\theHremark}{\thechapter.\arabic{remark}}%
 }{%
     \renewcommand{\theHexample}{\thesection.\arabic{example}}%
     \renewcommand{\theHexercise}{\thesection.\arabic{exercise}}%
+    % Article mode: remark counter is flat, default \theHremark already unique.
 }
 
 \endinput
