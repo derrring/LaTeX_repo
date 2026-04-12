@@ -20,6 +20,10 @@
     postheadspace=1em,
 ]{general_thm_style}
 
+% def_style is currently identical to general_thm_style. Kept as a
+% separate named style so definition presentation can diverge from
+% theorems in the future (e.g., different head font, no italic body)
+% without touching theorem/proposition/lemma/corollary.
 \declaretheoremstyle[
     spaceabove=7pt, spacebelow=7pt,
     headfont=\normalfont\bfseries,

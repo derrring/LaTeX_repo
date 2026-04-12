@@ -45,5 +45,6 @@
 \RequirePackage{e_title_fenced_chap}
 \RequirePackage{e_math_env_deco}
 
+\pagestyle{plain}
 
 \endinput

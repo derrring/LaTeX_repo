@@ -1,24 +1,29 @@
-% File: espresso/features/e_frontbackmatter_simple.sty
-% Purpose: Provides a simple frontmatter style that reverts to the
-%          default title block of the base class (book or article).
+% =================================================================
+% e_frontbackmatter_simple.sty
+% Minimal frontmatter that defers to the base class \maketitle.
+%
+% Stubs all metadata commands from e_frontbackmatter_formal so that
+% documents compile without errors when switching between styles.
+% =================================================================
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{e_frontbackmatter_simple}[Simple Frontmatter]
+\ProvidesPackage{e_frontbackmatter_simple}%
+  [2026/04/11 Simple frontmatter (base-class defaults)]
 
-% In the 'simple' frontmatter style, we define the extra metadata
-% commands from the 'formal' style to take one argument but do nothing.
-% This prevents errors if a user includes them in a document that uses
-% this simple style, while ensuring they have no effect on the standard
-% title block.
-
+% Stub formal-only metadata commands (accept argument, do nothing).
+\newcommand{\subtitle}[1]{}
 \newcommand{\institution}[1]{}
 \newcommand{\location}[1]{}
-\newcommand{\subtitle}[1]{}
 \newcommand{\email}[1]{}
+\newcommand{\address}[1]{}
+\newcommand{\dedicatory}[1]{}
+\newcommand{\keywords}[1]{}
+\newcommand{\subjclass}[2][]{}
+\newcommand{\setabstract}[1]{}
+\newcommand{\setacknowledgements}[1]{}
 
 % We intentionally do NOT redefine \maketitle here.
-% By not redefining it, we force LaTeX to use the default \maketitle
-% command that is provided by the base document class (e.g., 'book.cls'
-% or 'article.cls'). This is the desired behavior for a simple style
-% and automatically adapts to the user's choice of class.
+% The base class (book or article) provides its own \maketitle,
+% which is the desired behavior for simple frontmatter.
+
 \endinput

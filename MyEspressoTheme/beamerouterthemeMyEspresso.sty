@@ -1,58 +1,69 @@
-% MyEspresso Outer Theme
-% Based on Amurmaple theme by Maxime CHUPIN
+% =================================================================
+% beamerouterthemeMyEspresso.sty
+% Outer theme: background, frametitle, sidebar, frame numbering.
+% =================================================================
 
-\NeedsTeXFormat{LaTeX2e}[2021-11-15]
-\ProvidesPackage{beamerouterthemeMyEspresso}[2024/02/07 v.1.3 MyEspresso Outer Theme for Beamer]
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{beamerouterthemeMyEspresso}%
+  [2026/04/11 v2.0 MyEspresso Outer Theme for Beamer]
 
 \mode<presentation>
 
-% Require TikZ libraries
+% Only load TikZ libraries actually used by this theme
 \usetikzlibrary{backgrounds}
-\usetikzlibrary{quotes,angles}
-\usetikzlibrary{automata}
-\usetikzlibrary{arrows}
 \usetikzlibrary{calc}
 
+% =================================================================
 % Dimensions and margins
-% Note: \myespresso@sidebarwidth is defined in beamerthemeMyEspresso.sty
+% =================================================================
 
 \ExplSyntaxOn
 \ifbeamer@me@sidebar
-  \dim_const:Nn \c_myespresso_barre_dim  { \myespresso@sidebarwidth }
+  \dim_const:Nn \c_myespresso_barre_dim { \myespresso@sidebarwidth }
 \else
-  \dim_const:Nn \c_myespresso_barre_dim  { 15pt }
+  \dim_const:Nn \c_myespresso_barre_dim { 15pt }
 \fi
-\dim_const:Nn \c_myespresso_margin {15pt}
+
+\dim_const:Nn \c_myespresso_margin { 15pt }
+
 \ifbeamer@me@sidebar
-  \tl_set:Nx \l_myespresso_margin_left { \dim_eval:n {\c_myespresso_margin } }
+  \tl_set:Nx \l_myespresso_margin_left
+    { \dim_eval:n { \c_myespresso_margin } }
 \else
-  \tl_set:Nx \l_myespresso_margin_left { \dim_eval:n { \c_myespresso_barre_dim+\c_myespresso_margin } }
+  \tl_set:Nx \l_myespresso_margin_left
+    { \dim_eval:n { \c_myespresso_barre_dim + \c_myespresso_margin } }
 \fi
+
 \setbeamersize
-{
-  text~ margin~ left=\l_myespresso_margin_left,
-  text~ margin~ right=\c_myespresso_margin
-}
+  {
+    text~ margin~ left  = \l_myespresso_margin_left ,
+    text~ margin~ right = \c_myespresso_margin ,
+  }
 \ExplSyntaxOff
 
-% Sidebar configuration
+% =================================================================
+% Sidebar configuration (optional)
+% =================================================================
+
 \ifbeamer@me@sidebar
-  \useoutertheme[height=0pt,width=\myespresso@sidebarwidth,hideothersubsections]{sidebar}
+  \useoutertheme[height=0pt,width=\myespresso@sidebarwidth,
+                 hideothersubsections]{sidebar}
   \setbeamertemplate{sidebar left}{%
     \ifbeamer@me@toplogo
       \hskip -0.03cm%
-      \hbox to \beamer@sidebarwidth{
+      \hbox to \beamer@sidebarwidth{%
         \hfil \hbox{\insertlogo} \hfil
-      }
+      }%
     \fi
     \beamer@tempdim=\beamer@sidebarwidth%
-    \advance\beamer@tempdim by -6pt%  % Account for margins
+    \advance\beamer@tempdim by -6pt%
     {\usebeamerfont{title in sidebar}%
       \vskip1.5em%
       \hbox to \beamer@sidebarwidth{\hfil%
         \parbox{\beamer@tempdim}{\centering%
           \usebeamercolor[fg]{title in sidebar}%
-          {\hypersetup{linkcolor=white}\insertshorttitle[width=\beamer@tempdim,center,respectlinebreaks]}%
+          {\hypersetup{linkcolor=white}%
+           \insertshorttitle[width=\beamer@tempdim,center,respectlinebreaks]}%
         }\hfil}%
       \vskip1.em%
     }%
@@ -74,114 +85,145 @@
       \vskip2pt%
     \fi%
   }%
-  % Margins for sidebar
   \setbeamersize{text margin left=0.5cm,text margin right=0.5cm}
 \fi
 
+% =================================================================
 % Background template
+% =================================================================
+
 \ExplSyntaxOn
 \setbeamertemplate{background}%
 {%
   \hypersetup{linkcolor=white}%
   \begin{tikzpicture}[remember~picture,overlay]%
-    \fill[MyEspresso@structure]%
-    (current~page.south~west) rectangle ([xshift=\c_myespresso_barre_dim]current~%
-    page.north~west);%
+    % Left bar
+    \fill [MyEspresso@structure]
+      (current~page.south~west)
+      rectangle
+      ([xshift=\c_myespresso_barre_dim]current~page.north~west);
+    % Optional rule line
     \ifbeamer@me@rule
-      \fill[MyEspresso@rule]%
-      ([xshift=\c_myespresso_barre_dim]current~page.south~west) rectangle ([xshift=\c_myespresso_barre_dim+1pt]current~%
-      page.north~west);%
+      \fill [MyEspresso@rule]
+        ([xshift=\c_myespresso_barre_dim]current~page.south~west)
+        rectangle
+        ([xshift=\c_myespresso_barre_dim+1pt]current~page.north~west);
     \fi
-    \ifbeamer@me@nomail%
-    \node[anchor=south,color=black!40,rotate=90] at ($(current~page.east)$)%
-      (title) {\tiny%
-          \texttt{\myespresso@printmail}%
-      };%
-    \fi%
-    \ifbeamer@me@sidebar%
-      \ifbeamer@me@nogauge%
-        \ifnum\insertframenumber>\insertmainframenumber % gauge only in main part
-        \else%
-          \node[anchor=south~west,color=white,inner~sep=0pt] at ([xshift=3pt,yshift=5pt]current~page.south~west)%
-          (gauge) {\myespresso@gauge[\the\beamer@sidebarwidth-6pt]};%
-        \fi%
-      \fi%
-      \ifx\logo\empty%
-      \else%
-        \ifbeamer@me@toplogo%
-        \else%
-          \node [anchor=south~west,inner~sep=0pt] at ($(current~page.south~west)+(0,0.5)$)%
-            (logo) {\insertlogo};%
+    % Mail in right margin
+    \ifbeamer@me@showmail
+      \node [anchor=south, color=black!40, rotate=90]
+        at ($(current~page.east)$)
+        (title)
+        { \tiny \texttt{\myespresso@printmail} };
+    \fi
+    % Gauge and logo
+    \ifbeamer@me@sidebar
+      \ifbeamer@me@showgauge
+        \ifnum\insertframenumber>\insertmainframenumber
+        \else
+          \node [anchor=south~west, color=white, inner~sep=0pt]
+            at ([xshift=3pt,yshift=5pt]current~page.south~west)
+            (gauge) { \myespresso@gauge[\the\beamer@sidebarwidth-6pt] };
         \fi
-      \fi%
-    \else%
-      \node[anchor=north~west,rotate=90,color=white] at (current~page.south~west)%
-      (title) {\scriptsize\insertshorttitle\quad---\quad \insertshortauthor%
-      };%%
-      \ifbeamer@me@nogauge%
-        \ifnum\insertframenumber>\insertmainframenumber % gauge only in main part%
-        \else%
-          \node[anchor=north~east,rotate=90,color=white] at (current~page.north~west)%
-          (gauge) {\myespresso@gauge};%
-        \fi%
-      \fi%
-    \fi%
+      \fi
+      \ifx\logo\empty
+      \else
+        \ifbeamer@me@toplogo
+        \else
+          \node [anchor=south~west, inner~sep=0pt]
+            at ($(current~page.south~west)+(0,0.5)$)
+            (logo) { \insertlogo };
+        \fi
+      \fi
+    \else
+      % Non-sidebar: short title rotated on left bar.
+      % - \tiny font and short-title-only minimize bar usage
+      % - text width caps the rotated extent at \paperheight-60pt
+      %   so the gauge area at the top is never overlapped, even
+      %   for unusually long short titles
+      % - the 60pt reservation = ~40pt for the gauge + 20pt buffer
+      \node [anchor=north~west, rotate=90, color=white,
+             text~width=\dimexpr\paperheight-60pt\relax,
+             align=left]
+        at (current~page.south~west)
+        (title)
+        { \tiny \insertshorttitle };
+      \ifbeamer@me@showgauge
+        \ifnum\insertframenumber>\insertmainframenumber
+        \else
+          \node [anchor=north~east, rotate=90, color=white]
+            at (current~page.north~west)
+            (gauge) { \myespresso@gauge };
+        \fi
+      \fi
+    \fi
   \end{tikzpicture}%
 }%
 \ExplSyntaxOff
 
+% =================================================================
 % Frame title template
+% =================================================================
+
 \ExplSyntaxOn
 \setbeamertemplate{frametitle}{%
   \ifbeamer@me@leftframetitle
     \usebeamerfont{frametitle}\insertframetitle%
-    \vphantom{g}% To avoid fluctuations per frame
+    \vphantom{g}%
     \par%
     \vspace*{-0.3cm}%
-    \hspace*{-\c_myespresso_margin}\rule{0.5\paperwidth}{2pt}%%
+    \hspace*{-\c_myespresso_margin}\rule{0.5\paperwidth}{2pt}%
     \par%
     \vspace*{-0.3cm}%
-    {\ifx\insertframesubtitle\@empty%
-      \else%
-        \usebeamerfont{framesubtitle}\insertframesubtitle%
-      \fi}%
+    {\ifx\insertframesubtitle\@empty\else
+      \usebeamerfont{framesubtitle}\insertframesubtitle%
+    \fi}%
     \par%
   \else
     \raggedleft
     \usebeamerfont{frametitle}\insertframetitle%
-    \vphantom{g}% To avoid fluctuations per frame
-    \par
-    \raggedleft
-    \vspace*{-0.3cm}
-    \rule{0.5\paperwidth}{2pt}\hspace*{-1cm}%%
+    \vphantom{g}%
     \par
     \raggedleft
     \vspace*{-0.3cm}%
-    {\ifx\insertframesubtitle\@empty%
-      \else%
-        \usebeamerfont{framesubtitle}\insertframesubtitle%
-      \fi}%
+    \rule{0.5\paperwidth}{2pt}\hspace*{-1cm}%
+    \par
+    \raggedleft
+    \vspace*{-0.3cm}%
+    {\ifx\insertframesubtitle\@empty\else
+      \usebeamerfont{framesubtitle}\insertframesubtitle%
+    \fi}%
     \par
   \fi
 }
 \ExplSyntaxOff
 
+% =================================================================
 % Navigation symbols and frame numbering
+% =================================================================
+
 \setbeamertemplate{navigation symbols}{}
+
 \newcounter{myespresso@appendixframenumber}
 \newcounter{myespresso@appendixtotalframenumber}
 \newcounter{myespresso@numberofframes}
 \newcounter{myespresso@numberofmainframes}
+
+% Frame counter: arabic for main, roman for appendix
 \addtobeamertemplate{navigation symbols}{}{%
   \hspace{1em}%
-  \setcounter{myespresso@numberofframes}{\inserttotalframenumber}
-  \setcounter{myespresso@numberofmainframes}{\insertmainframenumber}
-  \setcounter{myespresso@appendixtotalframenumber}{\numexpr\value{myespresso@numberofframes}-\value{myespresso@numberofmainframes}}
-  \setcounter{myespresso@appendixframenumber}{\numexpr\value{framenumber}-\value{myespresso@numberofmainframes}}
-  \ifnum\insertframenumber>\insertmainframenumber% appendix
-  \footnotesize\color{black}\roman{myespresso@appendixframenumber}/\roman{myespresso@appendixtotalframenumber}
-  \else % main part
-  \footnotesize\color{black}\insertframenumber/\insertmainframenumber
+  \setcounter{myespresso@numberofframes}{\inserttotalframenumber}%
+  \setcounter{myespresso@numberofmainframes}{\insertmainframenumber}%
+  \setcounter{myespresso@appendixtotalframenumber}{%
+    \numexpr\value{myespresso@numberofframes}-\value{myespresso@numberofmainframes}}%
+  \setcounter{myespresso@appendixframenumber}{%
+    \numexpr\value{framenumber}-\value{myespresso@numberofmainframes}}%
+  \ifnum\insertframenumber>\insertmainframenumber
+    \footnotesize\color{black}%
+    \roman{myespresso@appendixframenumber}/\roman{myespresso@appendixtotalframenumber}%
+  \else
+    \footnotesize\color{black}%
+    \insertframenumber/\insertmainframenumber
   \fi
 }
 

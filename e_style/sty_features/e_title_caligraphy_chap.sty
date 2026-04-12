@@ -1,35 +1,42 @@
+% =================================================================
+% e_title_caligraphy_chap.sty
+% Chapter title style with large calligraphic chapter numbers
+% (Alegreya font, oldstyle figures).
+% =================================================================
+
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{e_title_caligraphy_chap}[Title Caligraphy Chapter Style]
+\ProvidesPackage{e_title_caligraphy_chap}%
+  [2026/04/12 v1.1 Calligraphic chapter titles]
 
-%-----------------------------------------------------------------------
-% Control the appearance of the title in mainmatter
-% \titleformat provided by titlesec package
-\renewcommand{\thepart}{\Roman{part}}
+% Shared \part formatting (Roman numerals, centered, colored)
+\RequirePackage{e_title_part}
 
-\titleformat{\part}%command
-    [display]%shape
-    {\normalfont\centering\large}%format
-    {\thispagestyle{empty}\color{titlecolorchapter}\partname~\MakeUppercase{\thepart}}%label
-    {1em}%sep
-    {\color{titlecolorchapter}\MakeUppercase}%beforcode
-    []
-% Chapter number on inside
-    % Chapter font
-    \newfontfamily\alegchapter{Alegreya}[
+% =================================================================
+% Calligraphic chapter number font
+% =================================================================
+
+\newfontfamily\alegchapter{Alegreya}[
     Numbers=OldStyle,
-    UprightFont=*-Regular,  % Ensure regular weight
+    UprightFont=*-Regular,
     BoldFont=*-Bold,
     ItalicFont=*-Italic,
     BoldItalicFont=*-BoldItalic,
 ]
+
 \newcommand{\chapterNumber}{%
     \alegchapter\mdseries\upshape\fontsize{108pt}{120pt}\selectfont
 }
-\titleformat{\chapter}[display]%{<commmand>}[<shape>]
-    {\normalfont} %<format>
-    {\vspace*{-3\baselineskip}\makebox[\linewidth][r]{\color{titlecolorchapter}\chapterNumber\thechapter}}{15pt}%{<label>}{<sep>}
-    {\raggedright\bfseries\large\MakeUppercase} %{<beforcode>}
-    [\normalsize\vspace*{.8\baselineskip}\titlerule] %[<aftercode>]
 
+% =================================================================
+% Chapter title format
+% =================================================================
+
+\titleformat{\chapter}[display]
+    {\normalfont}
+    {\vspace*{-3\baselineskip}%
+     \makebox[\linewidth][r]{\color{titlecolorchapter}\chapterNumber\thechapter}}%
+    {15pt}
+    {\raggedright\bfseries\large\MakeUppercase}
+    [\normalsize\vspace*{.8\baselineskip}\titlerule]
 
 \endinput

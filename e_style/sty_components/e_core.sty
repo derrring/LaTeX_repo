@@ -13,9 +13,10 @@
 %\cancel{} can be used in
 % formulae!\bcancel{}\xcancle{}\cancelto{<value>}{<expression>}
 % --- Font/Encoding Configuration ---
-% All font configuration (text, math, CJK) is centralized in c111_fonts.tex
-% fourier-orns removed: \caution, \warning, \noway now provided via TikZ
-% in c150_commands.tex (no external font dependency).
+% All font configuration (text, math, CJK) is centralized in c111_fonts.tex.
+% fourier-orns removed entirely; use \dmark (manfnt-based) for Bourbaki-style
+% danger marks. Defined in c150_commands.tex with no external font dependency
+% beyond manfnt (shipped with every TeX Live distribution).
 
 % --- Layout Settings ---
 \RequirePackage{graphicx}
@@ -57,9 +58,33 @@
 % Graphics (graphicx already loaded above in layout section)
 \RequirePackage{rotating}
 \RequirePackage{tikz,pgf}
+\usetikzlibrary{cd}
+% --- Diagram style conventions (Oceanic palette) ---
+\tikzset{
+    % Axes
+    diagaxis/.style={->, oceanicSlate1, thin},
+    diaggrid/.style={oceanicFoam1, very thin},
+    % Curve palette (Tier 2 for lines, distinguishable)
+    curveA/.style={oceanicAbyss2, thick},
+    curveB/.style={oceanicCrimson2, thick},
+    curveC/.style={oceanicSage2, thick},
+    curveD/.style={oceanicAmber2, thick},
+    curveE/.style={oceanicViolet2, thick},
+    % Fill palette (Tier 3, semi-transparent)
+    fillA/.style={fill=oceanicAbyss3, fill opacity=0.25},
+    fillB/.style={fill=oceanicCrimson3, fill opacity=0.25},
+    fillC/.style={fill=oceanicSage3, fill opacity=0.25},
+    fillD/.style={fill=oceanicAmber3, fill opacity=0.25},
+    fillE/.style={fill=oceanicViolet3, fill opacity=0.25},
+    % Markers
+    diagdot/.style={oceanicInk1, fill=oceanicInk1},
+    diagcross/.style={cross out, draw=oceanicInk1, thick, inner sep=2pt},
+}
 
 % Big delimiters for matrices and other structures
 \RequirePackage{bigdelim}
+% Margin notes that work inside boxes, tcolorbox, minipages
+\RequirePackage{marginnote}
 % --- 2. Input SAFE Style Components ---
 % These files contain custom commands, colors, and math settings.
 \input{sty_components/c111_fonts.tex}          % Font settings

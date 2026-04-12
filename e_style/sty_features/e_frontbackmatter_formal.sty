@@ -1,143 +1,284 @@
+% =================================================================
+% e_frontbackmatter_formal.sty
+% Formal front and back matter for book-based document classes.
+%
+% AMS-compatible metadata API:
+%   \author{Name}          -- one call per author (sequential)
+%   \email{addr}           -- attaches to most recent \author
+%   \address{affiliation}  -- attaches to most recent \author
+%   \title{...}            -- standard LaTeX
+%   \subtitle{...}         -- extension: rendered below title
+%   \institution{...}      -- extension: document-level institution
+%   \location{...}         -- extension: city/venue for course notes
+%   \date{...}             -- standard LaTeX
+%   \dedicatory{...}       -- AMS-compatible dedication
+%   \keywords{...}         -- AMS-compatible keyword list
+%   \subjclass[year]{...}  -- AMS-compatible MSC classification
+%   \setabstract{...}      -- deferred abstract (book-class pattern)
+%   \setacknowledgements{...}
+%
+% Output commands (called in document body):
+%   \makefrontmatter       -- title page
+%   \makededication        -- dedication page (if set)
+%   \makeabstract          -- abstract page (if set)
+%   \makeacknowledgements  -- acknowledgements page (if set)
+%   \makebackmatter        -- back cover with copyright
+% =================================================================
+
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{e_frontbackmatter_formal}[Formal Front Back Matter]
-
-
-
-\makeatletter
-
-% --- Correctly Scoped Multi-Author System using expl3 ---
+\ProvidesPackage{e_frontbackmatter_formal}%
+  [2026/04/11 Formal front/back matter (AMS-compatible API)]
 
 \ExplSyntaxOn
 
-% 1. Define sequences to hold the author names and emails.
-\seq_new:N \g_efrontmatter_authors_seq
-\seq_new:N \g_efrontmatter_emails_seq
+% =================================================================
+% 1. Data storage
+% =================================================================
 
-% 2. Define \clearauthors to reset the lists.
+% Three parallel sequences: one entry per \author call.
+% \email and \address overwrite the slot for the current author.
+\seq_new:N \g__efm_authors_seq
+\seq_new:N \g__efm_emails_seq
+\seq_new:N \g__efm_addresses_seq
 
+% Index of the current (most recent) author
+\int_new:N \g__efm_author_count_int
 
-\AtEndDocument{
-    \seq_gclear:N \g_efrontmatter_authors_seq
-    \seq_gclear:N \g_efrontmatter_emails_seq
-}
-
-% 3. Define \addauthor to add an author and optional email to the lists.
-\NewDocumentCommand{\addauthor}{ o m }
-    {
-        \seq_gput_right:Nn \g_efrontmatter_authors_seq { #2 }
-        \IfNoValueTF { #1 }
-        { \seq_gput_right:Nn \g_efrontmatter_emails_seq {} }
-        { \seq_gput_right:Nn \g_efrontmatter_emails_seq { #1 } }
-    }
-
-% 4. Standard metadata commands
-\providecommand{\subtitle}[1]{\def\@subtitle{#1}}
-\providecommand{\location}[1]{\def\@location{#1}}
-\providecommand{\institution}[1]{\def\@institution{#1}}
-\subtitle{}
-\location{}
-\institution{}
-
-\providecommand{\setacknowledgements}[1]{\def\@myacknowledgements{#1}}
-\providecommand{\setabstract}[1]{\def\@myabstract{#1}}
-\providecommand{\setdedication}[1]{\def\@mydedication{#1}}
-\setacknowledgements{}
-\setabstract{}
-\setdedication{}
+% Scalar metadata fields
+\tl_new:N \g__efm_subtitle_tl
+\tl_new:N \g__efm_institution_tl
+\tl_new:N \g__efm_location_tl
+\tl_new:N \g__efm_keywords_tl
+\tl_new:N \g__efm_subjclass_tl
+\tl_new:N \g__efm_subjclass_year_tl
+\tl_new:N \g__efm_dedication_tl
+\tl_new:N \g__efm_abstract_tl
+\tl_new:N \g__efm_acknowledgements_tl
 
 
-% 5. The \makefrontmatter command.
-% The entire definition is wrapped in ExplSyntaxOn because it *uses* expl3 commands.
-\providecommand{\makefrontmatter}{%
+% =================================================================
+% 2. Author commands (AMS sequential pattern)
+% =================================================================
+
+% \author{Name} -- push a new author; reset email/address slots.
+\RenewDocumentCommand { \author } { m }
+  {
+    \seq_gput_right:Nn \g__efm_authors_seq   { #1 }
+    \seq_gput_right:Nn \g__efm_emails_seq    { }
+    \seq_gput_right:Nn \g__efm_addresses_seq { }
+    \int_gincr:N \g__efm_author_count_int
+  }
+
+% \email{addr} -- attach to the current author.
+\NewDocumentCommand { \email } { m }
+  {
+    \int_compare:nNnT { \g__efm_author_count_int } > { 0 }
+      {
+        \seq_gset_item:Nnn \g__efm_emails_seq
+          { \g__efm_author_count_int } { #1 }
+      }
+  }
+
+% \address{affiliation} -- attach to the current author.
+% Distinct from the document-level \institution.
+\NewDocumentCommand { \address } { m }
+  {
+    \int_compare:nNnT { \g__efm_author_count_int } > { 0 }
+      {
+        \seq_gset_item:Nnn \g__efm_addresses_seq
+          { \g__efm_author_count_int } { #1 }
+      }
+  }
+
+
+% =================================================================
+% 3. Document-level metadata commands
+% =================================================================
+
+\NewDocumentCommand { \subtitle } { m }
+  { \tl_gset:Nn \g__efm_subtitle_tl { #1 } }
+
+\NewDocumentCommand { \institution } { m }
+  { \tl_gset:Nn \g__efm_institution_tl { #1 } }
+
+\NewDocumentCommand { \location } { m }
+  { \tl_gset:Nn \g__efm_location_tl { #1 } }
+
+\NewDocumentCommand { \keywords } { m }
+  { \tl_gset:Nn \g__efm_keywords_tl { #1 } }
+
+% \subjclass[2020]{35Q89, 49N80}
+\NewDocumentCommand { \subjclass } { O{2020} m }
+  {
+    \tl_gset:Nn \g__efm_subjclass_year_tl { #1 }
+    \tl_gset:Nn \g__efm_subjclass_tl { #2 }
+  }
+
+\NewDocumentCommand { \dedicatory } { +m }
+  { \tl_gset:Nn \g__efm_dedication_tl { #1 } }
+
+\NewDocumentCommand { \setabstract } { +m }
+  { \tl_gset:Nn \g__efm_abstract_tl { #1 } }
+
+\NewDocumentCommand { \setacknowledgements } { +m }
+  { \tl_gset:Nn \g__efm_acknowledgements_tl { #1 } }
+
+
+% =================================================================
+% 4. Output: title page
+% =================================================================
+
+\NewDocumentCommand { \makefrontmatter } { }
+  {
     \begin{titlepage}
-        \thispagestyle{empty}
-        \mbox{}\vfill
-        \begin{center}
-            \large
-            % The \ifstrempty command from etoolbox is safe to use here.
-            \ifstrempty{\@institution}{ }{%
-                \begingroup
-                    \begin{tabular}{c} \@institution \end{tabular}
-                \endgroup\par \vfill
-            }
-            \begingroup
-                {\LARGE \@title}\par
-            \endgroup
-            \ifstrempty{\@subtitle}{}{%
-                \vspace{1em}\MakeUppercase{\normalsize \@subtitle}
-            }
-            \vfill
-            \begingroup
-                \normalsize
-                % Loop through the author list
-                \seq_map_indexed_inline:Nn \g_efrontmatter_authors_seq
-                {
-                ##2 % Print author name
-                \tl_if_blank:nTF { \seq_item:Nn \g_efrontmatter_emails_seq {##1} }{
-                    % If no email, just print the name
-                    }
-                    { \textsuperscript{##1} } % Print superscript mark
-                \par\vspace{0.5em}
-                }
-            \endgroup
-            \vfill
-            \ifstrempty{\@location}{}{%
-            \@location\par
-            \vspace{0.5em}%
-            }
-            \@date%
-        \end{center}
+      \thispagestyle{empty}
+      \mbox{} \vfill
+      \begin{center}
+        \large
+
+        % -- Institution (document-level) --
+        \tl_if_blank:VF \g__efm_institution_tl
+          {
+            \begin{tabular}{c}
+              \tl_use:N \g__efm_institution_tl
+            \end{tabular}
+            \par \vfill
+          }
+
+        % -- Title --
+        { \LARGE \@title } \par
+
+        % -- Subtitle --
+        \tl_if_blank:VF \g__efm_subtitle_tl
+          {
+            \vspace{1em}
+            \MakeUppercase { \normalsize \tl_use:N \g__efm_subtitle_tl }
+          }
+
         \vfill
-        \par
-        \noindent
-        \begin{minipage}{\textwidth}
-            % if authors provided emails, add a rule
-            \ifnum \seq_count:N \g_efrontmatter_emails_seq > 0
-            \rule{0.35\textwidth}{0.45pt}\par
-            \fi
-            % Loop through the email list for the footnote text
-            \seq_map_indexed_inline:Nn \g_efrontmatter_emails_seq
-              {            
-                \tl_if_blank:nF {##2}
-                  {
-                    \textsuperscript{##1} \texttt{##2} \par
-                  }
+
+        % -- Authors --
+        % Each author is printed with optional superscript (if email
+        % exists) and optional address line below in smaller type.
+        \normalsize
+        \seq_map_indexed_inline:Nn \g__efm_authors_seq
+          {
+            ##2                                         % name
+            \tl_set:Nx \l_tmpa_tl
+              { \seq_item:Nn \g__efm_emails_seq { ##1 } }
+            \tl_if_blank:VF \l_tmpa_tl
+              { \textsuperscript { ##1 } }
+            % Per-author address (if provided)
+            \tl_set:Nx \l_tmpb_tl
+              { \seq_item:Nn \g__efm_addresses_seq { ##1 } }
+            \tl_if_blank:VF \l_tmpb_tl
+              { \par {\small \l_tmpb_tl} }
+            \par \vspace{0.5em}
+          }
+
+        \vfill
+
+        % -- Location and date --
+        \tl_if_blank:VF \g__efm_location_tl
+          { \tl_use:N \g__efm_location_tl \par \vspace{0.5em} }
+        \@date
+
+      \end{center}
+      \vfill
+
+      % -- Footer: emails, classification, keywords --
+      \par \noindent
+      \begin{minipage}{\textwidth}
+
+        % Email directory (only if at least one email is non-blank)
+        \bool_set_false:N \l_tmpa_bool
+        \seq_map_inline:Nn \g__efm_emails_seq
+          { \tl_if_blank:nF { ##1 } { \bool_set_true:N \l_tmpa_bool } }
+        \bool_if:NT \l_tmpa_bool
+          {
+            \rule{0.35\textwidth}{0.45pt} \par
+            \seq_map_indexed_inline:Nn \g__efm_emails_seq
+              {
+                \tl_if_blank:nF { ##2 }
+                  { \textsuperscript { ##1 } \texttt { ##2 } \par }
               }
-        \end{minipage}%
+          }
+
+        % Subject classification
+        \tl_if_blank:VF \g__efm_subjclass_tl
+          {
+            \vspace{0.5em}
+            \textit
+              {
+                \tl_use:N \g__efm_subjclass_year_tl
+                \ Mathematics~Subject~Classification.
+              } ~
+            \tl_use:N \g__efm_subjclass_tl \par
+          }
+
+        % Keywords
+        \tl_if_blank:VF \g__efm_keywords_tl
+          {
+            \vspace{0.3em}
+            \textit { Key~words~and~phrases. } ~
+            \tl_use:N \g__efm_keywords_tl \par
+          }
+
+      \end{minipage}
     \end{titlepage}
-}
+  }
 
 
-% Other commands
-\providecommand{\makededication}{%
-    \ifstrempty{\@mydedication}{}{%
-        \clearpage\thispagestyle{empty}\vspace*{3cm}
-        \@mydedication \cleardoublepage
-    }%
-}
-\providecommand{\makeacknowledgements}{%
-    \ifstrempty{\@myacknowledgements}{}{%
-        \chapter*{Acknowledgements} \@myacknowledgements \cleardoublepage
-    }%
-}
-\providecommand{\makeabstract}{%
-    \ifstrempty{\@myabstract}{}{%
-        \chapter*{Abstract} \@myabstract \cleardoublepage
-    }%
-}
-\providecommand{\makebackmatter}{%
+% =================================================================
+% 5. Output: optional front matter pages
+% =================================================================
+
+\NewDocumentCommand { \makededication } { }
+  {
+    \tl_if_blank:VF \g__efm_dedication_tl
+      {
+        \clearpage \thispagestyle{empty}
+        \vspace*{3cm}
+        \tl_use:N \g__efm_dedication_tl
+        \cleardoublepage
+      }
+  }
+
+\NewDocumentCommand { \makeacknowledgements } { }
+  {
+    \tl_if_blank:VF \g__efm_acknowledgements_tl
+      {
+        \chapter*{Acknowledgements}
+        \tl_use:N \g__efm_acknowledgements_tl
+        \cleardoublepage
+      }
+  }
+
+\NewDocumentCommand { \makeabstract } { }
+  {
+    \tl_if_blank:VF \g__efm_abstract_tl
+      {
+        \chapter*{Abstract}
+        \tl_use:N \g__efm_abstract_tl
+        \cleardoublepage
+      }
+  }
+
+
+% =================================================================
+% 6. Output: back cover
+% =================================================================
+
+\NewDocumentCommand { \makebackmatter } { }
+  {
     \thispagestyle{empty}
     \vfill
     \noindent
-    % Use \seq_use to print the author list with a comma separator
-    \seq_use:Nn \g_efrontmatter_authors_seq { ,~ }
-    : \textit{\@title,} \textcopyright\ \@date
+    \seq_use:Nn \g__efm_authors_seq { ,~ }
+    :~ \textit { \@title, } ~ \textcopyright\ \@date
     \cleardoublepage
-}
+  }
 
-% Turn off expl3 syntax
 \ExplSyntaxOff
 
-% Revert @ to its normal behavior
-\makeatother
 \endinput

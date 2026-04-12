@@ -1,30 +1,32 @@
+% =================================================================
+% e_title_fenced_chap.sty
+% Chapter title style with horizontal fenced rules above and below.
+% =================================================================
+
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{e_title_fenced_chap}[Title Fenced Chapter Style]
+\ProvidesPackage{e_title_fenced_chap}%
+  [2026/04/12 v1.1 Fenced chapter titles]
 
+% Shared \part formatting (Roman numerals, centered, colored)
+\RequirePackage{e_title_part}
 
-\renewcommand{\thepart}{\Roman{part}}
-
-\titleformat{\part}%command
-    [display]%shape
-    {\normalfont\centering\large}%format
-    {\thispagestyle{empty}\color{titlecolorchapter}\partname~\MakeUppercase{\thepart}}%label
-    {1em}%sep
-    {\color{titlecolorchapter}\MakeUppercase}%beforcode
-    []
-
+% =================================================================
+% Chapter title (numbered)
+% =================================================================
 
 \titleformat{\chapter}[block]
   {\normalfont\bfseries\large}
   {}{0pt}
   {\rule{\textwidth}{1.5pt}\\[1ex]\thechapter\quad\MakeUppercase}
-  [\rule{\textwidth}{1.5pt}]   
+  [\rule{\textwidth}{1.5pt}]
 
+% Chapter title (unnumbered, starred)
+\titleformat{name=\chapter,numberless}[block]
+  {\normalfont\bfseries\large}
+  {}{0pt}
+  {\rule{\textwidth}{1.5pt}\\[1ex]\MakeUppercase}
+  [\rule{\textwidth}{1.5pt}]
 
-\titleformat{name=\chapter,numberless}[block] %for unnumbered(starred*) sections
-{\normalfont\bfseries\large}
-{}{0pt}
-{\rule{\textwidth}{1.5pt}\\[1ex]\MakeUppercase}
-[\rule{\textwidth}{1.5pt}]
+\titlespacing*{\chapter}{0pt}{0pt}{20pt} % left, before, after
 
-\titlespacing*{\chapter}{0pt}{0pt}{20pt} % Left, before, after spacing
 \endinput

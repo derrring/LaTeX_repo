@@ -1,15 +1,17 @@
-% MyEspresso Font Theme
-% Based on Amurmaple theme by Maxime CHUPIN
+% =================================================================
+% beamerfontthemeMyEspresso.sty
+% Font configuration for the MyEspresso Beamer theme.
+% =================================================================
 
-\NeedsTeXFormat{LaTeX2e}[2021-11-15]
-\ProvidesPackage{beamerfontthemeMyEspresso}[2024/02/07 v.1.3 MyEspresso Font Theme for Beamer]
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{beamerfontthemeMyEspresso}%
+  [2026/04/11 v2.0 MyEspresso Font Theme for Beamer]
 
 \mode<presentation>
 
-% Use professional fonts
 \usefonttheme{professionalfonts}
 
-% Font settings for various elements
+% Element fonts
 \setbeamerfont{block title}{size=\bfseries}
 \setbeamerfont{author}{size=\bfseries\large}
 \setbeamerfont{institute}{size=\normalsize\itshape}
@@ -17,18 +19,15 @@
 \setbeamerfont{date}{size=\footnotesize}
 \setbeamerfont{subtitle}{size=\Large\normalfont\slshape}
 \setbeamerfont{mail}{size=\small\ttfamily}
-
-% Frame title font
 \setbeamerfont{frametitle}{size=\bfseries\Large}
 
-% Sidebar fonts (if sidebar is enabled)
+% Sidebar fonts (conditional)
 \ifbeamer@me@sidebar
-    \setbeamerfont{section in sidebar}{size=\fontsize{5}{6}\selectfont}
-    \setbeamerfont{subsection in sidebar}{size=\fontsize{4}{5}\selectfont}
-    \setbeamerfont{title in sidebar}{size=\scriptsize}
-    \setbeamerfont{author in sidebar}{size=\tiny}
+  \setbeamerfont{section in sidebar}{size=\fontsize{5}{6}\selectfont}
+  \setbeamerfont{subsection in sidebar}{size=\fontsize{4}{5}\selectfont}
+  \setbeamerfont{title in sidebar}{size=\scriptsize}
+  \setbeamerfont{author in sidebar}{size=\tiny}
 \fi
-
 
 \mode<all>
 \endinput

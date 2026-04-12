@@ -1,15 +1,21 @@
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{e_math_env_deco}[E Math Environment Decoration]
-%----------  wrap/decorate !EXISTED! theorem-like environments ----------------
-%------------------------realized by tcolorbox-------------------------
+\ProvidesPackage{e_math_env_deco}[2026/04/12 v1.1 Math environment decoration]
+% =================================================================
+% Wrap existing theorem-like environments in tcolorbox.
 %
 % proof and remark are intentionally left UNDECORATED:
 %   - Semantically discursive (not statements to reference)
 %   - Readers identify proofs by "Proof." heading and QED symbol
 %   - Avoids tcolorbox minipage boxing, so \footnote works natively
-%   - Consistent with standard mathematical typesetting (Rudin, Serre, Bourbaki)
+%   - Consistent with standard typesetting (Rudin, Serre, Bourbaki)
+%
+% \ifintcbenv is declared in c150_commands.tex (so \dmark works
+% even when this package is not loaded). We set it true inside
+% each tcolorbox hook below.
+% =================================================================
 
 \tcolorboxenvironment{definition}{
+    before upper=\intcbenvtrue,
     enhanced,breakable,
     frame hidden,
     colback=mydefinitioncolor!5!white,
@@ -17,6 +23,7 @@
     before skip=.5em,after skip=7pt,width=\linewidth,
 }
 \tcolorboxenvironment{theorem}{
+    before upper=\intcbenvtrue,
     enhanced,breakable,
     frame hidden,
     colback=mytheoremcolor!5!white,
@@ -25,6 +32,7 @@
 }
 
 \tcolorboxenvironment{proposition}{
+    before upper=\intcbenvtrue,
     enhanced,breakable,
     frame hidden,
     colback=mypropositioncolor!5!white,
@@ -33,6 +41,7 @@
 }
 
 \tcolorboxenvironment{corollary}{
+    before upper=\intcbenvtrue,
     enhanced,breakable,
     frame hidden,
     colback=mycorollarycolor!5!white,
@@ -40,6 +49,7 @@
     before skip=.5em,after skip=7pt,
 }
 \tcolorboxenvironment{lemma}{
+    before upper=\intcbenvtrue,
     enhanced,breakable,
     frame hidden,
     colback=mylemmacolor!5!white,

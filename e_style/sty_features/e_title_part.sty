@@ -1,0 +1,34 @@
+% =================================================================
+% e_title_part.sty
+% Shared \part formatting used by both fenced and calligraphy
+% chapter title packages. Roman numerals, centered, uppercase,
+% colored with titlecolorchapter.
+%
+% Loaded internally by:
+%   - e_title_fenced_chap.sty
+%   - e_title_caligraphy_chap.sty
+% Should not normally be loaded directly by users.
+% =================================================================
+
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{e_title_part}%
+  [2026/04/12 v1.0 Shared part formatting for chapter title packages]
+
+% titlesec is a hard requirement (provides \titleformat).
+% Already loaded transitively via e_standard_doc, but declare explicitly
+% so that loading order is unambiguous.
+\RequirePackage{titlesec}
+
+% Roman numeral part numbering
+\renewcommand{\thepart}{\Roman{part}}
+
+\titleformat{\part}%       command
+    [display]%             shape
+    {\normalfont\centering\large}%                                    format
+    {\thispagestyle{empty}\color{titlecolorchapter}%
+     \partname~\MakeUppercase{\thepart}}%                             label
+    {1em}%                 sep
+    {\color{titlecolorchapter}\MakeUppercase}%                        before-code
+    []
+
+\endinput
