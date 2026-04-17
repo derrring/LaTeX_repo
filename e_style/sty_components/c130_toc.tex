@@ -8,22 +8,16 @@
 % logic to choose the right title style.
 \newcommand{\printtoctitle}[1]{%
     \ifcsdef{chapter}{%
-        % In a book-style class, mimic the chapter title format
         \par\noindent
         \begingroup
         \normalfont\bfseries\large
-        %\rule{\columnwidth}{1.5pt}
-        \newline
-        %\vspace{1ex}
-        \MakeUppercase{#1} \par
+        \MakeUppercase{#1}\par
         \vspace*{.2\baselineskip}
         \noindent\rule{\columnwidth}{0.5pt}
         \endgroup
         \par\nobreak
-        \vspace{2em} % Space after the title
-
+        \vspace{2em}
     }{%
-        % In an article-style class, just use a simple \section*
         \section*{#1}
     }
 }
@@ -49,7 +43,7 @@
         \begin{multicols}{2}
             \printtoctitle{Brief Contents}
             \addcontentsline{toc}{chapter}{Brief Contents}
-            \tableofcontents
+            \e@orig@tableofcontents
         \end{multicols}
     }
     {
@@ -57,7 +51,7 @@
         \begin{multicols}{2}
             \printtoctitle{Brief Contents}
             \addcontentsline{toc}{section}{Brief Contents}
-            \tableofcontents
+            \e@orig@tableofcontents
         \end{multicols}
     }
 
@@ -83,40 +77,48 @@
         \addcontentsline{toc}{section}{Detailed Contents}
 
     }
-    \tableofcontents
+    \e@orig@tableofcontents
     \endgroup
 }
 
-% --- Command for the main ToC ---
-\newcommand{\mytoc}{%
+% --- Main ToC ---
+% Override \tableofcontents so it always prints a proper heading.
+% \mytoc is kept as an alias for backward compatibility.
+\let\e@orig@tableofcontents\tableofcontents
+\renewcommand{\tableofcontents}{%
     \begingroup
-    \etocsettocstyle{\renewcommand{\contentsname}{Contents}}{}
-    \phantomsection  % Create anchor here
+    \etocsettocstyle{\renewcommand{\contentsname}{Contents}}{}%
     \setcounter{tocdepth}{2}
-    \printtoctitle{\contentsname}
-    \ifcsdef{chapter}{
-        \addcontentsline{toc}{chapter}{\contentsname}  % Add this line for book class
-    }{
-        \addcontentsline{toc}{section}{\contentsname}  % Add this line for article class
-    }
-    \tableofcontents
+    \ifcsdef{chapter}{%
+        \chapter*{\contentsname}%
+        \addcontentsline{toc}{chapter}{\contentsname}%
+    }{%
+        \section*{\contentsname}%
+        \addcontentsline{toc}{section}{\contentsname}%
+    }%
+    \e@orig@tableofcontents
     \endgroup
     \clearpage
 }
+\let\mytoc\tableofcontents
 
 % --- Command to set up a local ToC (e.g., at the start of a chapter) ---
 
+% Local (chapter-level) TOC: call \setuplocaltoc then \localtableofcontents.
+% \localtableofcontents is etoc-native, unaffected by our \tableofcontents override.
 \newcommand{\setuplocaltoc}{%
-    \etocsettocstyle{
-        \setcounter{tocdepth}{3}
+    \etocsettocstyle{%
+        \setcounter{tocdepth}{3}%
         \par\noindent
-        \rule{\linewidth}{1pt}
-        \vskip0.5\baselineskip\parindent0em % indentation for all subsequent paragraphs in the group
-    } %Code Before
-    {\rule{\linewidth}{1pt}\vspace{0.5\baselineskip}} %Code After
+        \rule{\linewidth}{1pt}%
+        \vskip0.5\baselineskip\parindent0em
+    }{\rule{\linewidth}{1pt}\vspace{0.5\baselineskip}}%
 }
 
-\setuplocaltoc
+% NOTE: \setuplocaltoc must NOT be called here at load time.
+% It sets a global etocsettocstyle that suppresses the TOC title,
+% which breaks \tableofcontents and \mytoc if called before them.
+% Users should call \setuplocaltoc inside each chapter that needs a local TOC.
 %-----------------------------------------------------------------------
 %\etoctocstyle[⟨kind⟩]{⟨number_of_columns⟩}{⟨title⟩}
 

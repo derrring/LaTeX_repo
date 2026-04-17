@@ -13,17 +13,17 @@
 % where commands with "@" are defined and used.
 \makeatletter
 
-% CJK switch - must be defined BEFORE loading packages
-\newif\ifcjk
-\cjkfalse % Default to CJK support DISABLED
-
 % 12pt switch
 \newif\if@e@twelvept
 \@e@twelveptfalse
 
-% Declare CJK options
-\DeclareOption{cjk}{\cjktrue}
-\DeclareOption{nocjk}{\cjkfalse}
+% Legacy CJK options are accepted but no-op in 2026 refactor.
+\DeclareOption{cjk}{\ClassWarning{e_class_noteShort}{%
+    The [cjk] option is deprecated.\MessageBreak
+    Use \string\usepackage{c113_cjk_engine} in the document preamble%
+    \MessageBreak for full CJK layout, or \string\usepackage{c112_langfamily}%
+    \MessageBreak for lightweight per-script glyph rendering}}
+\DeclareOption{nocjk}{}
 
 % When the '12pt' option is found, pass it to the base class
 \DeclareOption{12pt}{

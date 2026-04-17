@@ -1,0 +1,47 @@
+% ===================================================================
+% c112_langfamily.sty — per-script font families honoured by luatexja
+%
+% Provides \newlangfamily for declaring inline font switches tied to
+% a tag (e.g., zh, ja, ar, he). Each call creates:
+%
+%     \<tag>font  -- NFSS font family switch (grouped scope)
+%     \<tag>{x}   -- typeset x in the tag font, grouped
+%
+% Implementation note: this package uses \newjfontfamily from
+% luatexja-fontspec, NOT plain \newfontfamily. The reason is that
+% luatexja's jachar reroute happens inside its pre_linebreak_filter
+% and overrides any font selected via plain \newfontfamily for
+% codepoints in jachar ranges (CJK Unified Ideographs etc.). Only
+% font families declared via \newjfontfamily are honoured by the
+% reroute. This package is therefore CJK-aware by construction;
+% tags like \zh and \ja do what their name suggests.
+%
+% Typical usage in a document preamble:
+%
+%     \usepackage{c112_langfamily}
+%     \newlangfamily{zh}{Source Han Serif SC}
+%     % \ja is unnecessary unless overriding the class default
+%     % (which is HaranoAjiMincho via \setmainjfont in c111_fonts).
+%
+% Note on fallback: fontspec/luatexja-fontspec has no true coverage
+% fallback (AltFont is range-override, not "use only if missing").
+% In practice Source Han Serif SC and Harano Aji Mincho both cover
+% CJK Unified + extensions A-F, so .notdef glyphs in body text do
+% not occur. Rare extension-G/H ideographs fall through to luatexja's
+% \setmainjfont default (Harano Aji), which is the implicit safety net.
+%
+% CJK line-breaking and the jachar default font are configured in
+% c111_fonts.tex (luatexja[pass] + luatexja-fontspec + \setmainjfont).
+% For full Japanese layout (ruby, kenten emphasis) use c113_cjk_engine.
+% ===================================================================
+
+\ProvidesPackage{c112_langfamily}[2026/04/14 Per-script font families honoured by luatexja]
+\RequirePackage{luatexja-fontspec}
+
+% \newlangfamily{tag}{font name}
+\newcommand{\newlangfamily}[2]{%
+    \expandafter\newjfontfamily\csname #1font\endcsname{#2}%
+    \expandafter\def\csname #1\endcsname##1{{\csname #1font\endcsname ##1}}%
+}
+
+\endinput

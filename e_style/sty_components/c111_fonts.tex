@@ -1,96 +1,223 @@
 % ===================================================================
-% c111_fonts.tex -- Final Corrected Logic
+% c111_fonts.tex — fonts and language support
+%
+% Scope:
+%   - Latin body and sans (Noto Serif / Noto Sans)
+%   - Cyrillic and Greek via Noto Serif's native coverage
+%   - CJK via Source Han Serif / Sans (glyph-identical to Noto CJK)
+%   - luatexja in pass mode + jacharrange fix for non-CJK ranges
+%   - Polyglossia language registration (en, de, fr, ru, el)
+%   - \zh, \ja, \zhsans, \jasans semantic wrappers
+%   - Reverse-patch of luatexja's \em hook so CJK \emph falls back
+%     to upright song rather than the luatexja-default gothic switch
+%
+% Out of scope (handled elsewhere):
+%   - Math fonts: set at the bottom of this file, audited separately
+%   - Additional non-European scripts (Arabic, Hebrew, Devanagari, ...):
+%     opt-in via c112_langfamily in the document preamble
+%   - Heavyweight Japanese layout features (ruby, kenten emphasis):
+%     opt-in via c113_cjk_engine in the document preamble
 % ===================================================================
 
-% 1. CLASS OPTION SWITCHES (may be pre-defined by class)
-% -------------------------------------------------------------------
-% Only define if not already defined by the document class
-% Using LaTeX's \@ifundefined to safely check for conditional
+% --- 12pt switch (for heading size adjustments later in this file) ---
 \makeatletter
-% CJK switch
-\@ifundefined{ifcjk}{
-    \newif\ifcjk
-    \cjkfalse % Default to CJK support DISABLED
-}{}
-% 12pt switch (for section heading size adjustments)
 \@ifundefined{if@e@twelvept}{
     \newif\if@e@twelvept
-    \@e@twelveptfalse % Default to standard sizes
+    \@e@twelveptfalse
 }{}
 \makeatother
-% Note: Options are processed by the document class, not here
 
-% 2. LOAD FONT PACKAGES
-% -------------------------------------------------------------------
+% --- Load font packages ---
 \RequirePackage{fontspec}
-\RequirePackage{noto}
-\RequirePackage{sourcecodepro}
 \RequirePackage{microtype}
 \RequirePackage{silence}
 \RequirePackage[warnings-off={mathtools-colon,mathtools-overbracket}]{unicode-math}
-% Note: Math fonts (STIX Two, New Computer Modern, XITS, IBM Plex) are
-% loaded directly via \setmathfont in section 5. Font files are provided
-% by TeX Live packages: stix2, newcomputermodern, xits, plex-otf.
-% 3. CONDITIONAL LOADING OF LANGUAGE & DEPENDENT PACKAGES
-% -------------------------------------------------------------------
-\ifcjk
-% --- CJK MODE ---
+
+% --- luatexja in pass mode ---
+% [pass] is a historical misnomer in our configuration: we DO set up
+% Japanese default fonts (below) and we DO fight with luatexja's \em
+% hook (also below). The [pass] option still suppresses the automatic
+% loading of luatexja-ruby and a few other heavyweight Japanese-layout
+% features we don't need. luatexja's pre_linebreak_filter still runs
+% and is what gives us correct CJK line-breaking.
+%
+% For Latin-only documents the luatexja loading is a near no-op: no
+% CJK glyphs means jachar reroute never fires, and the only cost is
+% the package load time.
 \WarningFilter{luatexja}{LuaTeX-ja's patch against the microtype package}
-
-% 1. Load luatexja for Japanese support.
 \RequirePackage[pass]{luatexja}
-\RequirePackage{luatexja-fontspec, luatexja-ruby}
 
-% 2. Load csquotes immediately after. It will now correctly detect the language.
-\RequirePackage{csquotes}
+% luatexja's default jacharrange marks several non-CJK ranges as *jachar*,
+% which forces those codepoints through the Japanese font (Harano Aji Mincho
+% by default) regardless of the fontspec selection. For a Latin-primary
+% multilingual document we flip the offending ranges to alchar so the main
+% Latin font handles them:
+%
+%   Range 2  "370-"4FF, "1F00-"1FFF
+%            Greek, Cyrillic, Greek Extended. Needed for Russian quotations
+%            and Greek letters in body text.
+%   Range 3  "2070-"243F, "2500-"27BF, "2900-"29FF, "2B00-"2BFF
+%            Super/subscripts, letterlike symbols (ℝ ℂ ℤ ℕ), arrows, math
+%            operators, dingbats. Needed for blackboard letters in text
+%            mode and miscellaneous arrows.
+%   Range 9  Curated list of "2002-"2051 punctuation
+%            En/em dash (— –), LaTeX quote pairs (‘ ’ “ ”), dagger (†),
+%            double dagger (‡), bullet, ellipsis, prime, guillemets (‹ ›).
+%            Needed so "---" and `quotes' render in Noto Serif, not Mincho.
+%
+% Ranges 6 and 7 (real CJK) stay as jachar — the user's \zh{}/\ja{} helpers
+% rely on luatexja's Japanese-font routing for Chinese and Japanese glyphs.
+\ltjsetparameter{jacharrange={-2, -3, -9}}
 
-% 3. Set Japanese fonts with HanaMin fallback for rare characters.
-% HanaMinA: BMP including CJK Ext-A | HanaMinB: SIP including CJK Ext-B through I
-\setmainjfont[
-    BoldFont={Source Han Serif Bold},
-    AltFont={
-        {Range="3400-"4DBF, Font=HanaMinA},    % CJK Unified Ideographs Extension A
-        {Range="20000-"3FFFF, Font=HanaMinB}, % SIP: CJK Extensions B-I (rare/historical)
-    }
-]{Source Han Serif}
-\setsansjfont[
-    BoldFont={Source Han Sans Bold},
-    AltFont={
-        {Range="3400-"4DBF, Font=HanaMinA},
-        {Range="20000-"3FFFF, Font=HanaMinB},
-    }
-]{Source Han Sans}
-\setmonojfont{HanaMinA}
-\else
-% --- NON-CJK MODE ---
-% 1. Load polyglossia for multi-language support.
+% --- luatexja-fontspec: gives us \setmainjfont and \newjfontfamily ---
+% These are the only mechanisms luatexja's jachar reroute actually honours.
+% Must be loaded after luatexja[pass] but before any \setmainjfont call.
+\RequirePackage{luatexja-fontspec}
+
+% --- Load language and quoting support (always) ---
 \RequirePackage{polyglossia}
 \setdefaultlanguage{english}
-\setotherlanguages{german,french,russian}
+\setotherlanguages{german, french, russian, greek}
+% csquotes is already required by e_core.
 
-% 2. Load csquotes immediately after. It will now correctly detect the language.
-\RequirePackage[autostyle]{csquotes}
-\fi
-
-% 4. SET MAIN LATIN FONTS (applies to both modes)
-% -------------------------------------------------------------------
+% --- Set main fonts: Noto everywhere ---
+% Design philosophy: Noto is the only font family that ships book-grade
+% glyphs for Latin, Cyrillic, Greek, CJK, Arabic, Devanagari, Hebrew, ...
+% all from a coordinated design programme. Boutique single-script fonts
+% (PT, Libertinus, STIX Two Text, Source Han) all looked good in isolation
+% but mixing them produced visible style clashes and forced per-script
+% fontspec gymnastics. Noto is the only consistent answer.
 \setmainfont{Noto Serif}[
     UprightFont=*-Regular,
     BoldFont=*-Bold,
     ItalicFont=*-Italic,
-    BoldItalicFont=*-BoldItalic
+    BoldItalicFont=*-BoldItalic,
+    Ligatures=TeX,
 ]
 \setsansfont{Noto Sans}[
     UprightFont=*-Regular,
     BoldFont=*-Bold,
     ItalicFont=*-Italic,
-    BoldItalicFont=*-BoldItalic
+    BoldItalicFont=*-BoldItalic,
+    Ligatures=TeX,
 ]
 \setmonofont{Source Code Pro}
 
-% 5. MATH FONT SETUP
-% -------------------------------------------------------------------
-% Set math fonts at end of preamble (after all font packages fully initialized)
+% --- Per-language serif + sans overrides picked up by polyglossia ---
+%
+% Russian: PT Serif + PT Sans (Paratype). PT is a Russian foundry and
+% the PT family is the official book-grade Cyrillic face, with proper
+% Russian typographic tradition (true italic cursive shapes, Old Style
+% Figures, coherent serif/sans pairing) that Noto Serif/Sans's generic
+% universal Cyrillic does not match.
+%
+% Greek: Libertinus Serif + Libertinus Sans. Philipp Hauer's Greek is
+% a real book face with proper ligatures and a consistent design
+% philosophy across upright/italic/bold/sans, matching classical-text
+% typographic tradition better than Noto Serif's generic Greek.
+%
+% polyglossia picks \<lang>font up automatically at \text<lang>{...}
+% because the languages are in \setotherlanguages above. The sans
+% variants \<lang>sansfont are NOT picked up automatically — polyglossia
+% only looks at \<lang>font — so the wrapper macros \rusans and \elsans
+% below are the explicit entry points when sans shape is needed.
+\newfontfamily\russianfont{PT Serif}[
+    UprightFont=* ,
+    BoldFont=* Bold,
+    ItalicFont=* Italic,
+    BoldItalicFont=* Bold Italic,
+]
+\newfontfamily\russiansansfont{PT Sans}[
+    UprightFont=* ,
+    BoldFont=* Bold,
+    ItalicFont=* Italic,
+    BoldItalicFont=* Bold Italic,
+]
+\newfontfamily\greekfont{LibertinusSerif}[
+    Extension=.otf,
+    UprightFont=*-Regular,
+    BoldFont=*-Bold,
+    ItalicFont=*-Italic,
+    BoldItalicFont=*-BoldItalic,
+    Ligatures=TeX,
+]
+\newfontfamily\greeksansfont{LibertinusSans}[
+    Extension=.otf,
+    UprightFont=*-Regular,
+    BoldFont=*-Bold,
+    ItalicFont=*-Italic,
+    Ligatures=TeX,
+]
+
+% --- CJK fonts ---
+% Universal CJK = Noto Serif CJK JP. Japanese mincho is the unrivalled choice
+% for a single CJK fallback because its character coverage spans JP shinjitai,
+% TC kyuujitai, SC simplified, hiragana, katakana, and CJK extensions A–H all
+% in one font. All \zh / \ja / \zhsans / \jasans wrappers route here.
+%
+% No ItalicFont declaration: CJK has no real italic shape, and we want italic
+% context (myquotation, \emph, \textit) to fall back cleanly to upright song.
+% No fake-slant, no kaiti substitute, no mincho→gothic emphasis switch.
+% Source Han Serif IS Noto Serif CJK — Adobe and Google co-released the
+% same font under two brand names (identical glyphs, identical metrics).
+% We use the Source Han packaging because Adobe distributes the .ttc with
+% discrete named weight subfonts, which fontspec can resolve via family
+% name. The Google "NotoSerifCJK-VF.ttf.ttc" is a variable font whose
+% default instance is ExtraLight, and selecting Regular/Bold weights via
+% the wght axis requires hardcoded paths or workarounds we'd rather avoid.
+%
+% "Source Han Serif" with no SC/TC/JP/KR suffix is the JP variant.
+\setmainjfont{Source Han Serif}[
+    BoldFont={Source Han Serif Bold},
+    ItalicFont={},
+]
+\setsansjfont{Source Han Sans}[
+    BoldFont={Source Han Sans Bold},
+    ItalicFont={},
+]
+% --- Semantic language wrappers: \zh \ja \ru \el and *sans variants ---
+%
+% Short two-letter macros that mark the language of inline passages.
+% Use them in chapter source to make the script explicit:
+%
+%     \zh{劉徽}  \ja{岡潔}  \ru{Колмогоров}  \el{Ἀρχιμήδης}
+%
+% Serif forms:
+%   \zh / \ja pass through unchanged (\def\zh#1{#1}). They do NOT
+%   switch fonts. The jachar reroute in luatexja's pre_linebreak_filter
+%   routes CJK codepoints to \setmainjfont (Source Han Serif), and
+%   since one universal CJK font covers everything, there is nothing
+%   to switch. The macros exist purely as semantic markers.
+%
+%   \ru and \el switch to the polyglossia per-language font explicitly.
+%   (polyglossia would also pick them up via \textrussian / \textgreek,
+%   but the short forms are more readable in chapter source and keep
+%   the \zh / \ja / \ru / \el family visually consistent.)
+%
+% Sans forms:
+%   \zhsans / \jasans wrap in \sffamily so CJK glyphs route to the
+%   sans jfont (Source Han Sans). Side effect: Latin inside the
+%   wrapper also switches to Noto Sans.
+%
+%   \rusans / \elsans switch to the per-language sans font explicitly.
+\def\zh#1{#1}
+\def\ja#1{#1}
+\def\zhsans#1{{\sffamily #1}}
+\def\jasans#1{{\sffamily #1}}
+\def\ru#1{{\russianfont #1}}
+\def\el#1{{\greekfont #1}}
+\def\rusans#1{{\russiansansfont #1}}
+\def\elsans#1{{\greeksansfont #1}}
+
+% Undo luatexja's \em hook. lltjdefs.sty patches \csname em \endcsname to
+% inject \gtfamily before \itshape, which routes CJK \emph to gothic. We
+% want \emph on CJK to fall back to upright song mincho (no italic shape
+% declared on the jfont, no gothic substitution either). Reverse-patch
+% (etoolbox is already required by e_core):
+\expandafter\patchcmd\csname em \endcsname{\gtfamily\itshape}{\itshape}{}{%
+    \PackageWarning{c111_fonts}{Could not revert luatexja's \string\em\space patch.}}
+
+% --- Math fonts (set at end of preamble after all font packages init) ---
 \AtEndPreamble{%
     \setmathfont[StylisticSet=01]{STIX Two Math}%
     \setmathfont[version=bold, StylisticSet=01, FakeBold=1.5]{STIX Two Math}%
@@ -101,32 +228,11 @@
     \setmathfont[range={frak,bffrak}]{New Computer Modern Math}%
 }
 
-% 6. CONDITIONAL EMPHASIS AND TEXT STYLING
-% -------------------------------------------------------------------
-\ifcjk
-    % CJK emphasis: boten (dots) via luatexja-ruby (already loaded above)
-    \ltjsetparameter{kanjiskip={0.1\zw plus 0.04\zw minus 0.04\zw}}
-
-    % Redefine \emph for CJK to use boten
-    \let\latinemph\emph
-    \renewcommand{\emph}[1]{
-        \kenten{#1}%
-    }
-
-    % For explicit Latin emphasis within CJK text
-    \newcommand{\emphLatin}[1]{\latinemph{#1}}
-\fi
-
-% 7. 12PT SECTION HEADING SIZE ADJUSTMENTS
-% -------------------------------------------------------------------
+% --- 12pt heading size adjustments ---
 % When 12pt option is used, adjust section heading sizes accordingly.
 % Uses begindocument/end hook to ensure titlesec is fully initialized.
-%
-% NOTE: Feature packages (e_title_fenced_sec, e_title_fenced_chap)
-% define their own \titleformat for the levels they style. This hook
-% must NOT overwrite those. We skip \section if e_title_fenced_sec is
-% loaded, and \chapter if e_title_fenced_chap is loaded, so that
-% feature-package formatting is preserved.
+% Feature packages (e_title_fenced_sec, e_title_fenced_chap) define their
+% own \titleformat for the levels they style; skip those to avoid clobbering.
 \makeatletter
 \AddToHook{begindocument/end}{%
     \if@e@twelvept
@@ -142,5 +248,4 @@
 }
 \makeatother
 
-% --- End of File ---
 \endinput

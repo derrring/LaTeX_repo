@@ -1,0 +1,51 @@
+% ===================================================================
+% c113_cjk_engine.sty — full CJK layout engine (luatexja full)
+%
+% Use this package when CJK is the primary script of the document.
+% It loads c112_langfamily (which already brings luatexja in pass
+% mode for line-breaking) and then adds the remaining luatexja
+% companions that are only appropriate for CJK-primary text:
+%
+%   - luatexja-fontspec (for \setmainjfont etc.)
+%   - luatexja-ruby     (for ruby annotation and kenten emphasis)
+%
+% This package also:
+%   - Does NOT touch \emph. Latin \emph stays italic. For kenten
+%     (傍点) emphasis call \cjkemph{...} explicitly, or, if CJK is
+%     truly primary, call \makeemphkenten in the preamble.
+%   - Sets Noto Serif CJK JP / Noto Sans CJK JP as Japanese defaults,
+%     overridable via \setmainjfont{...}.
+%
+% For occasional CJK glyph rendering (a few quotations), prefer
+% c112_langfamily alone: it already gives you correct line-breaking.
+% ===================================================================
+
+\ProvidesPackage{c113_cjk_engine}[2026/04/13 Full CJK layout via luatexja]
+
+% c112_langfamily already loads luatexja in pass mode; we just add
+% the remaining companions.
+\RequirePackage{c112_langfamily}
+\RequirePackage{luatexja-fontspec}
+\RequirePackage{luatexja-ruby}
+
+% Default CJK fonts (Noto Serif/Sans CJK JP, widely available).
+\setmainjfont{Noto Serif CJK JP}
+\setsansjfont{Noto Sans CJK JP}
+
+% Reasonable default kanji spacing
+\ltjsetparameter{kanjiskip={0.1\zw plus 0.04\zw minus 0.04\zw}}
+
+% \cjkemph: explicit kenten-dot emphasis for CJK text.
+% Always available, does NOT touch \emph.
+\providecommand{\cjkemph}[1]{\kenten{#1}}
+
+% \makeemphkenten: opt-in global redirect of \emph to kenten, for
+% documents whose PRIMARY script is CJK. The previous \emph is
+% saved as \latinemph for Latin-emphasis escape inside CJK scope.
+% This is OFF by default; authors who want it must call it explicitly.
+\providecommand{\makeemphkenten}{%
+    \let\latinemph\emph
+    \renewcommand{\emph}[1]{\kenten{##1}}%
+}
+
+\endinput

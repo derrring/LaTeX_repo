@@ -477,10 +477,24 @@
 \newcommand{\rank}{\operatorname{rank}}
 
 %----------------------------------------------------------------------
+%% Inline-friendly matrix shortcuts
+%----------------------------------------------------------------------
+% \smallpmatrix{a & b \\ c & d} — paren-bracketed smallmatrix for use
+% inside running text. Avoids the line-spacing blowout that a regular
+% \begin{pmatrix}...\end{pmatrix} causes in inline math.
+\DeclareRobustCommand{\smallpmatrix}[1]{%
+    \left(\begin{smallmatrix}#1\end{smallmatrix}\right)%
+}
+
+% \eval — evaluation map (used in functional calculus, universal
+% property diagrams, etc.). Typeset as upright "eval".
+\DeclareMathOperator{\eval}{eval}
+
+%----------------------------------------------------------------------
 %% Probability
 %----------------------------------------------------------------------
 \newcommand{\Law}{\mathsf{Law}} % for law of a random variable
-\newcommand{\Prob}{ \mathbb{P} }
+\newcommand{\Prob}{\mathbb{P}}
 \newcommand{\Var}{\operatorname{Var\mathop{}}} % for variance
 \newcommand{\Cov}{\operatorname{Cov\mathop{}}} % for covariance
 \newcommand{\iid}{\mathrm{i.i.d.}} % for independent and identically distributed
