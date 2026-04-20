@@ -87,18 +87,25 @@
 \let\e@orig@tableofcontents\tableofcontents
 \renewcommand{\tableofcontents}{%
     \begingroup
-    \etocsettocstyle{\renewcommand{\contentsname}{Contents}}{}%
     \setcounter{tocdepth}{2}
     \ifcsdef{chapter}{%
+        % Book-based classes: \chapter* heading, own page (\clearpage after)
+        \etocsettocstyle{\renewcommand{\contentsname}{Contents}}{}%
         \chapter*{\contentsname}%
         \addcontentsline{toc}{chapter}{\contentsname}%
     }{%
-        \section*{\contentsname}%
-        \addcontentsline{toc}{section}{\contentsname}%
+        % Article-based classes: fenced TOC body with no heading; flows into body text
+        \etocsettocstyle{%
+            \par\noindent\rule{\linewidth}{1pt}%
+            \vskip0.3\baselineskip\parindent0em
+        }{%
+            \vskip0.3\baselineskip\noindent\rule{\linewidth}{1pt}%
+            \vspace{0.5\baselineskip}
+        }%
     }%
     \e@orig@tableofcontents
     \endgroup
-    \clearpage
+    \ifcsdef{chapter}{\clearpage}{}%
 }
 \let\mytoc\tableofcontents
 
