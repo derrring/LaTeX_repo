@@ -1,5 +1,9 @@
 % TOC
 \setcounter{secnumdepth}{3}
+% Default tocdepth: 2 (through subsection). Classes may override
+% before \tableofcontents is called — e.g., e_class_thesis.cls sets 1
+% (section only). Users may also override in their preamble.
+\setcounter{tocdepth}{2}
 
 % --- Table of Contents Commands ---
 
@@ -87,7 +91,7 @@
 \let\e@orig@tableofcontents\tableofcontents
 \renewcommand{\tableofcontents}{%
     \begingroup
-    \setcounter{tocdepth}{2}
+    % tocdepth is not reset here — it respects whatever the class or user set.
     \ifcsdef{chapter}{%
         % Book-based classes: \chapter* heading, own page (\clearpage after)
         \etocsettocstyle{\renewcommand{\contentsname}{Contents}}{}%

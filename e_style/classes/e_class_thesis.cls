@@ -58,6 +58,10 @@
 % This section contains styling for chapters and ToC from general.tex
 \linespread{1.1}
 
+% Thesis convention: TOC shows chapters + sections (no subsections).
+% Package default in c130_toc.tex is 2; thesis overrides to 1.
+\setcounter{tocdepth}{1}
+
 
 
 % Override only for 12pt option

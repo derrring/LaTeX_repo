@@ -49,4 +49,9 @@
 
 \pagestyle{plain}
 
+% Lecture notes convention: TOC shows chapters + sections + subsections.
+% Matches the package default set in c130_toc.tex; stated here explicitly so
+% the contrast with e_class_thesis (tocdepth=1) is visible at class level.
+\setcounter{tocdepth}{2}
+
 \endinput
