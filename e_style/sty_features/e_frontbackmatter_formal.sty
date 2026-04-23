@@ -35,6 +35,8 @@
 %   \efmlanguageswitch{#1}     -- per-abstract language-context wrapper
 %                                 (default: \selectlanguage{#1} if babel or
 %                                 polyglossia is loaded, no-op otherwise)
+%   \efmcopyrightyear          -- year used in \makebackmatter colophon
+%                                 (default: \the\year, the compile year)
 %
 % Multilingual abstracts/acknowledgements:
 %   Each \setabstract call pushes onto an internal sequence. Multiple
@@ -88,6 +90,13 @@
 \providecommand{\efmlanguageswitch}[1]{%
     \@ifundefined{selectlanguage}{}{\selectlanguage{#1}}%
 }
+
+% Copyright year used by \makebackmatter's colophon. Defaults to the
+% current (compile-time) year via \the\year. Copyright-notice convention
+% is year-only, not a full date; \date{...} on the title page carries
+% the defense/submission date separately. Override if the copyright year
+% differs from the compile year (e.g., \renewcommand{\efmcopyrightyear}{2026}).
+\providecommand{\efmcopyrightyear}{\the\year}
 
 
 \ExplSyntaxOn
@@ -404,11 +413,13 @@
 % 6. Output: back cover
 % =================================================================
 
-% Back cover colophon: author list, italic title, copyright year,
-% rendered at the bottom of its own page. Starts with \clearpage so
+% Back cover colophon: author list, italic title, copyright year.
+% Rendered at the bottom of its own page. Starts with \clearpage so
 % the colophon doesn't accidentally append to the last main-text
 % page (which would also clobber that page's folio via
-% \thispagestyle{empty}).
+% \thispagestyle{empty}). Uses \efmcopyrightyear (default \the\year),
+% not \@date, because copyright notices conventionally carry the
+% year only -- the title page's \date already carries the full date.
 \NewDocumentCommand { \makebackmatter } { }
   {
     \clearpage
@@ -416,7 +427,7 @@
     \null \vfill
     \noindent
     \seq_use:Nn \g__efm_authors_seq { ,~ }
-    :~ \textit { \@title, } ~ \textcopyright\ \@date
+    :~ \textit { \@title, } ~ \textcopyright\ \efmcopyrightyear
   }
 
 \ExplSyntaxOff
