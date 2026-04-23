@@ -45,6 +45,10 @@
 %   - Optional [lang] wraps label + body in the given language context,
 %     activating babel/polyglossia hyphenation, font switching, and any
 %     language-specific typography (e.g., french-spacing, CJK scripts).
+%   - When [lang] is set, the label + body render inside a TeX group
+%     (\begingroup...\endgroup), so language state and any other
+%     setting changes made inside the body do not leak into subsequent
+%     content.
 %   Examples:
 %       \setabstract{Body in default language...}
 %       \setabstract[Résumé][french]{Ce document presente...}
@@ -55,8 +59,9 @@
 %   language context.
 %
 % Hyperref integration:
-%   If hyperref is loaded, pdftitle/pdfauthor/pdfkeywords are populated
-%   automatically at \AtBeginDocument from the stored metadata.
+%   If hyperref is loaded, pdftitle/pdfauthor/pdfkeywords/pdfsubject are
+%   populated automatically at \AtBeginDocument from the stored metadata
+%   (pdfsubject draws from the subtitle).
 % =================================================================
 
 \NeedsTeXFormat{LaTeX2e}
@@ -465,6 +470,7 @@
       {
         pdftitle    = { \@title } ,
         pdfauthor   = { \seq_use:Nn \g__efm_authors_seq { ,\c_space_tl } } ,
+        pdfsubject  = { \tl_use:N \g__efm_subtitle_tl } ,
         pdfkeywords = { \tl_to_str:N \g__efm_keywords_tl }
       }
     \exp_args:NV \hypersetup \l_tmpa_tl
