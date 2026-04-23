@@ -294,11 +294,13 @@
 % 5. Output: optional front matter pages
 % =================================================================
 
-% Dedication: right-aligned italic block in a 70%-width minipage,
-% vertically offset to roughly 30% down the page. Matches the visual
-% register of the `myquotation` environment (see c140_envs.tex) but
-% without the author-attribution line, since a dedication is directed
-% *at* someone, not authored *by* someone.
+% Dedication: italic block in a 70%-width minipage, with text
+% genuinely right-aligned (\raggedleft) *inside* the minipage, and
+% the minipage itself flushed to the page's right edge. Matches the
+% myquotation environment's visual register (flushright + narrow
+% minipage + italic), but without the author-attribution line since
+% a dedication is directed at someone, not authored by someone.
+% Vertical offset at ~30% down the page.
 \NewDocumentCommand { \makededication } { }
   {
     \tl_if_blank:VF \g__efm_dedication_tl
@@ -307,6 +309,7 @@
         \vspace*{0.3\textheight}
         \begin{flushright}
           \begin{minipage}{0.7\textwidth}
+            \raggedleft
             \itshape
             \tl_use:N \g__efm_dedication_tl
           \end{minipage}
