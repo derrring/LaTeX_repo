@@ -10,17 +10,33 @@
 \ProvidesPackage{e_frontbackmatter_simple}%
   [2026/04/11 Simple frontmatter (base-class defaults)]
 
-% Stub formal-only metadata commands (accept argument, do nothing).
-\newcommand{\subtitle}[1]{}
-\newcommand{\institution}[1]{}
-\newcommand{\location}[1]{}
-\newcommand{\email}[1]{}
-\newcommand{\address}[1]{}
-\newcommand{\dedicatory}[1]{}
-\newcommand{\keywords}[1]{}
-\newcommand{\subjclass}[2][]{}
-\newcommand{\setabstract}[1]{}
-\newcommand{\setacknowledgements}[1]{}
+% Stub formal-only metadata commands.
+% These commands render in e_frontbackmatter_formal (loaded by
+% e_class_noteLong and e_class_thesis). Here they are accepted so
+% documents compile when switched to simple frontmatter, but not
+% rendered. A compile-time warning surfaces the limitation so the
+% silent-drop isn't surprising when a user writes, e.g., \subtitle
+% in an e_class_noteShort document.
+\makeatletter
+\newcommand{\@e@fm@warn@ignored}[1]{%
+    \PackageWarning{e_frontbackmatter_simple}{%
+        #1\space is accepted but not rendered by the simple frontmatter\MessageBreak
+        (use e_class_noteLong or e_class_thesis for decorated frontmatter,\MessageBreak
+         or bake the content into \string\title\space directly)%
+    }%
+}
+
+\newcommand{\subtitle}[1]{\@e@fm@warn@ignored{\string\subtitle}}
+\newcommand{\institution}[1]{\@e@fm@warn@ignored{\string\institution}}
+\newcommand{\location}[1]{\@e@fm@warn@ignored{\string\location}}
+\newcommand{\email}[1]{\@e@fm@warn@ignored{\string\email}}
+\newcommand{\address}[1]{\@e@fm@warn@ignored{\string\address}}
+\newcommand{\dedicatory}[1]{\@e@fm@warn@ignored{\string\dedicatory}}
+\newcommand{\keywords}[1]{\@e@fm@warn@ignored{\string\keywords}}
+\newcommand{\subjclass}[2][]{\@e@fm@warn@ignored{\string\subjclass}}
+\newcommand{\setabstract}[1]{\@e@fm@warn@ignored{\string\setabstract}}
+\newcommand{\setacknowledgements}[1]{\@e@fm@warn@ignored{\string\setacknowledgements}}
+\makeatother
 
 % We intentionally do NOT redefine \maketitle here.
 % The base class (book or article) provides its own \maketitle,
