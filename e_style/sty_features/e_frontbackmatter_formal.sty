@@ -4,8 +4,9 @@
 %
 % AMS-compatible metadata API:
 %   \author{Name}          -- one call per author (sequential)
-%   \email{addr}           -- attaches to most recent \author
+%   \email{addr}            -- attaches to most recent \author
 %   \address{affiliation}  -- attaches to most recent \author
+%   \addauthor[email][addr]{Name}  -- one-call convenience
 %   \title{...}            -- standard LaTeX
 %   \subtitle{...}         -- extension: rendered below title
 %   \institution{...}      -- extension: document-level institution
@@ -14,20 +15,58 @@
 %   \dedicatory{...}       -- AMS-compatible dedication
 %   \keywords{...}         -- AMS-compatible keyword list
 %   \subjclass[year]{...}  -- AMS-compatible MSC classification
-%   \setabstract{...}      -- deferred abstract (book-class pattern)
-%   \setacknowledgements{...}
+%   \setabstract[label]{body}            -- multilingual-capable (repeatable)
+%   \setacknowledgements[label]{body}    -- multilingual-capable (repeatable)
 %
 % Output commands (called in document body):
 %   \makefrontmatter       -- title page
 %   \makededication        -- dedication page (if set)
-%   \makeabstract          -- abstract page (if set)
-%   \makeacknowledgements  -- acknowledgements page (if set)
+%   \makeabstract          -- abstract page(s) (iterates all \setabstract calls)
+%   \makeacknowledgements  -- acknowledgements page(s) (iterates)
 %   \makebackmatter        -- back cover with copyright
+%
+% Customisation points (redefine in preamble):
+%   \efmabstractlabel          -- "Abstract" (default)
+%   \efmacknowledgementslabel  -- "Acknowledgements"
+%   \efmsubjclassprefix        -- "Mathematics Subject Classification."
+%   \efmkeywordsprefix         -- "Key words and phrases."
+%   \efmfrontmatterheading{#1} -- heading style for abstract/ack pages
+%                                 (default: centered bold \large + 1em vskip)
+%
+% Multilingual abstracts/acknowledgements:
+%   Each \setabstract call pushes onto an internal sequence. Multiple
+%   calls yield multiple pages (one per call) when \makeabstract fires.
+%   The optional [label] overrides the heading text for that page:
+%       \setabstract[Résumé]{Ce document presente...}
+%       \setabstract[Abstract]{This document presents...}
+%
+% Hyperref integration:
+%   If hyperref is loaded, pdftitle/pdfauthor/pdfkeywords are populated
+%   automatically at \AtBeginDocument from the stored metadata.
 % =================================================================
 
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesPackage{e_frontbackmatter_formal}%
-  [2026/04/11 Formal front/back matter (AMS-compatible API)]
+  [2026/04/23 Formal front/back matter (AMS-compatible API)]
+
+
+% =================================================================
+% Customisation points (user-redefinable, no @ in names so that no
+% \makeatletter wrapper is needed in preamble \renewcommand calls).
+% =================================================================
+
+\providecommand{\efmabstractlabel}{Abstract}
+\providecommand{\efmacknowledgementslabel}{Acknowledgements}
+\providecommand{\efmsubjclassprefix}{Mathematics~Subject~Classification.}
+\providecommand{\efmkeywordsprefix}{Key~words~and~phrases.}
+
+% Heading style for front-matter pages (abstract, acknowledgements).
+% Default: centered bold \large with 1em vskip below. Redefine to
+% \chapter*{#1} for book-chapter-style headings, or customise freely.
+\providecommand{\efmfrontmatterheading}[1]{%
+    \begin{center}\textbf{\large #1}\end{center}\vspace{1em}%
+}
+
 
 \ExplSyntaxOn
 
@@ -52,8 +91,12 @@
 \tl_new:N \g__efm_subjclass_tl
 \tl_new:N \g__efm_subjclass_year_tl
 \tl_new:N \g__efm_dedication_tl
-\tl_new:N \g__efm_abstract_tl
-\tl_new:N \g__efm_acknowledgements_tl
+
+% Sequences for abstract and acknowledgements (repeatable, multilingual)
+\seq_new:N \g__efm_abstract_labels_seq
+\seq_new:N \g__efm_abstract_bodies_seq
+\seq_new:N \g__efm_acknowl_labels_seq
+\seq_new:N \g__efm_acknowl_bodies_seq
 
 
 % =================================================================
@@ -90,6 +133,15 @@
       }
   }
 
+% \addauthor[email][address]{Name} -- one-call convenience.
+% Equivalent to \author{Name} + optional \email{...} + optional \address{...}.
+\NewDocumentCommand { \addauthor } { O{} O{} m }
+  {
+    \author{#3}
+    \tl_if_blank:nF { #1 } { \email{#1} }
+    \tl_if_blank:nF { #2 } { \address{#2} }
+  }
+
 
 % =================================================================
 % 3. Document-level metadata commands
@@ -117,11 +169,20 @@
 \NewDocumentCommand { \dedicatory } { +m }
   { \tl_gset:Nn \g__efm_dedication_tl { #1 } }
 
-\NewDocumentCommand { \setabstract } { +m }
-  { \tl_gset:Nn \g__efm_abstract_tl { #1 } }
+% \setabstract[label]{body} -- repeatable; each call pushes a new abstract.
+% Default label is \efmabstractlabel (user-redefinable).
+\NewDocumentCommand { \setabstract } { O{\efmabstractlabel} +m }
+  {
+    \seq_gput_right:Nn \g__efm_abstract_labels_seq { #1 }
+    \seq_gput_right:Nn \g__efm_abstract_bodies_seq { #2 }
+  }
 
-\NewDocumentCommand { \setacknowledgements } { +m }
-  { \tl_gset:Nn \g__efm_acknowledgements_tl { #1 } }
+% \setacknowledgements[label]{body} -- repeatable; each call pushes a new ack block.
+\NewDocumentCommand { \setacknowledgements } { O{\efmacknowledgementslabel} +m }
+  {
+    \seq_gput_right:Nn \g__efm_acknowl_labels_seq { #1 }
+    \seq_gput_right:Nn \g__efm_acknowl_bodies_seq { #2 }
+  }
 
 
 % =================================================================
@@ -163,12 +224,11 @@
         \normalsize
         \seq_map_indexed_inline:Nn \g__efm_authors_seq
           {
-            ##2                                         % name
+            ##2
             \tl_set:Nx \l_tmpa_tl
               { \seq_item:Nn \g__efm_emails_seq { ##1 } }
             \tl_if_blank:VF \l_tmpa_tl
               { \textsuperscript { ##1 } }
-            % Per-author address (if provided)
             \tl_set:Nx \l_tmpb_tl
               { \seq_item:Nn \g__efm_addresses_seq { ##1 } }
             \tl_if_blank:VF \l_tmpb_tl
@@ -211,7 +271,7 @@
             \textit
               {
                 \tl_use:N \g__efm_subjclass_year_tl
-                \ Mathematics~Subject~Classification.
+                \ \efmsubjclassprefix
               } ~
             \tl_use:N \g__efm_subjclass_tl \par
           }
@@ -220,7 +280,7 @@
         \tl_if_blank:VF \g__efm_keywords_tl
           {
             \vspace{0.3em}
-            \textit { Key~words~and~phrases. } ~
+            \textit { \efmkeywordsprefix } ~
             \tl_use:N \g__efm_keywords_tl \par
           }
 
@@ -245,23 +305,29 @@
       }
   }
 
-\NewDocumentCommand { \makeacknowledgements } { }
+% Iterate over all stored abstracts, rendering each on its own page.
+% Each iteration starts with \clearpage (not \cleardoublepage) so
+% consecutive multilingual abstracts pack onto successive pages
+% without forced blank versos in twoside layout.
+\NewDocumentCommand { \makeabstract } { }
   {
-    \tl_if_blank:VF \g__efm_acknowledgements_tl
+    \seq_map_indexed_inline:Nn \g__efm_abstract_labels_seq
       {
-        \chapter*{Acknowledgements}
-        \tl_use:N \g__efm_acknowledgements_tl
-        \cleardoublepage
+        \clearpage
+        \thispagestyle{empty}
+        \efmfrontmatterheading{##2}
+        \seq_item:Nn \g__efm_abstract_bodies_seq { ##1 }
       }
   }
 
-\NewDocumentCommand { \makeabstract } { }
+\NewDocumentCommand { \makeacknowledgements } { }
   {
-    \tl_if_blank:VF \g__efm_abstract_tl
+    \seq_map_indexed_inline:Nn \g__efm_acknowl_labels_seq
       {
-        \chapter*{Abstract}
-        \tl_use:N \g__efm_abstract_tl
-        \cleardoublepage
+        \clearpage
+        \thispagestyle{empty}
+        \efmfrontmatterheading{##2}
+        \seq_item:Nn \g__efm_acknowl_bodies_seq { ##1 }
       }
   }
 
@@ -280,6 +346,45 @@
     \cleardoublepage
   }
 
+\ExplSyntaxOff
+
+
+% =================================================================
+% 7. Hyperref integration (automatic PDF metadata sync)
+% =================================================================
+% At \begin{document}, if hyperref is loaded, populate pdftitle,
+% pdfauthor, pdfkeywords from the stored metadata. One source of
+% truth; no manual \hypersetup duplication needed.
+%
+% Implementation detail: the whole block (definition AND hook
+% registration) lives inside \ExplSyntaxOn so that `:` and `_` in
+% \__efm_sync_pdfmeta: are read as letters. If the \AtBeginDocument
+% body were tokenised outside \ExplSyntaxOn, the stored tokens would
+% contain a cat-8 subscript `_` that triggers math-mode errors when
+% the hook fires.
+%
+% We pre-build the keyval string via \tl_set:Nx (fully expanding L3
+% accessors) and feed the result to \hypersetup via \exp_args:NV.
+% Passing L3 accessors directly inside \hypersetup{...} would fail
+% because \hypersetup tokenises before expansion.
+\ExplSyntaxOn
+\cs_new_protected:Npn \__efm_sync_pdfmeta:
+  {
+    \tl_set:Nx \l_tmpa_tl
+      {
+        pdftitle    = { \@title } ,
+        pdfauthor   = { \seq_use:Nn \g__efm_authors_seq { ,~ } } ,
+        pdfkeywords = { \tl_use:N \g__efm_keywords_tl }
+      }
+    \exp_args:NV \hypersetup \l_tmpa_tl
+  }
+
+\AtBeginDocument
+  {
+    \@ifpackageloaded { hyperref }
+      { \__efm_sync_pdfmeta: }
+      { }
+  }
 \ExplSyntaxOff
 
 \endinput
