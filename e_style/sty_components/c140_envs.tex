@@ -1,20 +1,36 @@
-% --- Column Box Setup ---
+% =================================================================
+% Callout: single aside box (renamed from special_columns).
+%
+% Usage:
+%   \begin{callout}{Title}
+%       Body...
+%   \end{callout}
+%
+% Supports \listofcallouts via the 'callouts' tcb list.
+% =================================================================
 \tcbuselibrary{listings,skins,breakable,fitting,raster,xparse,external}
+
 \tcbset{
     colback=lightgray!15,
     colframe=cyan!40!black,
-    fonttitle=\bfseries,breakable,enhanced,lines before break=5,
+    fonttitle=\bfseries,
+    breakable, enhanced,
+    lines before break=5,
 }
-\newtcolorbox[auto counter,number within=section,list inside=columns]{special_columns}[2][]{
+
+\newtcolorbox[auto counter, number within=section, list inside=callouts]{callout}[2][]{%
     colback=lightgray!15,
     colframe=cyan!40!black,
-    fonttitle=\bfseries,breakable,enhanced,
-title=Note: #2,#1}
-
-\newcommand{\listofcolumns}{%
-    \tcblistof[\chapter*]{columns}{List of Column Boxes}
+    fonttitle=\bfseries,
+    breakable, enhanced,
+    title=Note: #2, #1%
 }
 
+\newcommand{\listofcallouts}{%
+    \tcblistof[\section*]{callouts}{List of Callouts}%
+}
+
+% --- Attributed quotation (unchanged) ---
 \DeclareDocumentEnvironment{myquotation}{ O{Anonymous} }
 {% Begin code
     \newcommand*\QuoteAuthor{#1}
@@ -27,8 +43,6 @@ title=Note: #2,#1}
         \end{minipage}
     \end{flushright}
 }
-% usage: \begin{myquotation}{Author Name} ... \end{myquotation}
-%\begin{myquotation}[Shakespeare]
-%To be or not to be, that is the question.
-%\end{myquotation}
+% usage: \begin{myquotation}[Shakespeare]...\end{myquotation}
+
 \endinput
