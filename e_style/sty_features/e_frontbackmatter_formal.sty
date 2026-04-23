@@ -404,14 +404,19 @@
 % 6. Output: back cover
 % =================================================================
 
+% Back cover colophon: author list, italic title, copyright year,
+% rendered at the bottom of its own page. Starts with \clearpage so
+% the colophon doesn't accidentally append to the last main-text
+% page (which would also clobber that page's folio via
+% \thispagestyle{empty}).
 \NewDocumentCommand { \makebackmatter } { }
   {
+    \clearpage
     \thispagestyle{empty}
-    \vfill
+    \null \vfill
     \noindent
     \seq_use:Nn \g__efm_authors_seq { ,~ }
     :~ \textit { \@title, } ~ \textcopyright\ \@date
-    \cleardoublepage
   }
 
 \ExplSyntaxOff
