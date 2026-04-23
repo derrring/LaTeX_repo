@@ -83,9 +83,8 @@
     style=general_thm_style]{theorem}
     \declaretheorem[numberwithin=section,
     name=Example,style=remark_style]{example}
-    \declaretheorem[numberwithin=section, name=Exercise,
-    style=remark_style]{exercise}
-    % Article mode: remark is a flat global counter (1, 2, 3, ...).
+    % Article mode: exercise and remark are flat global counters (1, 2, 3, ...).
+    \declaretheorem[name=Exercise, style=remark_style]{exercise}
     \declaretheorem[name=Remark, style=remark_style]{remark}
 }
 \declaretheorem[sibling=theorem, name=Proposition, style=general_thm_style]{proposition}
@@ -103,8 +102,8 @@ style=general_thm_style]{corollary}
     \renewcommand{\theHremark}{\thechapter.\arabic{remark}}%
 }{%
     \renewcommand{\theHexample}{\thesection.\arabic{example}}%
-    \renewcommand{\theHexercise}{\thesection.\arabic{exercise}}%
-    % Article mode: remark counter is flat, default \theHremark already unique.
+    % Article mode: exercise and remark counters are flat,
+    % default \theHexercise and \theHremark already unique.
 }
 
 \endinput
