@@ -294,14 +294,23 @@
 % 5. Output: optional front matter pages
 % =================================================================
 
+% Dedication: right-aligned italic block in a 70%-width minipage,
+% vertically offset to roughly 30% down the page. Matches the visual
+% register of the `myquotation` environment (see c140_envs.tex) but
+% without the author-attribution line, since a dedication is directed
+% *at* someone, not authored *by* someone.
 \NewDocumentCommand { \makededication } { }
   {
     \tl_if_blank:VF \g__efm_dedication_tl
       {
         \clearpage \thispagestyle{empty}
-        \vspace*{3cm}
-        \tl_use:N \g__efm_dedication_tl
-        \cleardoublepage
+        \vspace*{0.3\textheight}
+        \begin{flushright}
+          \begin{minipage}{0.7\textwidth}
+            \itshape
+            \tl_use:N \g__efm_dedication_tl
+          \end{minipage}
+        \end{flushright}
       }
   }
 
@@ -370,11 +379,18 @@
 \ExplSyntaxOn
 \cs_new_protected:Npn \__efm_sync_pdfmeta:
   {
+    % Build sanitised strings for PDF metadata. Two subtleties:
+    %   - Author separator uses \c_space_tl (plain space) not `~', because
+    %     a tilde in the stored tl would expand to \nobreakspace which
+    %     (via its \unhbox\voidb@x internals) trips \pdfstringdef.
+    %   - Keywords are converted via \tl_to_str:N so any `~' the user
+    %     wrote inside \keywords{...} becomes a literal tilde character,
+    %     again avoiding \nobreakspace in the PDF string.
     \tl_set:Nx \l_tmpa_tl
       {
         pdftitle    = { \@title } ,
-        pdfauthor   = { \seq_use:Nn \g__efm_authors_seq { ,~ } } ,
-        pdfkeywords = { \tl_use:N \g__efm_keywords_tl }
+        pdfauthor   = { \seq_use:Nn \g__efm_authors_seq { ,\c_space_tl } } ,
+        pdfkeywords = { \tl_to_str:N \g__efm_keywords_tl }
       }
     \exp_args:NV \hypersetup \l_tmpa_tl
   }
