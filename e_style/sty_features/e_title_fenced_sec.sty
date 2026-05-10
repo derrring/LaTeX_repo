@@ -15,18 +15,23 @@
 % ====================================================================
 
 % Numbered sections
+% \\* and \nopagebreak glue top-rule + body + bottom-rule together as an
+% atomic unit, so the fence cannot split across a page break.
+% Note: in titlesec [after-code], a bare `\nopagebreak[4]` confuses the
+% bracket parser (the [4] is read as end-of-after-code). Use the
+% optional-argument-less form, which already defaults to penalty -10000.
 \titleformat{\section}[block]
 {\normalfont\bfseries\large}
 {}{0pt}
-{\noindent\rule{\dimexpr\linewidth-2.08pt\relax}{1.5pt}\\[1ex]\thesection\quad\MakeUppercase}
-[\noindent\rule{\dimexpr\linewidth-2.08pt\relax}{1.5pt}]
+{\noindent\rule{\dimexpr\linewidth-2.08pt\relax}{1.5pt}\\*[1ex]\nopagebreak\thesection\quad\MakeUppercase}
+[\nopagebreak\noindent\rule{\dimexpr\linewidth-2.08pt\relax}{1.5pt}]
 
 % Unnumbered (starred) sections
 \titleformat{name=\section,numberless}[block]
 {\normalfont\bfseries\large}
 {}{0pt}
-{\noindent\rule{\dimexpr\linewidth-2.08pt\relax}{1.5pt}\\[1ex]\MakeUppercase}
-[\noindent\rule{\dimexpr\linewidth-2.08pt\relax}{1.5pt}]
+{\noindent\rule{\dimexpr\linewidth-2.08pt\relax}{1.5pt}\\*[1ex]\nopagebreak\MakeUppercase}
+[\nopagebreak\noindent\rule{\dimexpr\linewidth-2.08pt\relax}{1.5pt}]
 
 % Section spacing: {left}{before}{after}
 \titlespacing*{\section}{0pt}{0pt}{20pt}
