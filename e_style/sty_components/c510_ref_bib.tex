@@ -23,9 +23,10 @@
         {\multicitedelim}
         {\usebibmacro{postnote}}
     }{%
-        % Not authoryear - just change parentheses to brackets
-        % without touching any internal macros
-        \let\mkbibparens\mkbibbrackets
+        % Not authoryear: respect the style's native parenthesis form.
+        % (Previously forced brackets via \let\mkbibparens\mkbibbrackets,
+        % which collaterally overrode APA / chicago-authordate parens.
+        % Numeric / alphabetic styles use brackets natively, so no-op here.)
     }
 
 }
