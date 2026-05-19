@@ -1,22 +1,32 @@
 % =================================================================
 % e_frontbackmatter_formal.sty
-% Formal front and back matter for book-based document classes.
+% Formal (book/thesis-style) front and back matter: standalone title
+% page (\makefrontmatter), dedication page, abstract pages
+% (multilingual + repeatable), acknowledgements pages, back cover.
 %
-% AMS-compatible metadata API:
-%   \author{Name}          -- one call per author (sequential)
-%   \email{addr}            -- attaches to most recent \author
-%   \address{affiliation}  -- attaches to most recent \author
-%   \addauthor[email][addr]{Name}  -- one-call convenience
-%   \title{...}            -- standard LaTeX
-%   \subtitle{...}         -- extension: rendered below title
-%   \institution{...}      -- extension: document-level institution
-%   \location{...}         -- extension: city/venue for course notes
-%   \date{...}             -- standard LaTeX
-%   \dedicatory{...}       -- AMS-compatible dedication
-%   \keywords{...}         -- AMS-compatible keyword list
-%   \subjclass[year]{...}  -- AMS-compatible MSC classification
-%   \setabstract[label][lang]{body}           -- multilingual-capable (repeatable)
-%   \setacknowledgements[label][lang]{body}   -- multilingual-capable (repeatable)
+% Author/affiliation/PDF-metadata vocabulary is provided by
+% e_frontbackmatter_core.sty (\author, \email, \address, \addauthor,
+% \institution, \location, \subtitle, \keywords, \pdftitle). This
+% package adds the thesis-only metadata (\subjclass, \dedicatory,
+% \setabstract, \setacknowledgements) and the rendering commands
+% (\makefrontmatter / \makededication / \makeabstract /
+% \makeacknowledgements / \makebackmatter).
+%
+% AMS-compatible metadata API (full):
+%   \author{Name}                  -- one call per author (core)
+%   \email{addr}                   -- attaches to most recent (core)
+%   \address{affiliation}          -- attaches to most recent (core)
+%   \addauthor[email][addr]{Name}  -- one-call convenience (core)
+%   \title{...}                    -- standard LaTeX
+%   \subtitle{...}                 -- rendered below title (core stores)
+%   \institution{...}              -- document-level institution (core)
+%   \location{...}                 -- city/venue (core)
+%   \date{...}                     -- standard LaTeX
+%   \dedicatory{...}               -- AMS-compatible dedication
+%   \keywords{...}                 -- AMS-compatible keyword list (core stores)
+%   \subjclass[year]{...}          -- AMS-compatible MSC classification
+%   \setabstract[label][lang]{body}           -- multilingual + repeatable
+%   \setacknowledgements[label][lang]{body}   -- multilingual + repeatable
 %
 % Output commands (called in document body):
 %   \makefrontmatter       -- title page
@@ -59,14 +69,15 @@
 %   language context.
 %
 % Hyperref integration:
-%   If hyperref is loaded, pdftitle/pdfauthor/pdfkeywords/pdfsubject are
-%   populated automatically at \AtBeginDocument from the stored metadata
-%   (pdfsubject draws from the subtitle).
+%   Handled by e_frontbackmatter_core (pdftitle/pdfauthor/pdfsubject/
+%   pdfkeywords auto-synced \AtBeginDocument when hyperref is loaded).
 % =================================================================
 
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesPackage{e_frontbackmatter_formal}%
-  [2026/04/23 Formal front/back matter (AMS-compatible API)]
+  [2026/05/19 Formal front/back matter (AMS-compatible API)]
+
+\RequirePackage{e_frontbackmatter_core}
 
 
 % =================================================================
@@ -107,23 +118,10 @@
 \ExplSyntaxOn
 
 % =================================================================
-% 1. Data storage
+% 1. Thesis-only storage (author/institution/subtitle/keywords/pdftitle
+%    storage is in core).
 % =================================================================
 
-% Three parallel sequences: one entry per \author call.
-% \email and \address overwrite the slot for the current author.
-\seq_new:N \g__efm_authors_seq
-\seq_new:N \g__efm_emails_seq
-\seq_new:N \g__efm_addresses_seq
-
-% Index of the current (most recent) author
-\int_new:N \g__efm_author_count_int
-
-% Scalar metadata fields
-\tl_new:N \g__efm_subtitle_tl
-\tl_new:N \g__efm_institution_tl
-\tl_new:N \g__efm_location_tl
-\tl_new:N \g__efm_keywords_tl
 \tl_new:N \g__efm_subjclass_tl
 \tl_new:N \g__efm_subjclass_year_tl
 \tl_new:N \g__efm_dedication_tl
@@ -140,64 +138,8 @@
 
 
 % =================================================================
-% 2. Author commands (AMS sequential pattern)
+% 2. Thesis-only metadata commands
 % =================================================================
-
-% \author{Name} -- push a new author; reset email/address slots.
-\RenewDocumentCommand { \author } { m }
-  {
-    \seq_gput_right:Nn \g__efm_authors_seq   { #1 }
-    \seq_gput_right:Nn \g__efm_emails_seq    { }
-    \seq_gput_right:Nn \g__efm_addresses_seq { }
-    \int_gincr:N \g__efm_author_count_int
-  }
-
-% \email{addr} -- attach to the current author.
-\NewDocumentCommand { \email } { m }
-  {
-    \int_compare:nNnT { \g__efm_author_count_int } > { 0 }
-      {
-        \seq_gset_item:Nnn \g__efm_emails_seq
-          { \g__efm_author_count_int } { #1 }
-      }
-  }
-
-% \address{affiliation} -- attach to the current author.
-% Distinct from the document-level \institution.
-\NewDocumentCommand { \address } { m }
-  {
-    \int_compare:nNnT { \g__efm_author_count_int } > { 0 }
-      {
-        \seq_gset_item:Nnn \g__efm_addresses_seq
-          { \g__efm_author_count_int } { #1 }
-      }
-  }
-
-% \addauthor[email][address]{Name} -- one-call convenience.
-% Equivalent to \author{Name} + optional \email{...} + optional \address{...}.
-\NewDocumentCommand { \addauthor } { O{} O{} m }
-  {
-    \author{#3}
-    \tl_if_blank:nF { #1 } { \email{#1} }
-    \tl_if_blank:nF { #2 } { \address{#2} }
-  }
-
-
-% =================================================================
-% 3. Document-level metadata commands
-% =================================================================
-
-\NewDocumentCommand { \subtitle } { m }
-  { \tl_gset:Nn \g__efm_subtitle_tl { #1 } }
-
-\NewDocumentCommand { \institution } { m }
-  { \tl_gset:Nn \g__efm_institution_tl { #1 } }
-
-\NewDocumentCommand { \location } { m }
-  { \tl_gset:Nn \g__efm_location_tl { #1 } }
-
-\NewDocumentCommand { \keywords } { m }
-  { \tl_gset:Nn \g__efm_keywords_tl { #1 } }
 
 % \subjclass[2020]{35Q89, 49N80}
 \NewDocumentCommand { \subjclass } { O{2020} m }
@@ -229,7 +171,7 @@
 
 
 % =================================================================
-% 4. Output: title page
+% 3. Output: title page
 % =================================================================
 
 \NewDocumentCommand { \makefrontmatter } { }
@@ -334,7 +276,7 @@
 
 
 % =================================================================
-% 5. Output: optional front matter pages
+% 4. Output: optional front matter pages
 % =================================================================
 
 % Dedication: italic block in a 70%-width minipage, with text
@@ -415,7 +357,7 @@
 
 
 % =================================================================
-% 6. Output: back cover
+% 5. Output: back cover
 % =================================================================
 
 % Back cover colophon: author list, italic title, copyright year.
@@ -435,53 +377,6 @@
     :~ \textit { \@title, } ~ \textcopyright\ \efmcopyrightyear
   }
 
-\ExplSyntaxOff
-
-
-% =================================================================
-% 7. Hyperref integration (automatic PDF metadata sync)
-% =================================================================
-% At \begin{document}, if hyperref is loaded, populate pdftitle,
-% pdfauthor, pdfkeywords from the stored metadata. One source of
-% truth; no manual \hypersetup duplication needed.
-%
-% Implementation detail: the whole block (definition AND hook
-% registration) lives inside \ExplSyntaxOn so that `:` and `_` in
-% \__efm_sync_pdfmeta: are read as letters. If the \AtBeginDocument
-% body were tokenised outside \ExplSyntaxOn, the stored tokens would
-% contain a cat-8 subscript `_` that triggers math-mode errors when
-% the hook fires.
-%
-% We pre-build the keyval string via \tl_set:Nx (fully expanding L3
-% accessors) and feed the result to \hypersetup via \exp_args:NV.
-% Passing L3 accessors directly inside \hypersetup{...} would fail
-% because \hypersetup tokenises before expansion.
-\ExplSyntaxOn
-\cs_new_protected:Npn \__efm_sync_pdfmeta:
-  {
-    % Build sanitised strings for PDF metadata. Two subtleties:
-    %   - Author separator uses \c_space_tl (plain space) not `~', because
-    %     a tilde in the stored tl would expand to \nobreakspace which
-    %     (via its \unhbox\voidb@x internals) trips \pdfstringdef.
-    %   - Keywords are converted via \tl_to_str:N so any `~' the user
-    %     wrote inside \keywords{...} becomes a literal tilde character,
-    %     again avoiding \nobreakspace in the PDF string.
-    \tl_set:Nx \l_tmpa_tl
-      {
-        pdftitle    = { \@title } ,
-        pdfauthor   = { \seq_use:Nn \g__efm_authors_seq { ,\c_space_tl } } ,
-        pdfsubject  = { \tl_use:N \g__efm_subtitle_tl } ,
-        pdfkeywords = { \tl_to_str:N \g__efm_keywords_tl }
-      }
-    \exp_args:NV \hypersetup \l_tmpa_tl
-  }
-
-\AtBeginDocument
-  {
-    \@ifpackageloaded { hyperref }
-      { \__efm_sync_pdfmeta: }
-      { }
-  }
 \ExplSyntaxOff
 
 \endinput

@@ -1,22 +1,28 @@
 % =================================================================
 % e_frontbackmatter_simple.sty
-% Minimal frontmatter that defers to the base class \maketitle.
+% Article-style frontmatter: hooks per-author name/email/address into
+% the base-class \@maketitle (between title and date), plus the
+% existing institution + location lines. Thesis-only commands
+% (\subjclass, \dedicatory, \setabstract, \setacknowledgements) are
+% accepted as warned stubs so documents compile when switching to/from
+% e_frontbackmatter_formal.
 %
-% Stubs all metadata commands from e_frontbackmatter_formal so that
-% documents compile without errors when switching between styles.
+% Author/email/address/institution/location/subtitle/keywords/pdftitle
+% commands and PDF-metadata sync live in e_frontbackmatter_core.sty,
+% which both this package and e_frontbackmatter_formal.sty require.
 % =================================================================
 
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesPackage{e_frontbackmatter_simple}%
-  [2026/04/11 Simple frontmatter (base-class defaults)]
+  [2026/05/19 Simple frontmatter (base-class maketitle + institution/location)]
 
-% Stub formal-only metadata commands.
-% These commands render in e_frontbackmatter_formal (loaded by
-% e_class_noteLong and e_class_thesis). Here they are accepted so
-% documents compile when switched to simple frontmatter, but not
-% rendered. A compile-time warning surfaces the limitation so the
-% silent-drop isn't surprising when a user writes, e.g., \subtitle
-% in an e_class_noteShort document.
+\RequirePackage{e_frontbackmatter_core}
+
+
+% --- Thesis-only commands kept as warned stubs.
+% (\subtitle and \keywords are NOT stubbed here -- core stores them
+% silently for hyperref pdfsubject/pdfkeywords sync, even though they
+% are not rendered in the title block by \@maketitle below.)
 \makeatletter
 \newcommand{\@e@fm@warn@ignored}[1]{%
     \PackageWarning{e_frontbackmatter_simple}{%
@@ -25,21 +31,74 @@
          or bake the content into \string\title\space directly)%
     }%
 }
-
-\newcommand{\subtitle}[1]{\@e@fm@warn@ignored{\string\subtitle}}
-\newcommand{\institution}[1]{\@e@fm@warn@ignored{\string\institution}}
-\newcommand{\location}[1]{\@e@fm@warn@ignored{\string\location}}
-\newcommand{\email}[1]{\@e@fm@warn@ignored{\string\email}}
-\newcommand{\address}[1]{\@e@fm@warn@ignored{\string\address}}
-\newcommand{\dedicatory}[1]{\@e@fm@warn@ignored{\string\dedicatory}}
-\newcommand{\keywords}[1]{\@e@fm@warn@ignored{\string\keywords}}
-\newcommand{\subjclass}[2][]{\@e@fm@warn@ignored{\string\subjclass}}
-\newcommand{\setabstract}[1]{\@e@fm@warn@ignored{\string\setabstract}}
-\newcommand{\setacknowledgements}[1]{\@e@fm@warn@ignored{\string\setacknowledgements}}
+% Signatures match e_frontbackmatter_formal so a document switching
+% between simple and formal compiles either way; the optional args
+% are silently consumed.
+\NewDocumentCommand{\dedicatory}         { +m         }{\@e@fm@warn@ignored{\string\dedicatory}}
+\NewDocumentCommand{\subjclass}          { O{2020} m  }{\@e@fm@warn@ignored{\string\subjclass}}
+\NewDocumentCommand{\setabstract}        { O{} O{} +m }{\@e@fm@warn@ignored{\string\setabstract}}
+\NewDocumentCommand{\setacknowledgements}{ O{} O{} +m }{\@e@fm@warn@ignored{\string\setacknowledgements}}
 \makeatother
 
-% We intentionally do NOT redefine \maketitle here.
-% The base class (book or article) provides its own \maketitle,
-% which is the desired behavior for simple frontmatter.
+
+% --- Render helpers (called from \@maketitle below).
+\ExplSyntaxOn
+
+% Iterate \g__efm_authors_seq, rendering each author as:
+%   Name [\thanks{email}]
+%   [\\ {\small\itshape address}]
+% with vertical spacing between authors. Single-entry seqs (whether
+% from \author{Alice} or \author{Alice \quad Bob}) render as one line.
+\cs_new_protected:Npn \efmrenderauthors
+  {
+    \seq_map_indexed_inline:Nn \g__efm_authors_seq
+      {
+        ##2
+        \tl_set:Nx \l_tmpa_tl
+          { \seq_item:Nn \g__efm_emails_seq { ##1 } }
+        \tl_if_blank:VF \l_tmpa_tl
+          { \thanks { \l_tmpa_tl } }
+        \tl_set:Nx \l_tmpb_tl
+          { \seq_item:Nn \g__efm_addresses_seq { ##1 } }
+        \tl_if_blank:VF \l_tmpb_tl
+          { \\ {\small \itshape \l_tmpb_tl } }
+        \par \vspace{0.3em}
+      }
+  }
+
+% Render \institution + \location lines (centered, between author block
+% and date) when set. Both are no-ops when blank.
+\cs_new_protected:Npn \efmrenderlocations
+  {
+    \tl_if_blank:VF \g__efm_institution_tl
+      { \vskip 0.4em { \normalsize \tl_use:N \g__efm_institution_tl \par } }
+    \tl_if_blank:VF \g__efm_location_tl
+      { \vskip 0.2em { \small      \tl_use:N \g__efm_location_tl    \par } }
+  }
+
+\ExplSyntaxOff
+
+
+% --- Hook the renderers into base-class \@maketitle.
+% Layout: title → per-author block (name + thanks-email + address) →
+% institution → location → date. \let\footnote\thanks routes any
+% \footnote-call inside the author block to the title-page footnote
+% mechanism (so the thanks-emails land at the bottom of the title page).
+\makeatletter
+\renewcommand{\@maketitle}{%
+    \newpage \null \vskip 2em%
+    \begin{center}%
+        \let\footnote\thanks
+        {\LARGE \@title \par}%
+        \vskip 1.5em%
+        {\large \lineskip .5em%
+            \efmrenderauthors
+        }%
+        \efmrenderlocations
+        \vskip 1em%
+        {\large \@date}%
+    \end{center}%
+    \par \vskip 1.5em}
+\makeatother
 
 \endinput

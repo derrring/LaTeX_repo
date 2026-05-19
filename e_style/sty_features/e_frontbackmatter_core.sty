@@ -1,0 +1,215 @@
+% =================================================================
+% e_frontbackmatter_core.sty
+% Shared author/affiliation/PDF-metadata core for the frontbackmatter
+% family. Loaded by both e_frontbackmatter_simple.sty (article-style
+% inline \@maketitle) and e_frontbackmatter_formal.sty (book-style
+% standalone \makefrontmatter page). The two variants share the
+% storage layer and command vocabulary; they differ only in rendering.
+%
+% AMS-compatible author metadata API (sequential pattern):
+%   \author{Name}                  -- push a new author slot
+%   \email{addr}                   -- attach to most recent \author
+%   \address{affiliation}          -- attach to most recent \author
+%   \addauthor[email][addr]{Name}  -- one-call convenience
+%
+% Document-level metadata API:
+%   \subtitle{...}     -- rendered by formal; stored (PDF) by simple
+%   \institution{...}  -- rendered by both
+%   \location{...}     -- rendered by both
+%   \keywords{...}     -- rendered by formal; stored (PDF) by simple
+%   \pdftitle{...}     -- plain-text override for hyperref pdftitle
+%                         (useful when \title{...} contains \\, \strut,
+%                         or other tokens \pdfstringdef cannot serialise)
+%
+% Storage (expl3 globals; consumer packages read these directly):
+%   \g__efm_authors_seq, \g__efm_emails_seq, \g__efm_addresses_seq
+%   \g__efm_author_count_int
+%   \g__efm_subtitle_tl, \g__efm_institution_tl, \g__efm_location_tl
+%   \g__efm_keywords_tl, \g__efm_pdftitle_tl
+%
+% Hyperref integration:
+%   At \begin{document}, if hyperref is loaded, pdftitle / pdfauthor /
+%   pdfsubject / pdfkeywords are populated from the stored metadata.
+%   Single source of truth; no manual \hypersetup duplication.
+%
+% Not in core (consumer-specific):
+%   Customisation points (\efmabstractlabel etc.), thesis-only metadata
+%   (\subjclass, \dedicatory, \setabstract, \setacknowledgements), and
+%   the rendering commands (\@maketitle renew vs \makefrontmatter) live
+%   in e_frontbackmatter_simple.sty and e_frontbackmatter_formal.sty
+%   respectively.
+%
+% Compatibility note on \author (single-author and multi-author both work):
+%   This package renews \author to PUSH onto a sequence. Three usage
+%   patterns are supported, each rendering as expected:
+%     - Single author:        \author{Alice}
+%                               → 1 seq entry; renders "Alice".
+%     - Multi-author, single string:
+%                             \author{Alice \quad Bob}
+%                               → 1 seq entry; renders the supplied
+%                               string verbatim. No per-author email
+%                               or address binding in this mode.
+%     - Multi-author, structured (recommended for per-author email/address):
+%                             \author{Alice} \email{a@x} \address{...}
+%                             \author{Bob}   \email{b@x} \address{...}
+%                               → 2 seq entries with distinct slots;
+%                               or use \addauthor[email][addr]{Name}
+%                               as the one-call shorthand.
+%   Renderers (simple's \@maketitle, formal's \makefrontmatter) iterate
+%   the sequence, so all three patterns produce correct output.
+% =================================================================
+
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{e_frontbackmatter_core}%
+  [2026/05/19 Shared author/affiliation/PDF-metadata core]
+
+
+\ExplSyntaxOn
+
+% =================================================================
+% 1. Storage
+% =================================================================
+
+% Three parallel sequences: one entry per \author call.
+% \email and \address overwrite the slot for the current author.
+\seq_new:N \g__efm_authors_seq
+\seq_new:N \g__efm_emails_seq
+\seq_new:N \g__efm_addresses_seq
+
+% Index of the current (most recent) author slot.
+\int_new:N \g__efm_author_count_int
+
+% Scalar document-level metadata.
+\tl_new:N \g__efm_subtitle_tl
+\tl_new:N \g__efm_institution_tl
+\tl_new:N \g__efm_location_tl
+\tl_new:N \g__efm_keywords_tl
+\tl_new:N \g__efm_pdftitle_tl
+
+
+% =================================================================
+% 2. Author API (AMS sequential pattern)
+% =================================================================
+
+% \author{Name} -- push a new author; reset that author's email/address slots.
+\RenewDocumentCommand { \author } { m }
+  {
+    \seq_gput_right:Nn \g__efm_authors_seq   { #1 }
+    \seq_gput_right:Nn \g__efm_emails_seq    { }
+    \seq_gput_right:Nn \g__efm_addresses_seq { }
+    \int_gincr:N \g__efm_author_count_int
+  }
+
+% \email{addr} -- attach to the current (most recent) author.
+\NewDocumentCommand { \email } { m }
+  {
+    \int_compare:nNnT { \g__efm_author_count_int } > { 0 }
+      {
+        \seq_gset_item:Nnn \g__efm_emails_seq
+          { \g__efm_author_count_int } { #1 }
+      }
+  }
+
+% \address{affiliation} -- attach to the current author.
+% Distinct from the document-level \institution.
+\NewDocumentCommand { \address } { m }
+  {
+    \int_compare:nNnT { \g__efm_author_count_int } > { 0 }
+      {
+        \seq_gset_item:Nnn \g__efm_addresses_seq
+          { \g__efm_author_count_int } { #1 }
+      }
+  }
+
+% \addauthor[email][address]{Name} -- one-call convenience.
+% Equivalent to \author{Name} + optional \email{...} + optional \address{...}.
+\NewDocumentCommand { \addauthor } { O{} O{} m }
+  {
+    \author{#3}
+    \tl_if_blank:nF { #1 } { \email{#1} }
+    \tl_if_blank:nF { #2 } { \address{#2} }
+  }
+
+
+% =================================================================
+% 3. Document-level metadata commands
+% =================================================================
+
+\NewDocumentCommand { \subtitle }    { m }
+  { \tl_gset:Nn \g__efm_subtitle_tl    { #1 } }
+
+\NewDocumentCommand { \institution } { m }
+  { \tl_gset:Nn \g__efm_institution_tl { #1 } }
+
+\NewDocumentCommand { \location }    { m }
+  { \tl_gset:Nn \g__efm_location_tl    { #1 } }
+
+\NewDocumentCommand { \keywords }    { m }
+  { \tl_gset:Nn \g__efm_keywords_tl    { #1 } }
+
+% \pdftitle{Plain Text} -- override PDF metadata title.
+% Useful when \title{...} contains \strut, \\, or other typesetting
+% commands that hyperref's \pdfstringdef cannot serialise.
+\NewDocumentCommand { \pdftitle }    { m }
+  { \tl_gset:Nn \g__efm_pdftitle_tl    { #1 } }
+
+
+% =================================================================
+% 4. Hyperref PDF-metadata sync
+% =================================================================
+% At \begin{document}, if hyperref is loaded, pre-build the keyval
+% string from stored metadata and feed it to \hypersetup. The whole
+% block (definition AND hook registration) lives inside \ExplSyntaxOn
+% so that `:` and `_` in \__efm_sync_pdfmeta: are read as letters; if
+% the \AtBeginDocument body were tokenised outside expl3, the stored
+% tokens would carry a cat-8 subscript `_` and trip math-mode errors
+% at hook fire.
+%
+% Two subtleties handled here:
+%   - Author separator uses \c_space_tl (plain space) not `~', because
+%     a tilde in the stored tl expands to \nobreakspace, whose internals
+%     trip \pdfstringdef.
+%   - Keywords are flattened via \tl_to_str:N so any `~' the user wrote
+%     inside \keywords{...} becomes a literal tilde character.
+\cs_new_protected:Npn \__efm_sync_pdfmeta:
+  {
+    \tl_set:Nx \l_tmpa_tl
+      {
+        pdftitle    = {
+          \tl_if_blank:VTF \g__efm_pdftitle_tl
+            { \@title }
+            { \tl_use:N \g__efm_pdftitle_tl }
+        } ,
+        pdfauthor   = { \seq_use:Nn \g__efm_authors_seq { ,\c_space_tl } } ,
+        pdfsubject  = { \tl_use:N \g__efm_subtitle_tl } ,
+        pdfkeywords = { \tl_to_str:N \g__efm_keywords_tl }
+      }
+    \exp_args:NV \hypersetup \l_tmpa_tl
+  }
+
+\AtBeginDocument
+  {
+    \@ifpackageloaded { hyperref }
+      { \__efm_sync_pdfmeta: }
+      { }
+  }
+
+\ExplSyntaxOff
+
+
+% =================================================================
+% 5. Rendering helpers (consumed by simple/formal renderers)
+% =================================================================
+
+% \affilbreak -- inside \address{...} content, break to a new line
+% with tight spacing. Use when a single author has multiple affiliation
+% lines that would be too long on one line but too airy with bare `\\`.
+% Renderers wrap the address in a smaller font, so the negative-skip
+% value here is tuned for \small body text.
+%
+% Example:
+%   \addauthor[a@x][Department of Mechanical Engineering \affilbreak
+%                   Graduate School of Science and Technology]{Linyu Peng}
+\providecommand{\affilbreak}{\\[-0.3em]}
+
+\endinput
