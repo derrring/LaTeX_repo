@@ -175,6 +175,36 @@
     BoldFont={Source Han Sans Bold},
     ItalicFont={},
 ]
+% CJK has no italic/small-caps, so any italic context (\emph, \textit, \textsc,
+% theorem/def bodies) makes NFSS log "Kanji font shape JY3/.../m/it undefined"
+% and fall back to upright -- ~170 Font Info lines in a math paper, which bury
+% real LaTeX warnings. Declare those shapes as SILENT upright substitutes (ssub)
+% for both horizontal (JY3) and vertical (JT3), on the live mincho/gothic
+% families. We target \mcdefault/\gtdefault (luatexja's current family names,
+% = fontspec's generated SourceHanSerif(0)/SourceHanSans(0)); the \edef expands
+% them into the family argument. We do NOT pin NFSSFamily: pinning orphans the
+% JT3 companion font ("invalid font identifier", no PDF). Rationale + full test
+% matrix: TeX dev note "Debug: luatexja CJK 'font shape ... undefined' Font Info".
+\makeatletter
+\newcommand\ltj@nofakeital[2]{% #1 = encoding (JY3/JT3), #2 = expanded family
+    % upright m/n and b/n are the only real CJK shapes; route every italic /
+    % slanted / small-caps / bold-extended request to the same-weight upright.
+    \DeclareFontShape{#1}{#2}{m}{it}{<->ssub*#2/m/n}{}%
+    \DeclareFontShape{#1}{#2}{m}{sl}{<->ssub*#2/m/n}{}%
+    \DeclareFontShape{#1}{#2}{m}{sc}{<->ssub*#2/m/n}{}%
+    \DeclareFontShape{#1}{#2}{b}{it}{<->ssub*#2/b/n}{}%
+    \DeclareFontShape{#1}{#2}{b}{sl}{<->ssub*#2/b/n}{}%
+    \DeclareFontShape{#1}{#2}{b}{sc}{<->ssub*#2/b/n}{}%
+    \DeclareFontShape{#1}{#2}{bx}{n}{<->ssub*#2/b/n}{}%
+    \DeclareFontShape{#1}{#2}{bx}{it}{<->ssub*#2/b/n}{}%
+    \DeclareFontShape{#1}{#2}{bx}{sl}{<->ssub*#2/b/n}{}%
+    \DeclareFontShape{#1}{#2}{bx}{sc}{<->ssub*#2/b/n}{}%
+}
+\begingroup\edef\@tempa{\endgroup
+    \noexpand\ltj@nofakeital{JY3}{\mcdefault}\noexpand\ltj@nofakeital{JT3}{\mcdefault}%
+    \noexpand\ltj@nofakeital{JY3}{\gtdefault}\noexpand\ltj@nofakeital{JT3}{\gtdefault}%
+}\@tempa
+\makeatother
 % --- Semantic language wrappers: \zh \ja \ru \el and *sans variants ---
 %
 % Short two-letter macros that mark the language of inline passages.
