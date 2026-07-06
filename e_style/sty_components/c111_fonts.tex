@@ -4,16 +4,19 @@
 % Scope:
 %   - Latin body and sans (Noto Serif / Noto Sans)
 %   - Cyrillic and Greek via Noto Serif's native coverage
-%   - CJK via Source Han Serif / Sans (glyph-identical to Noto CJK)
+%   - CJK via Source Han Serif / Sans (system), else CTAN Harano Aji;
+%     rare/historical hanzi (Ext-B..H) via a HanaMin/Jigmo AltFont chain
+%     where installed (portable: absent fallbacks degrade to tofu, no error)
+%   - Sanskrit / Devanagari via Shobhika + HarfBuzz (fontspec, not luatexja)
 %   - luatexja in pass mode + jacharrange fix for non-CJK ranges
-%   - Polyglossia language registration (en, de, fr, ru, el)
+%   - Polyglossia language registration (en, de, fr, ru, el, sa)
 %   - \zh, \ja, \zhsans, \jasans semantic wrappers
 %   - Reverse-patch of luatexja's \em hook so CJK \emph falls back
 %     to upright song rather than the luatexja-default gothic switch
 %
 % Out of scope (handled elsewhere):
 %   - Math fonts: set at the bottom of this file, audited separately
-%   - Additional non-European scripts (Arabic, Hebrew, Devanagari, ...):
+%   - Additional non-European scripts (Arabic, Hebrew, ...):
 %     opt-in via c112_langfamily in the document preamble
 %   - Heavyweight Japanese layout features (ruby, kenten emphasis):
 %     opt-in via c113_cjk_engine in the document preamble
@@ -77,7 +80,7 @@
 % --- Load language and quoting support (always) ---
 \RequirePackage{polyglossia}
 \setdefaultlanguage{english}
-\setotherlanguages{german, french, russian, greek}
+\setotherlanguages{german, french, russian, greek, sanskrit}
 % csquotes is already required by e_core.
 
 % --- Set main fonts: Noto everywhere ---
@@ -149,11 +152,28 @@
     Ligatures=TeX,
 ]
 
+% --- Sanskrit / Devanagari ---
+% Devanagari is NOT luatexja territory (luatexja is CJK-only); it is plain
+% fontspec + HarfBuzz. Shobhika (IIT Bombay, ships in TeX Live -> portable)
+% covers Devanagari conjuncts + IAST/ISO-15919 romanization + basic Vedic
+% svara. Renderer=Harfbuzz is load-bearing: the default node shaper mis-orders
+% Devanagari conjuncts and Vedic accents (dotted circles); pin it so a config
+% change cannot silently drop to node. polyglossia's sanskrit language picks
+% up \sanskritfont (\textsanskrit{...} / the sanskrit environment). IAST
+% romanization needs no separate font -- the Noto Serif body carries the
+% diacritics. Heavy Vedic (Ṛg/Sāma svara) is safer in Chandas/Uttara; swap
+% \sanskritfont to one of those (system fonts) if a document needs it.
+\newfontfamily\sanskritfont{Shobhika}[
+    Script=Devanagari,
+    Renderer=Harfbuzz,
+]
+
 % --- CJK fonts ---
-% Universal CJK = Noto Serif CJK JP. Japanese mincho is the unrivalled choice
-% for a single CJK fallback because its character coverage spans JP shinjitai,
-% TC kyuujitai, SC simplified, hiragana, katakana, and CJK extensions A–H all
-% in one font. All \zh / \ja / \zhsans / \jasans wrappers route here.
+% Universal CJK = Noto Serif CJK JP. Japanese mincho is the choice for a single
+% CJK font because its coverage spans JP shinjitai, TC kyuujitai, SC simplified,
+% hiragana, katakana, and CJK Unified + Extension A. The Supplementary
+% Ideographic Plane (Ext-B..F, rare/historical ideographs) is NOT in it and is
+% covered by the HanaMinB AltFont below. All \zh / \ja / \zhsans / \jasans route here.
 %
 % No ItalicFont declaration: CJK has no real italic shape, and we want italic
 % context (myquotation, \emph, \textit) to fall back cleanly to upright song.
@@ -167,14 +187,37 @@
 % the wght axis requires hardcoded paths or workarounds we'd rather avoid.
 %
 % "Source Han Serif" with no SC/TC/JP/KR suffix is the JP variant.
-\setmainjfont{Source Han Serif}[
-    BoldFont={Source Han Serif Bold},
-    ItalicFont={},
-]
-\setsansjfont{Source Han Sans}[
-    BoldFont={Source Han Sans Bold},
-    ItalicFont={},
-]
+% --- Rare-character safety net, built for DISTRIBUTION (verified both ways
+%     by render test). Historical/rare hanzi live in the planes Source Han
+%     omits (Ext-B and up); route them through a coverage-ordered chain,
+%     best-quality first -- but wire ONLY the fonts actually installed, so a
+%     distributed document still compiles where only the CTAN fonts exist
+%     (Overleaf, a co-author). Absent fonts are skipped; their codepoints
+%     degrade to tofu, never a "font not found" error.
+%       Ext-B..F  (U+20000-2EBEF) -> HanaMinB (花園明朝B, real mincho; NOT on CTAN)
+%       Ext-I     (U+2EBF0-2EE5D) -> Jigmo2   (HanaMin lacks Ext-I;      NOT on CTAN)
+%       Ext-G,H   (U+30000-323AF) -> Jigmo3   (Plane 3; KAGE skeletons;  NOT on CTAN)
+%     Ext-J+ has no installed font -> tofu. GNU Unifont would be the terminal
+%     floor (also not installed / not in this TeX Live).
+\makeatletter
+\newcommand\e@cjkalt{}
+\IfFontExistsTF{HanaMinB}{\g@addto@macro\e@cjkalt{{Range="20000-"2EBEF, Font=HanaMinB},}}{}
+\IfFontExistsTF{Jigmo2}  {\g@addto@macro\e@cjkalt{{Range="2EBF0-"2EE5D, Font=Jigmo2},}}{}
+\IfFontExistsTF{Jigmo3}  {\g@addto@macro\e@cjkalt{{Range="30000-"323AF, Font=Jigmo3},}}{}
+% --- CJK primary. Prefer the system Source Han (nicer .ttc named weights);
+%     fall back to the CTAN-portable, glyph-compatible Harano Aji Mincho (the
+%     TeX Live default) so the style compiles on any machine. ItalicFont={}:
+%     CJK \emph falls to upright song (no fake-slant / kaiti / gothic switch);
+%     the ssub matrix + \em reverse-patch below make the AltFont chain reach
+%     every NFSS shape (see that block). \textbf rare glyphs are regular weight
+%     (the fallback fonts ship no bold master).
+\IfFontExistsTF{Source Han Serif}
+  {\setmainjfont{Source Han Serif}[BoldFont={Source Han Serif Bold}, ItalicFont={}, AltFont={\e@cjkalt}]}
+  {\setmainjfont{HaranoAjiMincho}[BoldFont={HaranoAjiMincho-Bold},  ItalicFont={}, AltFont={\e@cjkalt}]}
+\IfFontExistsTF{Source Han Sans}
+  {\setsansjfont{Source Han Sans}[BoldFont={Source Han Sans Bold}, ItalicFont={}]}
+  {\setsansjfont{HaranoAjiGothic}[BoldFont={HaranoAjiGothic-Bold}, ItalicFont={}]}
+\makeatother
 % CJK has no italic/small-caps, so any italic context (\emph, \textit, \textsc,
 % theorem/def bodies) makes NFSS log "Kanji font shape JY3/.../m/it undefined"
 % and fall back to upright -- ~170 Font Info lines in a math paper, which bury
