@@ -229,6 +229,11 @@
 % them into the family argument. We do NOT pin NFSSFamily: pinning orphans the
 % JT3 companion font ("invalid font identifier", no PDF). Rationale + full test
 % matrix: TeX dev note "Debug: luatexja CJK 'font shape ... undefined' Font Info".
+% DURABILITY: besides silencing the Font Info, this ssub matrix is what makes the
+% AltFont rare-char chain reach \emph/\textbf/\textsc -- via an UNDOCUMENTED luatexja
+% detail (fake shapes alias to the jfont-id that carries the AltFont). No spec
+% guarantees it across luatexja updates; the render regression test in
+% e_style/test/fonts/ is the ONLY guard. Do not "simplify" this block.
 \makeatletter
 \newcommand\ltj@nofakeital[2]{% #1 = encoding (JY3/JT3), #2 = expanded family
     % upright m/n and b/n are the only real CJK shapes; route every italic /
@@ -288,6 +293,11 @@
 % want \emph on CJK to fall back to upright song mincho (no italic shape
 % declared on the jfont, no gothic substitution either). Reverse-patch
 % (etoolbox is already required by e_core):
+% DURABILITY: this string-matches a luatexja INTERNAL token sequence
+% (\gtfamily\itshape); a rename there makes \patchcmd fail and the warning below
+% fires (fail-loud, correct). NEVER \WarningFilter it -- the render regression
+% test (e_style/test/fonts/) greps "Could not revert" as the signal that CJK
+% \emph silently reverted to gothic.
 \expandafter\patchcmd\csname em \endcsname{\gtfamily\itshape}{\itshape}{}{%
     \PackageWarning{c111_fonts}{Could not revert luatexja's \string\em\space patch.}}
 

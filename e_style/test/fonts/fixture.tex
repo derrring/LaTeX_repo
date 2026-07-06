@@ -1,0 +1,11 @@
+\documentclass{article}
+\usepackage[margin=1.2cm,paperwidth=16cm,paperheight=9cm]{geometry}
+\input{c111_fonts.tex}   % the real e_style font stack (kpsewhich/texmf)
+\pagestyle{empty}\setlength\parindent{0pt}
+\begin{document}\large
+\textbf{[CJK AltFont chain]} 漢字  ExtB 𠀀  ExtI 𮯰  ExtG 𰀀  ExtJ 𲎰\par\smallskip
+\textbf{[emph=mincho]} \emph{漢字 mincho 𠀀}\par\smallskip
+\textbf{[bold/sc reach]} \textbf{漢字 𠀀} \quad \textsc{漢字 𠀀}\par\smallskip
+\textbf{[Devanagari+Vedic]} \textsanskrit{संस्कृतम् अग्नि॑म्}\par\smallskip
+\textbf{[Greek/Russian]} {\greekfont ἄνθρωπος μῆνιν} \quad {\russianfont\itshape Толстой}\par
+\end{document}
