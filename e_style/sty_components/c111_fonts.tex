@@ -187,8 +187,10 @@
 % the wght axis requires hardcoded paths or workarounds we'd rather avoid.
 %
 % "Source Han Serif" with no SC/TC/JP/KR suffix is the JP variant.
-% --- Rare-character safety net, built for DISTRIBUTION (verified both ways
-%     by render test). Historical/rare hanzi live in the planes Source Han
+% --- Rare-character safety net, built for DISTRIBUTION (the full-font path is
+%     guarded by the render regression test in e_style/test/fonts/; the
+%     CTAN-only degraded path is by construction -- IfFontExists skip -- not a
+%     golden). Historical/rare hanzi live in the planes Source Han
 %     omits (Ext-B and up); route them through a coverage-ordered chain,
 %     best-quality first -- but wire ONLY the fonts actually installed, so a
 %     distributed document still compiles where only the CTAN fonts exist
@@ -199,6 +201,9 @@
 %       Ext-G,H   (U+30000-323AF) -> Jigmo3   (Plane 3; KAGE skeletons;  NOT on CTAN)
 %       Ext-J+    (U+323B0-3FFFF) -> Unifont Upper (GNU Unifont, bitmap terminal floor;
 %                                   NOT on CTAN -- brew cask font-gnu-unifont; last resort)
+%     U+2EE5E-2FFFF (incl. CJK Compatibility Ideographs Supplement 2F800-2FA1F)
+%     is deliberately unrouted: those are canonically equivalent to unified
+%     ideographs already covered, and normalization removes them.
 \makeatletter
 \newcommand\e@cjkalt{}
 \IfFontExistsTF{HanaMinB}{\g@addto@macro\e@cjkalt{{Range="20000-"2EBEF, Font=HanaMinB},}}{}
