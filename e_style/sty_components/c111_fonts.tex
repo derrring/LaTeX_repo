@@ -197,13 +197,14 @@
 %       Ext-B..F  (U+20000-2EBEF) -> HanaMinB (花園明朝B, real mincho; NOT on CTAN)
 %       Ext-I     (U+2EBF0-2EE5D) -> Jigmo2   (HanaMin lacks Ext-I;      NOT on CTAN)
 %       Ext-G,H   (U+30000-323AF) -> Jigmo3   (Plane 3; KAGE skeletons;  NOT on CTAN)
-%     Ext-J+ has no installed font -> tofu. GNU Unifont would be the terminal
-%     floor (also not installed / not in this TeX Live).
+%       Ext-J+    (U+323B0-3FFFF) -> Unifont Upper (GNU Unifont, bitmap terminal floor;
+%                                   NOT on CTAN -- brew cask font-gnu-unifont; last resort)
 \makeatletter
 \newcommand\e@cjkalt{}
 \IfFontExistsTF{HanaMinB}{\g@addto@macro\e@cjkalt{{Range="20000-"2EBEF, Font=HanaMinB},}}{}
 \IfFontExistsTF{Jigmo2}  {\g@addto@macro\e@cjkalt{{Range="2EBF0-"2EE5D, Font=Jigmo2},}}{}
 \IfFontExistsTF{Jigmo3}  {\g@addto@macro\e@cjkalt{{Range="30000-"323AF, Font=Jigmo3},}}{}
+\IfFontExistsTF{Unifont Upper}{\g@addto@macro\e@cjkalt{{Range="323B0-"3FFFF, Font=Unifont Upper},}}{}
 % --- CJK primary. Prefer the system Source Han (nicer .ttc named weights);
 %     fall back to the CTAN-portable, glyph-compatible Harano Aji Mincho (the
 %     TeX Live default) so the style compiles on any machine. ItalicFont={}:
