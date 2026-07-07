@@ -6,7 +6,13 @@
 \RequirePackage{expl3,xparse}
 \RequirePackage{amsmath,amssymb,mathtools,empheq}
 \RequirePackage{etoolbox}
-\RequirePackage{amsthm,thmtools}
+% thmtools -> keytheorems migration (2026-07-07): thmtools' bundled aliasctr.sty
+% clashes with the LaTeX kernel 2026-06-01 native counter aliasing (sibling= throws
+% "\c@<env> already defined"); thmtools upstream is unmaintained (muzimuzhi #69).
+% keytheorems is the maintainer-endorsed successor; [thmtools-compat] keeps the
+% \declaretheorem/\declaretheoremstyle syntax in c320_math_env.tex verbatim.
+\RequirePackage{amsthm}
+\RequirePackage[thmtools-compat]{keytheorems}
 %amsmath and ntheorem should be loaded before {fontspec}
 %mathtools offer pmatirx*
 \RequirePackage{cancel}

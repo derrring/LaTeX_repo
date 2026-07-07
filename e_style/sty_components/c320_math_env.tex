@@ -1,5 +1,5 @@
 % --- Theorem-like Environments ---
-% Requires: amsthm, thmtools (loaded in e_core.sty)
+% Requires: amsthm, keytheorems [thmtools-compat] (loaded in e_core.sty)
 \let\proof\relax
 \let\endproof\relax
 \newcommand{\thmbegin}{\raisebox{0.35ex}{$\scriptstyle\blacktriangleright$}\hspace{0.3em}}
@@ -90,8 +90,19 @@
 \declaretheorem[sibling=theorem, name=Proposition, style=general_thm_style]{proposition}
 \declaretheorem[sibling=theorem, name=Definition, style=def_style,]{definition}
 \declaretheorem[sibling=theorem, name=Lemma, style=general_thm_style]{lemma}
-\declaretheorem[sibling=theorem, name=Corollary,
-style=general_thm_style]{corollary}
+\declaretheorem[sibling=theorem, name=Corollary, style=general_thm_style]{corollary}
+
+% --- \autoref name parity: keytheorems defaults \<env>autorefname to the
+% lower-cased name ("theorem 1.1"); thmtools used the capitalized name.
+% Restore the capitalized forms so \autoref renders "Theorem 1.1". ---
+\renewcommand{\theoremautorefname}{Theorem}
+\renewcommand{\propositionautorefname}{Proposition}
+\renewcommand{\definitionautorefname}{Definition}
+\renewcommand{\lemmaautorefname}{Lemma}
+\renewcommand{\corollaryautorefname}{Corollary}
+\renewcommand{\exampleautorefname}{Example}
+\renewcommand{\exerciseautorefname}{Exercise}
+\renewcommand{\remarkautorefname}{Remark}
 
 % --- Unique hyperref anchors for counters that reset per section/chapter ---
 % Without this, hyperref creates duplicate destinations like 'example.1'

@@ -52,7 +52,7 @@ goes through `hyperref` exclusively, which is the
 | `fontspec` | `c111_fonts` | ✓ |
 | `luatexja` (CJK) | `c111_fonts` | ✓ for metadata; ⚠ PDF/A mode may fail font-embedding subset rules |
 | `biblatex` (+ biber) | per-doc | ✓ |
-| `mathtools`, `amsmath`, `thmtools` | `e_core` | ✓ |
+| `mathtools`, `amsmath`, `keytheorems` [thmtools-compat] | `e_core` | ✓ (thmtools replaced 2026-07-07; see e_core.sty) |
 
 ### Migration plan
 
