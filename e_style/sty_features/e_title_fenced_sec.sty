@@ -1,6 +1,6 @@
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesPackage{e_title_fenced_sec}%
-  [2026/07/11 v1.2 Stable fenced section geometry]
+  [2026/07/12 v1.3 Stable fenced section geometry]
 
 % Direct dependency for \titleformat and \titlespacing.
 \RequirePackage{titlesec}
@@ -15,10 +15,10 @@
 %
 % DIMENSION CONSTANTS:
 %   - Rule thickness: 1.5pt provides visible weight without being heavy.
-%   - Title gap: 1ex, measured in the fixed heading font, on both sides.
-%   - External rhythm: compact asymmetric spacing. More space above associates
-%     the heading with the text that follows; em units scale with the document
-%     font but not with body line spreading.
+%   - Title gap: 1ex, measured in the selected heading font, on both sides.
+%   - External rhythm: treat the complete fence as the heading boundary. Its
+%     visible before/after distances follow ordinary section-heading rhythm;
+%     em units scale with the document font but not body line spreading.
 % ====================================================================
 
 \makeatletter
@@ -26,6 +26,20 @@
 % Public font hook. The 1ex internal gaps below are evaluated after this hook,
 % so changing the title size also scales the fence-to-text separation.
 \newcommand{\eFencedSectionFont}{\normalfont\bfseries\large}
+
+% titlesec's after-skip is followed by the document's paragraph glue. Compute
+% a compensated value after the preamble so the visible net separation remains
+% 1em even when the document changes \parskip.
+\newskip\e@fenced@section@afterskip
+\newcommand{\e@fenced@section@syncspacing}{%
+  \begingroup
+    \normalfont\normalsize
+    \skip@=1em plus .1em\relax
+    \advance\skip@ by -\parskip
+    \global\e@fenced@section@afterskip=\skip@
+  \endgroup
+}
+\AddToHook{begindocument/end}{\e@fenced@section@syncspacing}
 
 % Keep the heading single-spaced and remove paragraph glue locally. The
 % nested vbox makes the visible gap exactly 1ex from each glyph box to its
@@ -76,11 +90,12 @@
 
 % Section spacing: {left}{before}{after}. The old 0pt/20pt pair left only the
 % ambient paragraph glue above the fence while adding a large dedicated gap
-% below it. Keep the total compact and assign more of it above. This declaration
-% affects \section only; lower heading levels retain their class defaults.
+% below it. Match an ordinary section's visible rhythm at the outer fence edges,
+% with more space above than below. This declaration affects \section only;
+% lower heading levels retain their class defaults.
 \titlespacing*{\section}{0pt}
-  {1.5em plus .2em minus .1em}
-  {.4em plus .1em}
+  {2.25em plus .3em minus .15em}
+  {\e@fenced@section@afterskip}
 
 \makeatother
 \endinput

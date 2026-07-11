@@ -5,7 +5,7 @@
 
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesPackage{e_title_fenced_chap}%
-  [2026/07/11 v1.2 Stable fenced chapter geometry]
+  [2026/07/12 v1.3 Stable fenced chapter geometry]
 
 % Direct dependency for \titleformat and \titlespacing.
 \RequirePackage{titlesec}
@@ -22,6 +22,20 @@
 % Public font hook. The 1ex internal gaps below are evaluated after this hook,
 % so changing the title size also scales the fence-to-text separation.
 \newcommand{\eFencedChapterFont}{\normalfont\bfseries\large}
+
+% titlesec's after-skip is followed by the document's paragraph glue. Compute
+% a compensated value after the preamble so the visible net separation remains
+% 1em even when the document changes \parskip.
+\newskip\e@fenced@chapter@afterskip
+\newcommand{\e@fenced@chapter@syncspacing}{%
+  \begingroup
+    \normalfont\normalsize
+    \skip@=1em plus .1em\relax
+    \advance\skip@ by -\parskip
+    \global\e@fenced@chapter@afterskip=\skip@
+  \endgroup
+}
+\AddToHook{begindocument/end}{\e@fenced@chapter@syncspacing}
 
 % Build the complete fence as one atomic box. Local single spacing and
 % zero paragraph glue isolate chapter heads from document-level setspace
@@ -71,9 +85,10 @@
   {\e@fenced@chapter@numberless}
 
 % Chapters already start on a fresh page, so no additional space is needed
-% above. Keep the body close to the lower fence; this declaration affects
-% \chapter only, leaving section and subsection spacing at class defaults.
-\titlespacing*{\chapter}{0pt}{0pt}{.5em plus .1em}
+% above. Measure the compact body separation from the lower fence, not from the
+% title glyphs inside it. This declaration affects \chapter only, leaving
+% section and subsection spacing at class defaults.
+\titlespacing*{\chapter}{0pt}{0pt}{\e@fenced@chapter@afterskip}
 
 \makeatother
 \endinput
