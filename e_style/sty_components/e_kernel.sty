@@ -1,0 +1,14 @@
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{e_kernel}[2026/07/11 v1.0 Shared LuaLaTeX kernel]
+
+\RequirePackage{iftex}
+\ifLuaTeX\else
+  \PackageError{e_kernel}
+    {The e_style family requires LuaLaTeX}
+    {Compile with lualatex. XeLaTeX and pdfLaTeX are not supported.}
+\fi
+
+\RequirePackage{expl3,xparse}
+\RequirePackage{etoolbox}
+
+\endinput

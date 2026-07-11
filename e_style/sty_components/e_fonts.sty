@@ -1,0 +1,84 @@
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{e_fonts}[2026/07/11 v1.0 LuaLaTeX text and math fonts]
+
+\RequirePackage{e_math}
+\makeatletter
+\@ifpackageloaded{fontspec}{}{\RequirePackage{fontspec}}
+\@ifpackageloaded{microtype}{}{\RequirePackage{microtype}}
+\@ifpackageloaded{silence}{}{\RequirePackage{silence}}
+\@ifpackageloaded{unicode-math}{}{%
+  \RequirePackage[warnings-off={mathtools-colon,mathtools-overbracket}]{unicode-math}%
+}
+\makeatother
+\RequirePackage{polyglossia}
+
+\setdefaultlanguage{english}
+\setotherlanguages{german,french,russian,greek,sanskrit}
+
+\setmainfont{Noto Serif}[
+  UprightFont=*-Regular,
+  BoldFont=*-Bold,
+  ItalicFont=*-Italic,
+  BoldItalicFont=*-BoldItalic,
+  Ligatures=TeX,
+]
+\setsansfont{Noto Sans}[
+  UprightFont=*-Regular,
+  BoldFont=*-Bold,
+  ItalicFont=*-Italic,
+  BoldItalicFont=*-BoldItalic,
+  Ligatures=TeX,
+]
+\setmonofont{Source Code Pro}
+
+\newfontfamily\russianfont{PT Serif}[
+  UprightFont=* ,
+  BoldFont=* Bold,
+  ItalicFont=* Italic,
+  BoldItalicFont=* Bold Italic,
+]
+\newfontfamily\russiansansfont{PT Sans}[
+  UprightFont=* ,
+  BoldFont=* Bold,
+  ItalicFont=* Italic,
+  BoldItalicFont=* Bold Italic,
+]
+\newfontfamily\greekfont{LibertinusSerif}[
+  Extension=.otf,
+  UprightFont=*-Regular,
+  BoldFont=*-Bold,
+  ItalicFont=*-Italic,
+  BoldItalicFont=*-BoldItalic,
+  Ligatures=TeX,
+]
+\newfontfamily\greeksansfont{LibertinusSans}[
+  Extension=.otf,
+  UprightFont=*-Regular,
+  BoldFont=*-Bold,
+  ItalicFont=*-Italic,
+  Ligatures=TeX,
+]
+\newfontfamily\sanskritfont{Shobhika}[
+  Script=Devanagari,
+  Renderer=Harfbuzz,
+]
+
+\def\ru#1{{\russianfont #1}}
+\def\el#1{{\greekfont #1}}
+\def\rusans#1{{\russiansansfont #1}}
+\def\elsans#1{{\greeksansfont #1}}
+
+\AtEndPreamble{%
+  \setmathfont[StylisticSet=01]{STIX Two Math}%
+  \setmathfont[version=bold,StylisticSet=01,FakeBold=1.5]{STIX Two Math}%
+  \setmathfont[range={bb}]{New Computer Modern Math}%
+  \setmathfont[range={scr,bfscr},Scale=MatchUppercase]{XITS Math}%
+  \setmathfont[range={cal,bfcal}]{IBM Plex Math}%
+  \setmathfont[range={bfcal},FakeBold=1.5]{IBM Plex Math}%
+  \setmathfont[range={cal,bfcal},version=bold,FakeBold=1.5]{IBM Plex Math}%
+  \setmathfont[range={frak,bffrak}]{New Computer Modern Math}%
+}
+
+\input{sty_components/c410_hyphenation.tex}
+
+\endinput

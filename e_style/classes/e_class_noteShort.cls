@@ -20,9 +20,9 @@
 % Legacy CJK options are accepted but no-op in 2026 refactor.
 \DeclareOption{cjk}{\ClassWarning{e_class_noteShort}{%
     The [cjk] option is deprecated.\MessageBreak
-    Use \string\usepackage{c113_cjk_engine} in the document preamble%
-    \MessageBreak for full CJK layout, or \string\usepackage{c112_langfamily}%
-    \MessageBreak for lightweight per-script glyph rendering}}
+    The standard profile already provides CJK glyph routing.\MessageBreak
+    Use \string\usepackage{c113_cjk_engine} for full Japanese layout%
+    \MessageBreak or c112_langfamily for custom per-script font families}}
 \DeclareOption{nocjk}{}
 
 % When the '12pt' option is found, pass it to the base class
@@ -40,7 +40,7 @@
 \makeatother
 
 
-\RequirePackage{e_standard_doc}
+\RequirePackage{e_profile_standard}
 \RequirePackage{e_frontbackmatter_simple}
 \RequirePackage{e_title_fenced_sec}
 \RequirePackage{e_math_env_deco}

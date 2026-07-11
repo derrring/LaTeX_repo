@@ -24,7 +24,7 @@
 % Storage (expl3 globals; consumer packages read these directly):
 %   \g__efm_authors_seq, \g__efm_emails_seq, \g__efm_addresses_seq
 %   \g__efm_author_count_int
-%   \g__efm_subtitle_tl, \g__efm_institution_tl, \g__efm_location_tl
+%   \g__efm_title_tl, \g__efm_subtitle_tl, \g__efm_institution_tl, \g__efm_location_tl
 %   \g__efm_keywords_tl, \g__efm_pdftitle_tl
 %
 % Hyperref integration:
@@ -80,6 +80,7 @@
 \int_new:N \g__efm_author_count_int
 
 % Scalar document-level metadata.
+\tl_new:N \g__efm_title_tl
 \tl_new:N \g__efm_subtitle_tl
 \tl_new:N \g__efm_institution_tl
 \tl_new:N \g__efm_location_tl
@@ -90,6 +91,12 @@
 % =================================================================
 % 2. Author API (AMS sequential pattern)
 % =================================================================
+
+% Keep the standard LaTeX metadata view live. Formal documents may use either
+% \maketitle or \makefrontmatter, and third-party packages commonly inspect
+% \@author directly.
+\cs_gset_protected:Npn \@author
+  { \seq_use:Nn \g__efm_authors_seq { \and } }
 
 % \author{Name} -- push a new author; reset that author's email/address slots.
 \RenewDocumentCommand { \author } { m }
@@ -135,6 +142,16 @@
 % 3. Document-level metadata commands
 % =================================================================
 
+% Mirror \title in dedicated storage instead of probing/expanding \@title.
+% Before a title is supplied, standard LaTeX defines \@title as an error
+% sentinel; expanding it from a begin-document metadata hook is fatal.
+\cs_new_eq:NN \__efm_latex_title:n \title
+\RenewDocumentCommand { \title } { m }
+  {
+    \__efm_latex_title:n { #1 }
+    \tl_gset:Nn \g__efm_title_tl { #1 }
+  }
+
 \NewDocumentCommand { \subtitle }    { m }
   { \tl_gset:Nn \g__efm_subtitle_tl    { #1 } }
 
@@ -165,26 +182,36 @@
 % tokens would carry a cat-8 subscript `_` and trip math-mode errors
 % at hook fire.
 %
-% Two subtleties handled here:
-%   - Author separator uses \c_space_tl (plain space) not `~', because
-%     a tilde in the stored tl expands to \nobreakspace, whose internals
-%     trip \pdfstringdef.
-%   - Keywords are flattened via \tl_to_str:N so any `~' the user wrote
-%     inside \keywords{...} becomes a literal tilde character.
 \cs_new_protected:Npn \__efm_sync_pdfmeta:
   {
-    \tl_set:Nx \l_tmpa_tl
+    % Build the author list without expanding author content. Generate a real
+    % catcode-10 space so hyperref does not see an expl3 spacing command.
+    \tl_clear:N \l_tmpa_tl
+    \seq_map_indexed_inline:Nn \g__efm_authors_seq
       {
-        pdftitle    = {
-          \tl_if_blank:VTF \g__efm_pdftitle_tl
-            { \@title }
-            { \tl_use:N \g__efm_pdftitle_tl }
-        } ,
-        pdfauthor   = { \seq_use:Nn \g__efm_authors_seq { ,\c_space_tl } } ,
-        pdfsubject  = { \tl_use:N \g__efm_subtitle_tl } ,
-        pdfkeywords = { \tl_to_str:N \g__efm_keywords_tl }
+        \int_compare:nNnT { ##1 } > { 1 }
+          { \tl_put_right:Nx \l_tmpa_tl { , \char_generate:nn { 32 } { 10 } } }
+        \tl_put_right:Nn \l_tmpa_tl { ##2 }
       }
-    \exp_args:NV \hypersetup \l_tmpa_tl
+    % Explicit hyperref metadata wins. The dedicated \pdftitle API is also an
+    % explicit override; ordinary title/author data only fills empty fields.
+    % Let hyperref sanitize user tokens rather than x-expanding them here.
+    \tl_if_blank:VTF \g__efm_pdftitle_tl
+      {
+        \ifx\@pdftitle\@empty
+          \hypersetup { pdftitle = { \tl_use:N \g__efm_title_tl } }
+        \fi
+      }
+      { \hypersetup { pdftitle = { \tl_use:N \g__efm_pdftitle_tl } } }
+    \ifx\@pdfauthor\@empty
+      \hypersetup { pdfauthor = { \tl_use:N \l_tmpa_tl } }
+    \fi
+    \ifx\@pdfsubject\@empty
+      \hypersetup { pdfsubject = { \tl_use:N \g__efm_subtitle_tl } }
+    \fi
+    \ifx\@pdfkeywords\@empty
+      \hypersetup { pdfkeywords = { \tl_use:N \g__efm_keywords_tl } }
+    \fi
   }
 
 \AtBeginDocument

@@ -1,0 +1,14 @@
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{e_bibliography}[2026/07/11 v1.0 Conditional biblatex customizations]
+
+\RequirePackage{e_kernel}
+
+\makeatletter
+\AtEndPreamble{%
+  \@ifpackageloaded{biblatex}{%
+    \input{sty_components/c510_ref_bib.tex}%
+  }{}%
+}
+\makeatother
+
+\endinput

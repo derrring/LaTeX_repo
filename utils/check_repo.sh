@@ -1,0 +1,85 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+BUILD_ROOT="$(mktemp -d "${TMPDIR:-/tmp}/latex-repo-check.XXXXXX")"
+trap 'rm -rf "$BUILD_ROOT"' EXIT
+
+for tool in latexmk lualatex pdftotext; do
+    command -v "$tool" >/dev/null || {
+        echo "FAIL: required tool not found: $tool" >&2
+        exit 1
+    }
+done
+
+export TEXINPUTS="$ROOT//:${TEXINPUTS:-}"
+
+run_latexmk() {
+    local work="$1"
+    local source="$2"
+    if ! (
+        cd "$work"
+        latexmk -lualatex -interaction=nonstopmode -halt-on-error "$source" >build.out 2>&1
+    ); then
+        echo "FAIL: $source did not compile" >&2
+        tail -40 "$work/${source%.tex}.log" >&2 || tail -40 "$work/build.out" >&2
+        exit 1
+    fi
+}
+
+compile() {
+    local work="$1"
+    local source="$2"
+    mkdir -p "$work"
+    cp "$source" "$work/"
+    run_latexmk "$work" "$(basename "$source")"
+}
+
+STANDARD="$BUILD_ROOT/standard"
+mkdir -p "$STANDARD"
+cp "$ROOT"/examples/sample_*.tex "$ROOT/examples/color_appendix.tex" "$STANDARD/"
+for source in sample_article.tex sample_noteShort.tex sample_noteLong.tex sample_thesis.tex; do
+    run_latexmk "$STANDARD" "$source"
+done
+
+if grep -Fq 'No \author given' "$STANDARD/sample_noteLong.log" ||
+   grep -Fq 'No \author given' "$STANDARD/sample_thesis.log"; then
+    echo "FAIL: formal-class maketitle lost author metadata" >&2
+    exit 1
+fi
+
+CV="$BUILD_ROOT/cv"
+mkdir -p "$CV"
+cp "$ROOT"/examples/cv/*.tex "$CV/"
+for source in cv_eg-1col.tex cv_eg-2col.tex; do
+    run_latexmk "$CV" "$source"
+done
+
+SMOKE="$ROOT/e_style/test/smoke"
+compile "$BUILD_ROOT/empty" "$SMOKE/empty_article.tex"
+compile "$BUILD_ROOT/code" "$SMOKE/code_optin.tex"
+compile "$BUILD_ROOT/anchors" "$SMOKE/numberless_anchor.tex"
+compile "$BUILD_ROOT/toc-state" "$SMOKE/toc_state.tex"
+compile "$BUILD_ROOT/beamer" "$SMOKE/sample_beamer.tex"
+
+ANCHOR_AUX="$BUILD_ROOT/anchors/numberless_anchor.aux"
+grep -Fq '{section*.1}' "$ANCHOR_AUX"
+grep -Fq '{section*.2}' "$ANCHOR_AUX"
+
+TOC_LOG="$BUILD_ROOT/toc-state/toc_state.log"
+grep -Fq 'E-TOC-BEFORE=1' "$TOC_LOG"
+grep -Fq 'E-TOC-AFTER=1' "$TOC_LOG"
+
+BEAMER_TEXT="$BUILD_ROOT/beamer/second-separator.txt"
+pdftotext -f 3 -l 3 -layout "$BUILD_ROOT/beamer/sample_beamer.pdf" "$BEAMER_TEXT"
+grep -Fq 'Second' "$BEAMER_TEXT"
+if grep -Fq 'Custom First' "$BEAMER_TEXT"; then
+    echo "FAIL: sepframe option state leaked into the next call" >&2
+    exit 1
+fi
+
+if [[ "${1:-}" == "--fonts" ]]; then
+    (cd "$ROOT/e_style/test/fonts" && python3 check.py)
+fi
+
+echo "PASS: repository smoke checks"

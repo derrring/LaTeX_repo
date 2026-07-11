@@ -1,0 +1,51 @@
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{e_document_layout}[2026/07/11 v1.0 Standard-document layout and navigation]
+
+\RequirePackage{e_kernel}
+\RequirePackage{e_visual}
+\RequirePackage{e_tables}
+\RequirePackage[unicode]{hyperref}
+\RequirePackage{bookmark}
+\RequirePackage{geometry}
+\RequirePackage{fancyhdr}
+\RequirePackage{titlesec,titletoc,etoc}
+\RequirePackage{enumitem}
+
+\input{sty_components/c110_layout.tex}
+\input{sty_components/c130_toc.tex}
+
+\hypersetup{
+  colorlinks=true,
+  linkcolor=mylinkcolor,
+  citecolor=mycitecolor,
+  urlcolor=mylinkcolor,
+  anchorcolor=mylinkcolor,
+  filecolor=mylinkcolor,
+  linktoc=page,
+}
+
+% Class option bridge retained from the legacy font component. Feature
+% packages own the levels they decorate and must not be overwritten here.
+\makeatletter
+\@ifundefined{if@e@twelvept}{%
+  \newif\if@e@twelvept
+  \@e@twelveptfalse
+}{}
+\AddToHook{begindocument/end}{%
+  \if@e@twelvept
+    \@ifpackageloaded{e_title_fenced_sec}{}{%
+      \titleformat{\section}
+        {\fontsize{14.4pt}{17.28pt}\selectfont\bfseries}
+        {\thesection}{1em}{}%
+    }%
+    \titleformat{\subsection}
+      {\fontsize{12pt}{14.4pt}\selectfont\bfseries}
+      {\thesubsection}{1em}{}%
+    \titleformat{\subsubsection}
+      {\fontsize{11pt}{13.2pt}\selectfont\bfseries}
+      {\thesubsubsection}{1em}{}%
+  \fi
+}
+\makeatother
+
+\endinput

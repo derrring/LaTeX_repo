@@ -41,18 +41,18 @@ goes through `hyperref` exclusively, which is the
 
 | Package | Loaded by | `\DocumentMetadata` compatibility |
 |---|---|---|
-| `hyperref` | `e_standard_doc` | ✓ cooperates natively (>=2022) |
-| `bookmark` | `e_standard_doc` | ✓ improves with `\DocumentMetadata` |
-| `geometry` | `e_standard_doc` | ✓ unaffected |
-| `fancyhdr` | `e_standard_doc` | ✓ unaffected |
-| `titlesec`, `titletoc`, `etoc` | `e_standard_doc` | ✓ unaffected |
+| `hyperref` | `e_document_layout` | ✓ cooperates natively (>=2022) |
+| `bookmark` | `e_document_layout` | ✓ improves with `\DocumentMetadata` |
+| `geometry` | `e_document_layout` | ✓ unaffected |
+| `fancyhdr` | `e_document_layout` | ✓ unaffected |
+| `titlesec`, `titletoc`, `etoc` | `e_document_layout` | ✓ unaffected |
 | `tcolorbox` (+ skins, breakable, ...) | `c140_envs` / `e_math_env_deco` | ✓ metadata; ⚠ Tagged PDF (`testphase`) may produce untagged callout/theorem boxes |
-| `microtype` | `c111_fonts` | ✓ |
-| `unicode-math` | `c111_fonts` | ✓ |
-| `fontspec` | `c111_fonts` | ✓ |
-| `luatexja` (CJK) | `c111_fonts` | ✓ for metadata; ⚠ PDF/A mode may fail font-embedding subset rules |
+| `microtype` | `e_fonts` / `e_cjk` | ✓ |
+| `unicode-math` | `e_fonts` / `e_cjk` | ✓ |
+| `fontspec` | `e_fonts` / `e_cjk` | ✓ |
+| `luatexja` (CJK) | `e_cjk` | ✓ for metadata; ⚠ PDF/A mode may fail font-embedding subset rules |
 | `biblatex` (+ biber) | per-doc | ✓ |
-| `mathtools`, `amsmath`, `keytheorems` [thmtools-compat] | `e_core` | ✓ (thmtools replaced 2026-07-07; see e_core.sty) |
+| `mathtools`, `amsmath`, `keytheorems` [thmtools-compat] | `e_math` / `e_theorem_base` | ✓ (thmtools replaced 2026-07-07) |
 
 ### Migration plan
 

@@ -2,8 +2,6 @@
 import os
 import sys
 import subprocess
-import platform
-import shutil
 from pathlib import Path
 
 """
@@ -43,52 +41,40 @@ def get_texmf_home():
 
 
 def link_directory(src_path: Path, dest_path: Path):
-    """Remove the old link/dir and create a new symbolic link after user confirmation."""
+    """Atomically install a link, refusing to replace real files/directories."""
     if not src_path.exists():
         print(
             f"Warning: Source directory '{src_path}' does not exist. Skipping.",
             file=sys.stderr,
         )
-        return
+        return False
 
     print(f"Preparing to link '{src_path.name}'...")
 
-    # --- MODIFICATION: Added safety check and user confirmation ---
-    if dest_path.exists():
+    if dest_path.exists() and not dest_path.is_symlink():
         print(
-            f"Warning: A file or directory already exists at the destination '{dest_path}'."
+            f"Error: refusing to replace non-symlink destination '{dest_path}'.",
+            file=sys.stderr,
         )
-        response = (
-            input("Do you want to remove it and continue? (y/n): ").lower().strip()
-        )
-        if response != "y":
-            print("Operation cancelled by user. Skipping this directory.")
-            return
+        return False
 
-        # Remove existing link or directory at the destination
-        try:
-            if dest_path.is_symlink() or dest_path.is_file():
-                dest_path.unlink()
-            elif dest_path.is_dir():
-                shutil.rmtree(dest_path)
-            print("Removed existing target.")
-        except OSError as e:
-            print(f"Error removing '{dest_path}': {e}", file=sys.stderr)
-            return
-    # --- END MODIFICATION ---
-
-    # Create the symbolic link
+    temp_path = dest_path.with_name(f".{dest_path.name}.tmp-{os.getpid()}")
     try:
-        dest_path.symlink_to(src_path, target_is_directory=True)
+        temp_path.unlink(missing_ok=True)
+        temp_path.symlink_to(src_path, target_is_directory=True)
+        temp_path.replace(dest_path)
         print(
             f"Successfully linked:\n  Source: '{src_path}'\n  Destination: '{dest_path}'\n"
         )
+        return True
     except OSError as e:
+        temp_path.unlink(missing_ok=True)
         print(f"Error creating symbolic link: {e}", file=sys.stderr)
         print(
             "On Windows, you may need to run this script with administrator privileges.",
             file=sys.stderr,
         )
+        return False
 
 
 def main():
@@ -109,10 +95,29 @@ def main():
     print(f"TEXMFHOME is: {texmf_home}")
     print(f"Linking styles to: {dest_base_dir}\n{'=='*20}")
 
+    unsafe_destinations = [
+        dest_base_dir / src_path.name
+        for src_path in source_dirs
+        if (dest_base_dir / src_path.name).exists()
+        and not (dest_base_dir / src_path.name).is_symlink()
+    ]
+    if unsafe_destinations:
+        for destination in unsafe_destinations:
+            print(
+                f"Error: refusing to replace non-symlink destination '{destination}'.",
+                file=sys.stderr,
+            )
+        sys.exit(1)
+
     # Create the links
+    links_ok = True
     for src_path in source_dirs:
-        link_directory(src_path, dest_base_dir / src_path.name)
+        links_ok = link_directory(src_path, dest_base_dir / src_path.name) and links_ok
         print("-" * 20)
+
+    if not links_ok:
+        print("One or more links could not be installed.", file=sys.stderr)
+        sys.exit(1)
 
     print("\nDone linking files.")
 
@@ -137,6 +142,7 @@ def main():
                 f"--- texhash error output ---\n{e.stderr}\n----------------------------",
                 file=sys.stderr,
             )
+        sys.exit(1)
 
 
 if __name__ == "__main__":

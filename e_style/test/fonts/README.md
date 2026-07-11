@@ -1,8 +1,8 @@
 # Font-stack render regression test
 
-Guards the CJK / multilingual / rare-character font setup in
-`e_style/sty_components/c111_fonts.tex` against silent breakage on TeX Live /
-package updates.
+Guards the CJK / multilingual / rare-character implementation in `e_cjk` and
+`e_fonts` (through the legacy `c111_fonts.tex` compatibility entrypoint)
+against silent breakage on TeX Live / package updates.
 
 ## Why a *render* test (not a compile check)
 
@@ -27,10 +27,11 @@ python3 check.py          # PASS / FAIL (exit 0 / non-zero)
 
 Run it **after every `tlmgr update` / TeX Live year bump**. On FAIL, open
 `fixture_cur.png` next to `golden/fixture.png` and look. Deps: `lualatex`,
-`pdftoppm` (poppler), Pillow, numpy.
+`pdftoppm` (poppler), Pillow.
 
-`fixture.tex` `\input`s the **real installed** `c111_fonts.tex` (found via
-kpsewhich), so it tests the actual stack, not a copy. It exercises: the CJK
+`fixture.tex` `\input`s the repository's real compatibility entrypoint through
+an explicit `TEXINPUTS`, so a fresh clone does not depend on an installed
+symlink. It exercises: the CJK
 AltFont chain (one glyph each for Ext-B / Ext-I / Ext-G / Ext-J), CJK
 `\emph` (must stay upright mincho), `\textbf` + `\textsc` (ssub + AltFont must
 reach them), a Devanagari conjunct + Vedic svara (HarfBuzz), and polytonic
@@ -62,4 +63,4 @@ python3 check.py --bless
   test greps for it and it is the fail-loud signal for a luatexja internal rename.
 - Do not "clean up" the ssub matrix (`\ltj@nofakeital`) or migrate the AltFont
   chain to `luaotfload.add_fallback` (experimental + crashes under luatexja,
-  ctex-kit #691). See the maintainer notes in `c111_fonts.tex`.
+  ctex-kit #691). See the implementation notes in `e_cjk.sty`.

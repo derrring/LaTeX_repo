@@ -1,0 +1,11 @@
+\documentclass{e_class_noteLong}
+\title{ToC state test}
+\author{Regression Test}
+\setcounter{tocdepth}{1}
+\begin{document}
+\chapter{Before}
+\typeout{E-TOC-BEFORE=\the\value{tocdepth}}
+\brieftoc
+\typeout{E-TOC-AFTER=\the\value{tocdepth}}
+\chapter{After}
+\end{document}

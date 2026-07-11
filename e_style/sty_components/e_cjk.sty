@@ -1,0 +1,62 @@
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{e_cjk}[2026/07/11 v1.0 LuaTeX-ja font routing and fallbacks]
+
+% Preserve the historical initialization order: luatexja and its fontspec
+% bridge must be active before polyglossia is loaded by e_fonts.
+\RequirePackage{e_math}
+\RequirePackage{fontspec}
+\RequirePackage{microtype}
+\RequirePackage{silence}
+\RequirePackage[warnings-off={mathtools-colon,mathtools-overbracket}]{unicode-math}
+
+\WarningFilter{luatexja}{LuaTeX-ja's patch against the microtype package}
+\RequirePackage[pass]{luatexja}
+\ltjsetparameter{jacharrange={-2,-3,-9}}
+\RequirePackage{luatexja-fontspec}
+\RequirePackage{e_fonts}
+
+\makeatletter
+\newcommand\e@cjkalt{}
+\IfFontExistsTF{HanaMinB}{\g@addto@macro\e@cjkalt{{Range="20000-"2EBEF,Font=HanaMinB},}}{}
+\IfFontExistsTF{Jigmo2}{\g@addto@macro\e@cjkalt{{Range="2EBF0-"2EE5D,Font=Jigmo2},}}{}
+\IfFontExistsTF{Jigmo3}{\g@addto@macro\e@cjkalt{{Range="30000-"323AF,Font=Jigmo3},}}{}
+\IfFontExistsTF{Unifont Upper}{\g@addto@macro\e@cjkalt{{Range="323B0-"3FFFF,Font=Unifont Upper},}}{}
+
+\IfFontExistsTF{Source Han Serif}
+  {\setmainjfont{Source Han Serif}[BoldFont={Source Han Serif Bold},ItalicFont={},AltFont={\e@cjkalt}]}
+  {\setmainjfont{HaranoAjiMincho}[BoldFont={HaranoAjiMincho-Bold},ItalicFont={},AltFont={\e@cjkalt}]}
+\IfFontExistsTF{Source Han Sans}
+  {\setsansjfont{Source Han Sans}[BoldFont={Source Han Sans Bold},ItalicFont={}]}
+  {\setsansjfont{HaranoAjiGothic}[BoldFont={HaranoAjiGothic-Bold},ItalicFont={}]}
+
+\newcommand\ltj@nofakeital[2]{%
+  \DeclareFontShape{#1}{#2}{m}{it}{<->ssub*#2/m/n}{}%
+  \DeclareFontShape{#1}{#2}{m}{sl}{<->ssub*#2/m/n}{}%
+  \DeclareFontShape{#1}{#2}{m}{sc}{<->ssub*#2/m/n}{}%
+  \DeclareFontShape{#1}{#2}{b}{it}{<->ssub*#2/b/n}{}%
+  \DeclareFontShape{#1}{#2}{b}{sl}{<->ssub*#2/b/n}{}%
+  \DeclareFontShape{#1}{#2}{b}{sc}{<->ssub*#2/b/n}{}%
+  \DeclareFontShape{#1}{#2}{bx}{n}{<->ssub*#2/b/n}{}%
+  \DeclareFontShape{#1}{#2}{bx}{it}{<->ssub*#2/b/n}{}%
+  \DeclareFontShape{#1}{#2}{bx}{sl}{<->ssub*#2/b/n}{}%
+  \DeclareFontShape{#1}{#2}{bx}{sc}{<->ssub*#2/b/n}{}%
+}
+\begingroup\edef\@tempa{\endgroup
+  \noexpand\ltj@nofakeital{JY3}{\mcdefault}\noexpand\ltj@nofakeital{JT3}{\mcdefault}%
+  \noexpand\ltj@nofakeital{JY3}{\gtdefault}\noexpand\ltj@nofakeital{JT3}{\gtdefault}%
+}\@tempa
+\makeatother
+
+\def\zh#1{#1}
+\def\ja#1{#1}
+\def\zhsans#1{{\sffamily #1}}
+\def\jasans#1{{\sffamily #1}}
+
+% luatexja redirects \em to gothic. CJK emphasis in this profile remains
+% upright mincho; fail loudly if the upstream internal token sequence changes.
+\expandafter\patchcmd\csname em \endcsname{\gtfamily\itshape}{\itshape}{}{%
+  \PackageError{e_cjk}
+    {Could not revert luatexja's \string\em\space patch}
+    {The upstream luatexja implementation changed; CJK emphasis would be incorrect.}}
+
+\endinput

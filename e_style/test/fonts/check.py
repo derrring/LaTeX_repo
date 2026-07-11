@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-"""Render-regression check for the e_style font stack (c111_fonts.tex).
+"""Render-regression check for the e_style e_fonts/e_cjk stack.
 
-WHY. Three CJK/multilingual mechanisms in c111 fail in the "compiles clean,
+WHY. Three CJK/multilingual mechanisms in e_cjk/e_fonts fail in the "compiles clean,
 renders WRONG" mode, invisible to any compile-time assertion:
   - the \\em reverse-patch string-matches a luatexja internal -> CJK \\emph can
     silently revert to gothic;
@@ -11,7 +11,7 @@ renders WRONG" mode, invisible to any compile-time assertion:
     across a TeX Live update once).
 Only rasterizing the output and diffing it catches this class.
 
-WHAT. Compiles fixture.tex (which \\inputs the REAL c111_fonts.tex), then makes
+WHAT. Compiles fixture.tex through the c111 compatibility entrypoint, then makes
 TWO assertions:
   1. tofu guard  -- zero "Missing character" lines in the log. Size-independent,
      so it catches any rare glyph that fell through the AltFont chain, however
@@ -34,15 +34,18 @@ Golden = the FULL-FONT path (system Source Han + HanaMin/Jigmo/Unifont). On a
 CTAN-only machine the rare ranges tofu -> this test is *expected* to FAIL there;
 that portable/degraded path is a separate contract, by construction not golden.
 
-Deps: lualatex, pdftoppm (poppler), Pillow, numpy.
+Deps: lualatex, pdftoppm (poppler), Pillow.
 """
 import os
 import subprocess
 import sys
 from pathlib import Path
 
-import numpy as np
-from PIL import Image
+try:
+    from PIL import Image
+except ModuleNotFoundError:
+    print("FAIL: Python dependency missing: Pillow (install with 'python3 -m pip install Pillow')")
+    sys.exit(1)
 
 HERE = Path(__file__).resolve().parent
 FIX = "fixture"
@@ -133,12 +136,22 @@ def main():
             raise Fail(f"golden image missing: {GOLDEN}. "
                        f"After confirming the render is correct by eye, run: python3 check.py --bless")
         cur = rasterize(f"{FIX}_cur")
-        a = np.asarray(Image.open(GOLDEN).convert("RGB"), dtype=np.int16)
-        b = np.asarray(Image.open(cur).convert("RGB"), dtype=np.int16)
-        if a.shape != b.shape:
-            raise Fail(f"image size changed: golden {a.shape[:2]} vs current {b.shape[:2]} "
+        a = Image.open(GOLDEN).convert("RGB")
+        b = Image.open(cur).convert("RGB")
+        if a.size != b.size:
+            raise Fail(f"image size changed: golden {a.size} vs current {b.size} "
                        f"(a layout/line-break/glyph-width regression).")
-        frac = float((np.abs(a - b).max(axis=2) > TOL_PIXEL).mean())
+        left_bytes = a.tobytes()
+        right_bytes = b.tobytes()
+        changed = sum(
+            1
+            for offset in range(0, len(left_bytes), 3)
+            if max(
+                abs(left_bytes[offset + channel] - right_bytes[offset + channel])
+                for channel in range(3)
+            ) > TOL_PIXEL
+        )
+        frac = changed / (a.width * a.height)
         print(f"tofu (missing-char) count : {miss}")
         print(f"pixel-diff fraction       : {frac:.5f}  (threshold {TOL_FRAC})")
         if frac > TOL_FRAC:

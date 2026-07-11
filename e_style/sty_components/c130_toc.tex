@@ -39,13 +39,14 @@
 % --- Command for a two-column, brief ToC ---
 \newcommand{\brieftoc}{%
     \begingroup
+    \edef\e@saved@tocdepth{\number\value{tocdepth}}%
     \etocsettocstyle{}{\clearpage}%
-    \phantomsection  % Create anchor here
     \newgeometry{left=1.5cm, right=1.5cm, top=2.5cm, bottom=2.5cm}
     \ifcsdef{chapter}{
         \setcounter{tocdepth}{1}
         \begin{multicols}{2}
             \printtoctitle{Brief Contents}
+            \phantomsection
             \addcontentsline{toc}{chapter}{Brief Contents}
             \e@orig@tableofcontents
         \end{multicols}
@@ -54,40 +55,68 @@
         \setcounter{tocdepth}{2}
         \begin{multicols}{2}
             \printtoctitle{Brief Contents}
+            \phantomsection
             \addcontentsline{toc}{section}{Brief Contents}
             \e@orig@tableofcontents
         \end{multicols}
     }
 
     \restoregeometry
-    \setcounter{tocdepth}{3}
+    \setcounter{tocdepth}{\e@saved@tocdepth}
     \endgroup
 }
 
 % --- Command for a single-column, detailed ToC ---
 \newcommand{\detailedtoc}{%
     \begingroup
+    \edef\e@saved@tocdepth{\number\value{tocdepth}}%
     \etocsettocstyle{
     }{\clearpage}
-    \phantomsection  % Create anchor here
-
     \ifcsdef{chapter}{
         \setcounter{tocdepth}{3}
         \printtoctitle{Detailed Contents}
+        \phantomsection
         \addcontentsline{toc}{chapter}{Detailed Contents}
     }{
         \setcounter{tocdepth}{3}
         \printtoctitle{Detailed Contents}
+        \phantomsection
         \addcontentsline{toc}{section}{Detailed Contents}
 
     }
     \e@orig@tableofcontents
+    \setcounter{tocdepth}{\e@saved@tocdepth}
     \endgroup
 }
 
 % --- Main ToC ---
 % Override \tableofcontents so it always prints a proper heading.
 % \mytoc is kept as an alias for backward compatibility.
+%
+% Freeze the gap before etoc changes font size, then reuse the same dimension
+% below the final entry. Primitive vertical rules avoid the implicit paragraph
+% boxes created by \rule. This remains page-breakable inside a long ToC; only
+% the rule-to-entry gaps are protected from a page break. Local single spacing
+% keeps the geometry independent of document-level setspace and parskip.
+\newdimen\e@fenced@toc@gap
+\newcommand{\e@fenced@toc@open}{%
+    \par
+    \begingroup
+    \linespread{1}\selectfont
+    \parskip=0pt\relax
+    \e@fenced@toc@gap=.6em\relax
+    \parindent=0pt\relax
+    \hrule height 1pt width \linewidth
+    \nobreak\vskip\e@fenced@toc@gap
+}
+\newcommand{\e@fenced@toc@close}{%
+    \par
+    \nobreak\vskip\e@fenced@toc@gap
+    \hrule height 1pt width \linewidth
+    \endgroup
+    \par
+}
+
 \let\e@orig@tableofcontents\tableofcontents
 \renewcommand{\tableofcontents}{%
     \begingroup
@@ -99,13 +128,9 @@
         \addcontentsline{toc}{chapter}{\contentsname}%
     }{%
         % Article-based classes: fenced TOC body with no heading; flows into body text
-        \etocsettocstyle{%
-            \par\noindent\rule{\linewidth}{1pt}%
-            \vskip0.3\baselineskip\parindent0em
-        }{%
-            \vskip0.3\baselineskip\noindent\rule{\linewidth}{1pt}%
-            \vspace{0.5\baselineskip}
-        }%
+        \etocsettocstyle
+            {\e@fenced@toc@open}
+            {\e@fenced@toc@close\vspace{0.5\baselineskip}}%
     }%
     \e@orig@tableofcontents
     \endgroup
@@ -115,21 +140,28 @@
 
 % --- Command to set up a local ToC (e.g., at the start of a chapter) ---
 
-% Local (chapter-level) TOC: call \setuplocaltoc then \localtableofcontents.
-% \localtableofcontents is etoc-native, unaffected by our \tableofcontents override.
-\newcommand{\setuplocaltoc}{%
+% Local (chapter-level) TOC. The wrapper groups etoc's style mutation so a
+% local fence cannot change a later global or local ToC.
+\let\e@orig@localtableofcontents\localtableofcontents
+\newcommand{\e@fenced@localtableofcontents}{%
+    \begingroup
+    \edef\e@saved@tocdepth{\number\value{tocdepth}}%
     \etocsettocstyle{%
         \setcounter{tocdepth}{3}%
-        \par\noindent
-        \rule{\linewidth}{1pt}%
-        \vskip0.5\baselineskip\parindent0em
-    }{\rule{\linewidth}{1pt}\vspace{0.5\baselineskip}}%
+        \e@fenced@toc@open
+    }{\e@fenced@toc@close\vspace{0.5\baselineskip}}%
+    \e@orig@localtableofcontents
+    \setcounter{tocdepth}{\e@saved@tocdepth}%
+    \endgroup
 }
 
-% NOTE: \setuplocaltoc must NOT be called here at load time.
-% It sets a global etocsettocstyle that suppresses the TOC title,
-% which breaks \tableofcontents and \mytoc if called before them.
-% Users should call \setuplocaltoc inside each chapter that needs a local TOC.
+\newcommand{\setuplocaltoc}{%
+    \let\localtableofcontents\e@fenced@localtableofcontents
+}
+
+% Backward-compatible usage remains:
+%   \setuplocaltoc
+%   \localtableofcontents
 %-----------------------------------------------------------------------
 %\etoctocstyle[⟨kind⟩]{⟨number_of_columns⟩}{⟨title⟩}
 
@@ -271,8 +303,7 @@
 
 % --- Appendix Style ---
 % Patches \appendix to change ToC style for appendix chapters.
-% Make sure 'etoolbox' is loaded in your e_core.sty or e_standard_doc.sty
-% (It is already loaded via e_core.sty in your setup).
+% etoolbox is provided by e_kernel through e_document_layout.
 
 \apptocmd{\appendix}{%
     % Define and apply the new style for appendix chapters in the ToC.

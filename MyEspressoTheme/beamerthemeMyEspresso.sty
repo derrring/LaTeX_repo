@@ -9,7 +9,7 @@
 
 \mode<presentation>
 
-\RequirePackage{e_core}
+\RequirePackage{e_profile_beamer}
 \setbeamercovered{dynamic}
 
 % =================================================================
@@ -28,7 +28,10 @@
 % -- Visual options --
 \newif\ifbeamer@me@delaunay
 \beamer@me@delaunayfalse
+\def\myespresso@randomseed{20260411}
 \DeclareOptionBeamer{delaunay}{\beamer@me@delaunaytrue}
+\DeclareOptionBeamer{randomseed}{\def\myespresso@randomseed{#1}}
+\DeclareOptionBeamer{randomize}{\edef\myespresso@randomseed{\the\time}}
 
 \newif\ifbeamer@me@myespressoblue
 \beamer@me@myespressobluefalse
@@ -58,8 +61,9 @@
 
 \newif\ifbeamer@me@rule
 \beamer@me@rulefalse
+\def\myespresso@rulecolor{black}
 \DeclareOptionBeamer{rule}{\beamer@me@ruletrue}
-\DeclareOptionBeamer{rulecolor}{\colorlet{MyEspresso@rule}{#1}}
+\DeclareOptionBeamer{rulecolor}{\def\myespresso@rulecolor{#1}}
 
 \ProcessOptionsBeamer
 
@@ -80,9 +84,9 @@
   \fi
 \fi
 
-% Random seed for Delaunay mesh
+% Reproducible by default; opt into time-based output with [randomize].
 \ExplSyntaxOn
-\sys_gset_rand_seed:n { \time }
+\sys_gset_rand_seed:n { \myespresso@randomseed }
 \ExplSyntaxOff
 
 % =================================================================
@@ -215,6 +219,8 @@
 % =================================================================
 
 \ExplSyntaxOn
+\tl_new:N \l__myespresso_sepframe_title_tl
+\tl_new:N \l__myespresso_sepframe_image_tl
 \keys_define:nn { myespresso/sepframe }
   {
     title .tl_set:N = \l__myespresso_sepframe_title_tl ,
@@ -223,6 +229,8 @@
 
 \NewDocumentCommand { \sepframe } { o }
   {
+    \tl_clear:N \l__myespresso_sepframe_title_tl
+    \tl_clear:N \l__myespresso_sepframe_image_tl
     \IfNoValueF { #1 }
       { \keys_set:nn { myespresso/sepframe } { #1 } }
     \begingroup

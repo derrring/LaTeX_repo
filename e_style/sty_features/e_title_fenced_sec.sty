@@ -1,38 +1,86 @@
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesPackage{e_title_fenced_sec}%
-  [2026/04/12 v1.1 Fenced section titles]
+  [2026/07/11 v1.2 Stable fenced section geometry]
+
+% Direct dependency for \titleformat and \titlespacing.
+\RequirePackage{titlesec}
 
 % ====================================================================
 % == Fenced Section Title Style ==
 % ====================================================================
 % Creates section titles with horizontal rules above and below.
-% Uses titlesec's \titleformat command.
+% Uses titlesec's \titleformat command. The complete fence is built in
+% one vbox so body-level \baselinestretch and \parskip changes cannot alter
+% the title's internal geometry.
 %
 % DIMENSION CONSTANTS:
 %   - Rule thickness: 1.5pt provides visible weight without being heavy.
-%   - Title gap: 1ex provides breathing room between rule and text.
-%   - After spacing: 20pt between section title block and body text.
+%   - Title gap: 1ex, measured in the fixed heading font, on both sides.
+%   - External rhythm: compact asymmetric spacing. More space above associates
+%     the heading with the text that follows; em units scale with the document
+%     font but not with body line spreading.
 % ====================================================================
 
+\makeatletter
+
+% Public font hook. The 1ex internal gaps below are evaluated after this hook,
+% so changing the title size also scales the fence-to-text separation.
+\newcommand{\eFencedSectionFont}{\normalfont\bfseries\large}
+
+% Keep the heading single-spaced and remove paragraph glue locally. The
+% nested vbox makes the visible gap exactly 1ex from each glyph box to its
+% rule, including for wrapped titles, and keeps the whole fence atomic.
+\newcommand{\e@fenced@section@box}[1]{%
+  \begingroup
+    \linespread{1}\selectfont
+    \eFencedSectionFont
+    \parindent=0pt\relax
+    \parskip=0pt\relax
+    \noindent
+    \vbox{%
+      \hsize=\linewidth
+      \hrule height 1.5pt
+      \kern 1ex
+      \vbox{%
+        \hsize=\linewidth
+        \parindent=0pt\relax
+        \parskip=0pt\relax
+        \emergencystretch=2em\relax
+        \raggedright
+        \noindent#1\par
+      }%
+      \kern 1ex
+      \hrule height 1.5pt
+    }%
+  \endgroup
+}
+
+\newcommand{\e@fenced@section@numbered}[1]{%
+  \e@fenced@section@box{\thesection\quad\MakeUppercase{#1}}}
+
+\newcommand{\e@fenced@section@numberless}[1]{%
+  \@ifundefined{phantomsection}{}{\phantomsection}%
+  \e@fenced@section@box{\MakeUppercase{#1}}}
+
 % Numbered sections
-% \\* and \nopagebreak glue top-rule + body + bottom-rule together as an
-% atomic unit, so the fence cannot split across a page break.
-% Note: in titlesec [after-code], a bare `\nopagebreak[4]` confuses the
-% bracket parser (the [4] is read as end-of-after-code). Use the
-% optional-argument-less form, which already defaults to penalty -10000.
 \titleformat{\section}[block]
-{\normalfont\bfseries\large}
+{\normalfont\parskip=0pt\relax\nostruts}
 {}{0pt}
-{\noindent\rule{\dimexpr\linewidth-2.08pt\relax}{1.5pt}\\*[1ex]\nopagebreak\thesection\quad\MakeUppercase}
-[\nopagebreak\noindent\rule{\dimexpr\linewidth-2.08pt\relax}{1.5pt}]
+{\e@fenced@section@numbered}
 
 % Unnumbered (starred) sections
 \titleformat{name=\section,numberless}[block]
-{\normalfont\bfseries\large}
+{\normalfont\parskip=0pt\relax\nostruts}
 {}{0pt}
-{\noindent\rule{\dimexpr\linewidth-2.08pt\relax}{1.5pt}\\*[1ex]\nopagebreak\MakeUppercase}
-[\nopagebreak\noindent\rule{\dimexpr\linewidth-2.08pt\relax}{1.5pt}]
+{\e@fenced@section@numberless}
 
-% Section spacing: {left}{before}{after}
-\titlespacing*{\section}{0pt}{0pt}{20pt}
+% Section spacing: {left}{before}{after}. The old 0pt/20pt pair left only the
+% ambient paragraph glue above the fence while adding a large dedicated gap
+% below it. Keep the total compact and assign more of it above. This declaration
+% affects \section only; lower heading levels retain their class defaults.
+\titlespacing*{\section}{0pt}
+  {1.5em plus .2em minus .1em}
+  {.4em plus .1em}
+
+\makeatother
 \endinput

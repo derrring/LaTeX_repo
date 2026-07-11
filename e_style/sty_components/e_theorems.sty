@@ -1,0 +1,20 @@
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{e_theorems}[2026/07/11 v1.0 Theorem environments]
+
+\RequirePackage{e_theorem_base}
+
+\input{sty_components/c320_math_env.tex}
+
+\makeatletter
+\AtBeginDocument{%
+  \@ifpackageloaded{hyperref}{%
+    \renewcommand{\theHtheorem}{\thetheorem}%
+    \renewcommand{\theHdefinition}{\thedefinition}%
+    \renewcommand{\theHlemma}{\thelemma}%
+    \renewcommand{\theHproposition}{\theproposition}%
+    \renewcommand{\theHcorollary}{\thecorollary}%
+  }{}%
+}
+\makeatother
+
+\endinput

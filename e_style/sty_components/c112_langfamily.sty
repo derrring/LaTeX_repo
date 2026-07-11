@@ -21,7 +21,7 @@
 %     \usepackage{c112_langfamily}
 %     \newlangfamily{zh}{Source Han Serif SC}
 %     % \ja is unnecessary unless overriding the class default
-%     % (which is HaranoAjiMincho via \setmainjfont in c111_fonts).
+%     % (which is configured via \setmainjfont in e_cjk).
 %
 % Note on fallback: fontspec/luatexja-fontspec has no true coverage
 % fallback (AltFont is range-override, not "use only if missing").
@@ -31,7 +31,7 @@
 % \setmainjfont default (Harano Aji), which is the implicit safety net.
 %
 % CJK line-breaking and the jachar default font are configured in
-% c111_fonts.tex (luatexja[pass] + luatexja-fontspec + \setmainjfont).
+% e_cjk (luatexja[pass] + luatexja-fontspec + \setmainjfont).
 % For full Japanese layout (ruby, kenten emphasis) use c113_cjk_engine.
 % ===================================================================
 

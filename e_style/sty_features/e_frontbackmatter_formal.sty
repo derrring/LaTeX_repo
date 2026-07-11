@@ -274,6 +274,11 @@
     \cleardoublepage
   }
 
+% Preserve the standard class contract. The formal renderer owns title-page
+% output, so \maketitle and \makefrontmatter must not be divergent paths.
+\RenewDocumentCommand { \maketitle } { }
+  { \makefrontmatter }
+
 
 % =================================================================
 % 4. Output: optional front matter pages

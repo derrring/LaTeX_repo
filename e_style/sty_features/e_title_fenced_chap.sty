@@ -5,7 +5,10 @@
 
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesPackage{e_title_fenced_chap}%
-  [2026/04/12 v1.1 Fenced chapter titles]
+  [2026/07/11 v1.2 Stable fenced chapter geometry]
+
+% Direct dependency for \titleformat and \titlespacing.
+\RequirePackage{titlesec}
 
 % Shared \part formatting (Roman numerals, centered, colored)
 \RequirePackage{e_title_part}
@@ -14,19 +17,63 @@
 % Chapter title (numbered)
 % =================================================================
 
+\makeatletter
+
+% Public font hook. The 1ex internal gaps below are evaluated after this hook,
+% so changing the title size also scales the fence-to-text separation.
+\newcommand{\eFencedChapterFont}{\normalfont\bfseries\large}
+
+% Build the complete fence as one atomic box. Local single spacing and
+% zero paragraph glue isolate chapter heads from document-level setspace
+% and parskip settings; equal explicit kerns give symmetric rule gaps.
+% Body text after the title retains the document's own paragraph spacing.
+\newcommand{\e@fenced@chapter@box}[1]{%
+  \begingroup
+    \linespread{1}\selectfont
+    \eFencedChapterFont
+    \parindent=0pt\relax
+    \parskip=0pt\relax
+    \noindent
+    \vbox{%
+      \hsize=\linewidth
+      \hrule height 1.5pt
+      \kern 1ex
+      \vbox{%
+        \hsize=\linewidth
+        \parindent=0pt\relax
+        \parskip=0pt\relax
+        \emergencystretch=2em\relax
+        \raggedright
+        \noindent#1\par
+      }%
+      \kern 1ex
+      \hrule height 1.5pt
+    }%
+  \endgroup
+}
+
+\newcommand{\e@fenced@chapter@numbered}[1]{%
+  \e@fenced@chapter@box{\thechapter\quad\MakeUppercase{#1}}}
+
+\newcommand{\e@fenced@chapter@numberless}[1]{%
+  \@ifundefined{phantomsection}{}{\phantomsection}%
+  \e@fenced@chapter@box{\MakeUppercase{#1}}}
+
 \titleformat{\chapter}[block]
-  {\normalfont\bfseries\large}
+  {\normalfont\parskip=0pt\relax\nostruts}
   {}{0pt}
-  {\rule{\textwidth}{1.5pt}\\[1ex]\thechapter\quad\MakeUppercase}
-  [\rule{\textwidth}{1.5pt}]
+  {\e@fenced@chapter@numbered}
 
 % Chapter title (unnumbered, starred)
 \titleformat{name=\chapter,numberless}[block]
-  {\normalfont\bfseries\large}
+  {\normalfont\parskip=0pt\relax\nostruts}
   {}{0pt}
-  {\rule{\textwidth}{1.5pt}\\[1ex]\MakeUppercase}
-  [\rule{\textwidth}{1.5pt}]
+  {\e@fenced@chapter@numberless}
 
-\titlespacing*{\chapter}{0pt}{0pt}{20pt} % left, before, after
+% Chapters already start on a fresh page, so no additional space is needed
+% above. Keep the body close to the lower fence; this declaration affects
+% \chapter only, leaving section and subsection spacing at class defaults.
+\titlespacing*{\chapter}{0pt}{0pt}{.5em plus .1em}
 
+\makeatother
 \endinput

@@ -21,9 +21,9 @@
 % Legacy CJK options are accepted but no-op in 2026 refactor.
 \DeclareOption{cjk}{\ClassWarning{e_class_thesis}{%
     The [cjk] option is deprecated.\MessageBreak
-    Use \string\usepackage{c113_cjk_engine} in the document preamble%
-    \MessageBreak for full CJK layout, or \string\usepackage{c112_langfamily}%
-    \MessageBreak for lightweight per-script glyph rendering}}
+    The standard profile already provides CJK glyph routing.\MessageBreak
+    Use \string\usepackage{c113_cjk_engine} for full Japanese layout%
+    \MessageBreak or c112_langfamily for custom per-script font families}}
 \DeclareOption{nocjk}{}
 
 % When the '12pt' option is found, pass it to the base class
@@ -41,7 +41,7 @@
 \makeatother
 % --- 2. Load the common style package ---
 % This single command loads all your modular style components (packages, commands, colors, etc.).
-\RequirePackage{e_standard_doc}
+\RequirePackage{e_profile_standard}
 \RequirePackage{e_frontbackmatter_formal} % Load the front and back matter package
 \RequirePackage{e_title_caligraphy_chap}
 

@@ -1,0 +1,42 @@
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{e_visual}[2026/07/11 v1.0 Graphics, color, and visual environments]
+
+\RequirePackage{e_kernel}
+\RequirePackage{graphicx}
+\RequirePackage[normalem]{ulem}
+\RequirePackage{pdfpages}
+\RequirePackage[table,x11names,dvipsnames]{xcolor}
+\RequirePackage{caption}
+\RequirePackage{subcaption}
+\RequirePackage{adjustbox}
+\RequirePackage{wrapfig}
+\RequirePackage{lscape}
+\RequirePackage{multicol,paracol}
+\RequirePackage{tcolorbox}
+\RequirePackage{rotating}
+\RequirePackage{tikz,pgf}
+\RequirePackage{marginnote}
+
+\input{sty_components/c120_color.tex}
+\input{sty_components/c140_envs.tex}
+\input{sty_components/c150_commands.tex}
+\input{sty_components/c210_tikz.tex}
+
+\tikzset{
+  diagaxis/.style={->, oceanicSlate1, thin},
+  diaggrid/.style={oceanicFoam1, very thin},
+  curveA/.style={oceanicAbyss2, thick},
+  curveB/.style={oceanicCrimson2, thick},
+  curveC/.style={oceanicSage2, thick},
+  curveD/.style={oceanicAmber2, thick},
+  curveE/.style={oceanicViolet2, thick},
+  fillA/.style={fill=oceanicAbyss3, fill opacity=0.25},
+  fillB/.style={fill=oceanicCrimson3, fill opacity=0.25},
+  fillC/.style={fill=oceanicSage3, fill opacity=0.25},
+  fillD/.style={fill=oceanicAmber3, fill opacity=0.25},
+  fillE/.style={fill=oceanicViolet3, fill opacity=0.25},
+  diagdot/.style={oceanicInk1, fill=oceanicInk1},
+  diagcross/.style={cross out, draw=oceanicInk1, thick, inner sep=2pt},
+}
+
+\endinput
