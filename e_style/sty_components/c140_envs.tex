@@ -8,7 +8,10 @@
 %
 % Supports \listofcallouts via the 'callouts' tcb list.
 % =================================================================
-\tcbuselibrary{listings,skins,breakable,fitting,raster,xparse,external}
+% Only skins (via enhanced) and breakable are used. listings/fitting/raster/
+% xparse/external were dead-loaded onto every profile (incl. beamer); listings
+% pulls the full listings package and external the externalization stack.
+\tcbuselibrary{skins,breakable}
 
 \tcbset{
     colback=lightgray!15,
