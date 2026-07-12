@@ -1,0 +1,53 @@
+% =================================================================
+% e_title_fenced_core.sty
+% Shared geometry for the fenced title styles: the atomic fence box
+% (top and bottom 1.5pt rules with symmetric 1ex gaps around a
+% raggedright inner vbox).
+%
+% Loaded internally by:
+%   - e_title_fenced_sec.sty
+%   - e_title_fenced_chap.sty
+% Each caller supplies its own font hook and keeps its own external
+% spacing policy (\titlespacing); only the fence geometry lives here.
+% Should not normally be loaded directly by users.
+% =================================================================
+
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{e_title_fenced_core}%
+  [2026/07/12 v1.0 Shared fence-box geometry for fenced title styles]
+
+\makeatletter
+% \e@fenced@box{<font-hook>}{<title body>}
+% Build the complete fence as one atomic box. Local single spacing and zero
+% paragraph glue isolate the head from document-level setspace/parskip; equal
+% explicit kerns give symmetric rule gaps; the nested vbox makes the visible
+% gap exactly 1ex from each glyph box to its rule, including wrapped titles.
+% DIMENSION CONSTANTS (single-sourced here): rule thickness 1.5pt; rule-to-text
+% gap 1ex in the selected heading font; wrapped-title emergencystretch 2em.
+\newcommand{\e@fenced@box}[2]{%
+  \begingroup
+    \linespread{1}\selectfont
+    #1%
+    \parindent=0pt\relax
+    \parskip=0pt\relax
+    \noindent
+    \vbox{%
+      \hsize=\linewidth
+      \hrule height 1.5pt
+      \kern 1ex
+      \vbox{%
+        \hsize=\linewidth
+        \parindent=0pt\relax
+        \parskip=0pt\relax
+        \emergencystretch=2em\relax
+        \raggedright
+        \noindent#2\par
+      }%
+      \kern 1ex
+      \hrule height 1.5pt
+    }%
+  \endgroup
+}
+\makeatother
+
+\endinput

@@ -108,6 +108,15 @@ if ! grep -Fq '@ifpackageloaded{e_cjk}' "$ROOT/e_style/sty_components/c113_cjk_e
     exit 1
 fi
 
+# The fenced-title fence geometry (rules + gaps) is single-sourced in
+# e_title_fenced_core.sty; the section and chapter styles must call it rather
+# than re-inline their own vbox.
+fence_sources=$(grep -rlF 'hrule height 1.5pt' "$ROOT/e_style/sty_features" | wc -l | tr -d ' ')
+if [[ "$fence_sources" != "1" ]]; then
+    echo "FAIL: fenced fence-box geometry must live only in e_title_fenced_core.sty, found in $fence_sources files" >&2
+    exit 1
+fi
+
 if [[ "${1:-}" == "--fonts" ]]; then
     (cd "$ROOT/e_style/test/fonts" && python3 check.py)
 fi
