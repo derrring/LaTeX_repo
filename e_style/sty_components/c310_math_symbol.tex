@@ -222,12 +222,10 @@
 \newcommand{\mbfChi}{\mathbf{\Chi}}
 \newcommand{\mbfPsi}{\mathbf{\Psi}}
 \newcommand{\mbfOmega}{\mathbf{\Omega}}
-\newcommand{\mbfVarepsilon}{\mathbf{\Varepsilon}}
-\newcommand{\mbfVartheta}{\mathbf{\Vartheta}}
-\newcommand{\mbfVarpi}{\mathbf{\Varpi}}
-\newcommand{\mbfVarrho}{\mathbf{\Varrho}}
-\newcommand{\mbfVarsigma}{\mathbf{\Varsigma}}
-\newcommand{\mbfVarphi}{\mathbf{\Varphi}}
+% Capital variant-Greek (\Varepsilon, \Vartheta, \Varpi, \Varrho, \Varsigma,
+% \Varphi) exists in neither LaTeX nor unicode-math, so \mathbf of it was
+% fatal-on-use. Removed -- there is no capital-variant glyph to embolden.
+% (The lowercase \mbfvar* forms above are fine: \varepsilon etc. do exist.)
 
 % Caligraphic, Fraktur, Script
 
