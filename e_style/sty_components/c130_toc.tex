@@ -185,6 +185,12 @@
 \newlength{\tocsubsectionnumwidth}
 \newlength{\tocsubsubsectionnumwidth}
 \newlength{\tocnumwidthplus}
+% M14: per-entry effective number width + per-level "does it overflow" thresholds.
+\newlength{\e@tocnumeff}
+\newlength{\tocchapternumthresh}
+\newlength{\tocsectionnumthresh}
+\newlength{\tocsubsectionnumthresh}
+\newlength{\tocsubsubsectionnumthresh}
 
 % Set fixed lengths
 \setlength{\tocrightmargin}{0.5cm}
@@ -212,7 +218,27 @@
     %
     % For SUBSUBSECTIONS - calculate the indentation needed
     \settowidth{\tocsubsubsectionnumwidth}{\footnotesize 99.9.9.9\hspace{\tocnumwidthplus}}%
+    % M14: bare worst-string thresholds (no trailing gap). A number wider than
+    % its bare template overflows the fixed box; \e@settocnumeff grows only
+    % those, leaving every fitting number on its exact former (fixed) width.
+    \settowidth{\tocchapternumthresh}{\small 99}%
+    \settowidth{\tocsectionnumthresh}{\footnotesize 99.9}%
+    \settowidth{\tocsubsectionnumthresh}{\footnotesize 99.9.9}%
+    \settowidth{\tocsubsubsectionnumthresh}{\footnotesize 99.9.9.9}%
 }
+
+% M14 helper: set \e@tocnumeff to the fixed template width #1 when the actual
+% number #2 fits its bare threshold #3, else to the number's natural width plus
+% one \tocnumwidthplus, so an over-long number no longer collides with the title.
+% (Chapters use a -0.25em trailing kern which absorbs half the added gap, so a
+% single full \tocnumwidthplus keeps both the fixed and grown gaps consistent.)
+\newcommand{\e@settocnumeff}[3]{%
+  \settowidth{\e@tocnumeff}{#2}%
+  \ifdim\e@tocnumeff>#3\relax
+    \addtolength{\e@tocnumeff}{\tocnumwidthplus}%
+  \else
+    \setlength{\e@tocnumeff}{#1}%
+  \fi}
 
 % --- Part Style ---
 \etocsetstyle{part}
@@ -232,9 +258,10 @@
 {\etocifnumbered{%
         \leftskip0em\rightskip\tocrightmargin\parfillskip-\rightskip
         % Print number naturally with consistent space after
-        \makebox[\tocchapternumwidth][l]{\etocnumber}\hspace{-0.25em}
+        \e@settocnumeff{\tocchapternumwidth}{\etocnumber}{\tocchapternumthresh}%
+        \makebox[\e@tocnumeff][l]{\etocnumber}\hspace{-0.25em}
         % Calculate hanging indent for wrapped chapter titles
-        \hangindent\tocchapternumwidth
+        \hangindent\e@tocnumeff
         \textsc{\etocthename}\hfill
         \makebox[2.5em][r]{\footnotesize\etocpage}\par
     }{%
@@ -250,9 +277,10 @@
         \leftskip\tocchapternumwidth
         \rightskip\tocrightmargin\parfillskip-\rightskip
         % Print number naturally with consistent space after
-        \makebox[\tocsectionnumwidth][l]{\etocnumber}%%
+        \e@settocnumeff{\tocsectionnumwidth}{\etocnumber}{\tocsectionnumthresh}%
+        \makebox[\e@tocnumeff][l]{\etocnumber}%%
         % Calculate hanging indent based on actual number width
-        \hangindent\tocsectionnumwidth
+        \hangindent\e@tocnumeff
         \etocname\mydotfill
         \makebox[2.5em][r]{\etocpage}\par
     }{%
@@ -269,9 +297,10 @@
         \leftskip\dimexpr\tocchapternumwidth+\tocsectionnumwidth\relax
         \rightskip\tocrightmargin\parfillskip-\rightskip
         % Print number naturally with consistent space after
-        \makebox[\tocsubsectionnumwidth][l]{\etocnumber}%
+        \e@settocnumeff{\tocsubsectionnumwidth}{\etocnumber}{\tocsubsectionnumthresh}%
+        \makebox[\e@tocnumeff][l]{\etocnumber}%
         % Calculate hanging indent
-        \hangindent\tocsubsectionnumwidth
+        \hangindent\e@tocnumeff
         \etocname\mydotfill
         \makebox[2.5em][r]{\etocpage}\par
     }{%
@@ -289,9 +318,10 @@
         \leftskip\dimexpr\tocchapternumwidth+\tocsectionnumwidth+\tocsubsectionnumwidth\relax
         \rightskip\tocrightmargin\parfillskip-\rightskip
         % Print number naturally with consistent space after
-        \makebox[\tocsubsubsectionnumwidth][l]{\etocnumber}%
+        \e@settocnumeff{\tocsubsubsectionnumwidth}{\etocnumber}{\tocsubsubsectionnumthresh}%
+        \makebox[\e@tocnumeff][l]{\etocnumber}%
         % Calculate hanging indent
-        \hangindent\tocsubsubsectionnumwidth
+        \hangindent\e@tocnumeff
         \etocname\mydotfill
         \makebox[2.5em][r]{\etocpage}\par
     }{%
@@ -314,8 +344,9 @@
         \leftskip0em\rightskip\tocrightmargin\parfillskip-\rightskip
         % Define the format for the appendix entry line.
         % We combine "Appendix" with the chapter letter.
-        \makebox[\tocchapternumwidth][l]{\appendixname~\etocnumber}\hspace{-0.25em}%
-        \hangindent\tocchapternumwidth
+        \e@settocnumeff{\tocchapternumwidth}{\appendixname~\etocnumber}{\tocchapternumthresh}%
+        \makebox[\e@tocnumeff][l]{\appendixname~\etocnumber}\hspace{-0.25em}%
+        \hangindent\e@tocnumeff
         \textsc{\etocthename}\hfill
         \makebox[2.5em][r]{\footnotesize\etocpage}\par
     }

@@ -178,6 +178,13 @@ if [[ "$efm_fetch" != "1" ]]; then
     exit 1
 fi
 
+# ToC number columns grow for over-wide numbers via \e@settocnumeff instead of
+# clipping into fixed-width makeboxes that collide with the title (M14).
+if ! grep -Fq 'makebox[\e@tocnumeff]' "$ROOT/e_style/sty_components/c130_toc.tex"; then
+    echo "FAIL: c130_toc must route numbered ToC entries through \\e@tocnumeff (M14 overflow fix)" >&2
+    exit 1
+fi
+
 if [[ "${1:-}" == "--fonts" ]]; then
     (cd "$ROOT/e_style/test/fonts" && python3 check.py)
 fi
