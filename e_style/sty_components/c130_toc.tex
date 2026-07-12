@@ -329,8 +329,12 @@
 
 % --- Configuration Options ---
 
-% Define toccolorpart if not already defined
-\providecolor{toccolorpart}{rgb}{0.2,0.2,0.6} % Default: dark blue
+% The toccolorpart color is defined once, in c120_color.tex (as cornellred),
+% which e_visual loads before this file. A local color source here would be a
+% silent-divergent second owner (the removed one declared dark blue, never
+% rendered because c120 wins by load order); it is intentionally absent so a
+% broken composition fails loud on the color rather than rendering a
+% different-but-valid blue.
 
 % Optional: Adjust spacing between TOC entries
 % \setlength{\etocbeforechapterskip}{0.5em}
