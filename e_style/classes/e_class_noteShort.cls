@@ -44,6 +44,7 @@
 \RequirePackage{e_frontbackmatter_simple}
 \RequirePackage{e_title_fenced_sec}
 \RequirePackage{e_math_env_deco}
+\RequirePackage{e_heading_scale}
 
 
 \endinput

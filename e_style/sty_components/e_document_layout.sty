@@ -24,28 +24,9 @@
   linktoc=page,
 }
 
-% Class option bridge retained from the legacy font component. Feature
-% packages own the levels they decorate and must not be overwritten here.
-\makeatletter
-\@ifundefined{if@e@twelvept}{%
-  \newif\if@e@twelvept
-  \@e@twelveptfalse
-}{}
-\AddToHook{begindocument/end}{%
-  \if@e@twelvept
-    \@ifpackageloaded{e_title_fenced_sec}{}{%
-      \titleformat{\section}
-        {\fontsize{14.4pt}{17.28pt}\selectfont\bfseries}
-        {\thesection}{1em}{}%
-    }%
-    \titleformat{\subsection}
-      {\fontsize{12pt}{14.4pt}\selectfont\bfseries}
-      {\thesubsection}{1em}{}%
-    \titleformat{\subsubsection}
-      {\fontsize{11pt}{13.2pt}\selectfont\bfseries}
-      {\thesubsubsection}{1em}{}%
-  \fi
-}
-\makeatother
+% The [12pt] heading-size policy that once lived here has moved to the
+% feature e_style/sty_features/e_heading_scale.sty (classes select it),
+% so this component no longer reads class-option state or references a
+% title feature by name.
 
 \endinput

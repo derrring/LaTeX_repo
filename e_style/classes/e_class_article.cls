@@ -42,6 +42,7 @@
 % --- 2. Load the common style package ---
 \RequirePackage{e_profile_standard}
 \RequirePackage{e_frontbackmatter_simple}
+\RequirePackage{e_heading_scale}
 
 % --- 3. Article-specific Formatting ---
 \linespread{1.1}

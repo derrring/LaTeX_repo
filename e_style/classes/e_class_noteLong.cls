@@ -46,6 +46,7 @@
 \RequirePackage{e_frontbackmatter_formal}
 \RequirePackage{e_title_fenced_chap}
 \RequirePackage{e_math_env_deco}
+\RequirePackage{e_heading_scale}
 
 \pagestyle{plain}
 

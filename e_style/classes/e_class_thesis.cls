@@ -44,6 +44,7 @@
 \RequirePackage{e_profile_standard}
 \RequirePackage{e_frontbackmatter_formal} % Load the front and back matter package
 \RequirePackage{e_title_caligraphy_chap}
+\RequirePackage{e_heading_scale}
 
 
 % --- 3. Define user-facing commands for thesis metadata ---
