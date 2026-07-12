@@ -82,7 +82,7 @@ fi
 # toccolorpart is owned solely by c120_color.tex. The old dark-blue
 # \providecolor in c130_toc.tex was a second source that silently diverged
 # by load order; regressing it must fail here.
-tcp_sources=$(grep -rlE '\\(colorlet|definecolor|providecolor)\{toccolorpart\}' "$ROOT/e_style" | wc -l | tr -d ' ')
+tcp_sources=$({ grep -rlE '\\(colorlet|definecolor|providecolor)\{toccolorpart\}' "$ROOT/e_style" || true; } | wc -l | tr -d ' ')
 if [[ "$tcp_sources" != "1" ]]; then
     echo "FAIL: toccolorpart must have exactly one color source, found $tcp_sources" >&2
     exit 1
@@ -111,7 +111,7 @@ fi
 # The fenced-title fence geometry (rules + gaps) is single-sourced in
 # e_title_fenced_core.sty; the section and chapter styles must call it rather
 # than re-inline their own vbox.
-fence_sources=$(grep -rlF 'hrule height 1.5pt' "$ROOT/e_style/sty_features" | wc -l | tr -d ' ')
+fence_sources=$({ grep -rlF 'hrule height 1.5pt' "$ROOT/e_style/sty_features" || true; } | wc -l | tr -d ' ')
 if [[ "$fence_sources" != "1" ]]; then
     echo "FAIL: fenced fence-box geometry must live only in e_title_fenced_core.sty, found in $fence_sources files" >&2
     exit 1
@@ -147,9 +147,25 @@ fi
 
 # The CV default palette is single-sourced in \__cv_theme_default:; the primary
 # hex must not be restated (init vs theme=default silent drift).
-cv_default_dups=$(grep -c '2b2b2b' "$ROOT/MyCV/cv_espresso_deedy_common.sty")
+# grep returning 1 on "no match" must not abort under set -e/pipefail, so the
+# counting greps below are guarded with '|| true' (a zero count is a valid,
+# non-error result these pins test for).
+cv_default_dups=$({ grep -c '2b2b2b' "$ROOT/MyCV/cv_espresso_deedy_common.sty" || true; })
 if [[ "$cv_default_dups" != "1" ]]; then
     echo "FAIL: CV default primary color 2b2b2b must appear once (single-source), found $cv_default_dups" >&2
+    exit 1
+fi
+
+# The class-option prologue (12pt switch + cjk/nocjk) is single-sourced in
+# sty_components/e_class_prologue.tex; no .cls may re-declare the switch.
+switch_in_cls=$({ grep -lF 'newif\if@e@twelvept' "$ROOT"/e_style/classes/*.cls 2>/dev/null || true; } | wc -l | tr -d ' ')
+if [[ "$switch_in_cls" != "0" ]]; then
+    echo "FAIL: \\if@e@twelvept must live only in e_class_prologue.tex, found in $switch_in_cls .cls" >&2
+    exit 1
+fi
+# [nocjk] must warn (it cannot disable the always-on CJK routing), not be silent.
+if ! grep -Fq 'has no effect' "$ROOT/e_style/sty_components/e_class_prologue.tex"; then
+    echo "FAIL: [nocjk] must emit a warning (not a silent no-op)" >&2
     exit 1
 fi
 
