@@ -1,6 +1,6 @@
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesPackage{e_title_fenced_sec}%
-  [2026/07/12 v1.3 Stable fenced section geometry]
+  [2026/07/12 v1.4 Stable fenced section geometry]
 
 % Direct dependency for \titleformat and \titlespacing.
 \RequirePackage{titlesec}
@@ -18,7 +18,7 @@
 %   - Title gap: 1ex, measured in the selected heading font, on both sides.
 %   - External rhythm: treat the complete fence as the heading boundary. Its
 %     visible before/after distances follow ordinary section-heading rhythm;
-%     em units scale with the document font but not body line spreading.
+%     baseline-relative units follow the document's body line spreading.
 % ====================================================================
 
 \makeatletter
@@ -27,14 +27,18 @@
 % so changing the title size also scales the fence-to-text separation.
 \newcommand{\eFencedSectionFont}{\normalfont\bfseries\large}
 
-% titlesec's after-skip is followed by the document's paragraph glue. Compute
-% a compensated value after the preamble so the visible net separation remains
-% 1em even when the document changes \parskip.
+% Keep external rhythm tied to the final body baseline while the fence's own
+% geometry stays single-spaced. titlesec's after-skip is followed by paragraph
+% glue, so subtract \parskip once to retain the intended net separation.
+\newskip\e@fenced@section@beforeskip
 \newskip\e@fenced@section@afterskip
 \newcommand{\e@fenced@section@syncspacing}{%
   \begingroup
     \normalfont\normalsize
-    \skip@=1em plus .1em\relax
+    \skip@=1.56\baselineskip
+      plus .21\baselineskip minus .1\baselineskip\relax
+    \global\e@fenced@section@beforeskip=\skip@
+    \skip@=.7\baselineskip plus .07\baselineskip\relax
     \advance\skip@ by -\parskip
     \global\e@fenced@section@afterskip=\skip@
   \endgroup
@@ -94,7 +98,7 @@
 % with more space above than below. This declaration affects \section only;
 % lower heading levels retain their class defaults.
 \titlespacing*{\section}{0pt}
-  {2.25em plus .3em minus .15em}
+  {\e@fenced@section@beforeskip}
   {\e@fenced@section@afterskip}
 
 \makeatother
