@@ -1,5 +1,12 @@
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesPackage{e_math_env_deco}[2026/04/12 v1.1 Math environment decoration]
+
+% Declare the capabilities this feature consumes rather than relying on class
+% load order: tcolorbox + the theorem colors + the \intcbenvtrue switch arrive
+% via e_visual, and the wrapped theorem environments via e_theorems. Both are
+% idempotent on the standard profile.
+\RequirePackage{e_visual}
+\RequirePackage{e_theorems}
 % =================================================================
 % Wrap existing theorem-like environments in tcolorbox.
 %
