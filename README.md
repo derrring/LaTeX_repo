@@ -89,7 +89,7 @@ without replacing the renderer:
 
 ```latex
 \renewcommand{\eFencedSectionFont}{\normalfont\bfseries\Large} % noteShort
-\renewcommand{\eFencedChapterFont}{\normalfont\bfseries\Large} % noteLong/thesis
+\renewcommand{\eFencedChapterFont}{\normalfont\bfseries\Large} % noteLong (thesis chapters use calligraphy; no font hook)
 ```
 
 ### CJK Support
