@@ -1,0 +1,43 @@
+% =================================================================
+% e_class_prologue.tex
+% Shared class-option prologue for the e_class family: the single source
+% for the 12pt switch and the deprecated cjk/nocjk options, previously
+% copy-pasted verbatim into all four e_class_*.cls.
+%
+% The owning class must \def\e@baseclass to its base (article|book)
+% before \input-ing this file:
+%     \def\e@baseclass{article}
+%     \input{sty_components/e_class_prologue.tex}
+% =================================================================
+\makeatletter
+
+% 12pt switch. Single declaration site; read by the e_heading_scale feature.
+\newif\if@e@twelvept
+\@e@twelveptfalse
+
+% Legacy CJK options, deprecated in the 2026 refactor. Both warn: [cjk] points
+% to the current mechanism, and [nocjk] states plainly that it has no effect
+% (CJK glyph routing is unconditional on the standard profile) instead of being
+% a silent no-op whose name implies it can disable CJK.
+\DeclareOption{cjk}{\ClassWarning{\@currname}{%
+    The [cjk] option is deprecated.\MessageBreak
+    The standard profile already provides CJK glyph routing.\MessageBreak
+    Use \string\usepackage{c113_cjk_engine} for full Japanese layout%
+    \MessageBreak or c112_langfamily for custom per-script font families}}
+\DeclareOption{nocjk}{\ClassWarning{\@currname}{%
+    The [nocjk] option has no effect: CJK glyph routing is always on in%
+    \MessageBreak the standard profile and cannot be disabled by an option}}
+
+% Pass 12pt to the base class and record it for e_heading_scale.
+\DeclareOption{12pt}{%
+    \PassOptionsToClass{\CurrentOption}{\e@baseclass}%
+    \@e@twelvepttrue
+}
+% Pass every other option through to the base class.
+\DeclareOption*{\PassOptionsToClass{\CurrentOption}{\e@baseclass}}
+
+\ProcessOptions\relax
+\LoadClass{\e@baseclass}
+
+\makeatother
+\endinput
