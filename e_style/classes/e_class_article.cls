@@ -5,7 +5,7 @@
 % =================================================================
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesClass{e_class_article}[Article Class]
+\ProvidesClass{e_class_article}[2026/07/12 v1.0 Article class]
 
 % --- Class Options (shared prologue: 12pt switch + deprecated cjk/nocjk) ---
 \def\e@baseclass{article}

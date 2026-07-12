@@ -6,8 +6,9 @@ from pathlib import Path
 
 """
 This script creates symbolic links from the project's style directories
-(estyle, MyEspressoTheme) to the user's TEXMFHOME directory, making the
-custom LaTeX classes and Beamer themes available to the TeX system.
+(e_style, MyEspressoTheme, MyCV) to the user's TEXMFHOME directory, making
+the custom LaTeX classes, Beamer theme, and CV templates available to the
+TeX system.
 """
 
 

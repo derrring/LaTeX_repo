@@ -5,7 +5,7 @@
 % =================================================================
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesClass{e_class_noteLong}[Lecture Notes Class]
+\ProvidesClass{e_class_noteLong}[2026/07/12 v1.0 Lecture notes class]
 
 % --- Class Options (shared prologue: 12pt switch + deprecated cjk/nocjk) ---
 \def\e@baseclass{book}
