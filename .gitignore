@@ -576,6 +576,7 @@ TSWLatexianTemp*
 ## Editors:
 # WinEdt
 *.bak
+*.bak_*
 *.sav
 
 # Texpad

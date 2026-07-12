@@ -1,0 +1,99 @@
+% =================================================================
+% Stress test: e_frontbackmatter_formal via e_class_noteLong
+% Exercises the post-refactor formal API:
+%   - Multi-author via \addauthor (per-author email + address)
+%   - \subtitle / \institution / \location / \keywords / \pdftitle
+%     (now in core; formal reads from same storage)
+%   - Thesis-only \subjclass, \dedicatory, \setabstract,
+%     \setacknowledgements (still in formal)
+%   - All rendering commands: \makefrontmatter, \makededication,
+%     \makeabstract, \makeacknowledgements, \makebackmatter
+%   - PDF metadata sync from core via hyperref
+% =================================================================
+
+\documentclass{e_class_noteLong}
+\usepackage{hyperref}
+
+\title{Frontmatter Stress Test \\ (formal variant)}
+\subtitle{A subtitle that should render below the title in small caps}
+\pdftitle{Frontmatter Stress Test (formal variant) -- PDF-safe title}
+
+\addauthor[alice@example.edu]
+  [Department of Applied Mathematics, Example University]
+  {Alice Anderson}
+
+\addauthor[bob@example.edu]
+  [Department of Mechanical Engineering \affilbreak
+   Graduate School of Science and Technology, Example University]
+  {Bob Bauer}
+
+\institution{Example University}
+\location{Yokohama 223-8522, Japan}
+\keywords{frontmatter, formal class, expl3, multilingual abstracts}
+\subjclass[2020]{65N06, 65N12, 49L25}
+\dedicatory{To everyone who ever debugged an expl3 catcode error.}
+
+\setabstract{%
+This abstract is the default-language (English) entry. It tests the
+\texttt{\textbackslash setabstract} command in its simplest form: no
+optional language tag, no custom label. Body should render on its own
+page after the title page and dedication.}
+
+\setabstract[R\'esum\'e]{%
+This second abstract uses an overridden label (``R\'esum\'e'') but
+keeps the document's default language context (no \texttt{[lang]}
+tag). It verifies that \texttt{\textbackslash setabstract} is
+repeatable -- two pages should appear, in order of \texttt{\textbackslash setabstract} calls.}
+
+\setacknowledgements{%
+The author thanks expl3 maintainers, the LaTeX team, and the unnamed
+Joplin reviewer who first noticed that \texttt{\textbackslash struct}
+is not a real command.}
+
+\date{\today}
+
+% --- Document Starts ---
+\begin{document}
+
+\makefrontmatter
+\makededication
+\makeabstract
+\makeacknowledgements
+
+\chapter{What this sample verifies}
+
+\begin{enumerate}
+  \item \texttt{\textbackslash makefrontmatter} renders a full title
+        page with institution at top, title (centered, LARGE), subtitle
+        in small caps below, two authors with superscript email markers
+        and address lines, location ``Yokohama...'' near the bottom,
+        date, then a horizontal rule and the email directory in
+        \texttt{\textbackslash texttt} font.
+  \item \texttt{\textbackslash makededication} produces a separate page
+        with italic right-aligned dedication ~30\% down.
+  \item \texttt{\textbackslash makeabstract} produces \emph{two} pages
+        (one per \texttt{\textbackslash setabstract} call); the second
+        carries the overridden ``R\'esum\'e'' heading.
+  \item \texttt{\textbackslash makeacknowledgements} produces one page.
+  \item \texttt{\textbackslash makebackmatter} at end of document
+        renders the colophon: ``Anderson, Bauer: \emph{Frontmatter
+        Stress Test (formal variant)}, \copyright\ \the\year''.
+  \item PDF metadata: open the PDF info dialog -- pdftitle should be
+        the override string (\texttt{\textbackslash pdftitle}),
+        pdfauthor should list ``Alice Anderson, Bob Bauer'',
+        pdfsubject should be the subtitle text, pdfkeywords as set.
+  \item Bob's affiliation uses \texttt{\textbackslash affilbreak} for
+        tight two-line formatting.
+\end{enumerate}
+
+\chapter{Mathematical content sanity check}
+
+A standard equation to confirm the math environment still works after
+the frontmatter refactor:
+\[
+  -\Delta u + H(x, \nabla u) = f(m), \qquad x \in \Omega.
+\]
+
+\makebackmatter
+
+\end{document}
