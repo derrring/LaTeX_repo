@@ -129,6 +129,14 @@ if ! grep -Fq 'text#1' "$ROOT/e_style/sty_components/c112_langfamily.sty"; then
     exit 1
 fi
 
+# The CJK rare-glyph extension ladder (HanaMinB/Jigmo/Unifont) is opt-in via
+# \eEnableCJKExtensionFonts, not loaded eagerly on every document (eager loading
+# adds ~10-15s/compile). e_cjk must keep the opt-in mechanism.
+if ! grep -Fq 'newcommand{\eEnableCJKExtensionFonts}' "$ROOT/e_style/sty_components/e_cjk.sty"; then
+    echo "FAIL: e_cjk must keep \\eEnableCJKExtensionFonts (extension ladder must stay opt-in, not eager)" >&2
+    exit 1
+fi
+
 if [[ "${1:-}" == "--fonts" ]]; then
     (cd "$ROOT/e_style/test/fonts" && python3 check.py)
 fi

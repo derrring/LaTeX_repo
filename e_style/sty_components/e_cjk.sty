@@ -17,18 +17,9 @@
 
 \makeatletter
 \newcommand\e@cjkalt{}
-\IfFontExistsTF{HanaMinB}{\g@addto@macro\e@cjkalt{{Range="20000-"2EBEF,Font=HanaMinB},}}{}
-\IfFontExistsTF{Jigmo2}{\g@addto@macro\e@cjkalt{{Range="2EBF0-"2EE5D,Font=Jigmo2},}}{}
-\IfFontExistsTF{Jigmo3}{\g@addto@macro\e@cjkalt{{Range="30000-"323AF,Font=Jigmo3},}}{}
-\IfFontExistsTF{Unifont Upper}{\g@addto@macro\e@cjkalt{{Range="323B0-"3FFFF,Font=Unifont Upper},}}{}
 
-\IfFontExistsTF{Source Han Serif}
-  {\setmainjfont{Source Han Serif}[BoldFont={Source Han Serif Bold},ItalicFont={},AltFont={\e@cjkalt}]}
-  {\setmainjfont{HaranoAjiMincho}[BoldFont={HaranoAjiMincho-Bold},ItalicFont={},AltFont={\e@cjkalt}]}
-\IfFontExistsTF{Source Han Sans}
-  {\setsansjfont{Source Han Sans}[BoldFont={Source Han Sans Bold},ItalicFont={}]}
-  {\setsansjfont{HaranoAjiGothic}[BoldFont={HaranoAjiGothic-Bold},ItalicFont={}]}
-
+% No-fake-italic ssub shapes: luatexja would otherwise synthesize slanted CJK.
+% Defined before the jfont setup so the setup can (re-)assert the shapes.
 \newcommand\ltj@nofakeital[2]{%
   \DeclareFontShape{#1}{#2}{m}{it}{<->ssub*#2/m/n}{}%
   \DeclareFontShape{#1}{#2}{m}{sl}{<->ssub*#2/m/n}{}%
@@ -41,10 +32,44 @@
   \DeclareFontShape{#1}{#2}{bx}{sl}{<->ssub*#2/b/n}{}%
   \DeclareFontShape{#1}{#2}{bx}{sc}{<->ssub*#2/b/n}{}%
 }
-\begingroup\edef\@tempa{\endgroup
-  \noexpand\ltj@nofakeital{JY3}{\mcdefault}\noexpand\ltj@nofakeital{JT3}{\mcdefault}%
-  \noexpand\ltj@nofakeital{JY3}{\gtdefault}\noexpand\ltj@nofakeital{JT3}{\gtdefault}%
-}\@tempa
+
+% Install the Japanese main/sans jfont from the current \e@cjkalt fallback
+% ladder, then re-assert the no-fake-italic shapes. Factored so
+% \eEnableCJKExtensionFonts can rebuild the fonts after populating \e@cjkalt.
+\newcommand{\e@setup@jfonts}{%
+  \IfFontExistsTF{Source Han Serif}
+    {\setmainjfont{Source Han Serif}[BoldFont={Source Han Serif Bold},ItalicFont={},AltFont={\e@cjkalt}]}
+    {\setmainjfont{HaranoAjiMincho}[BoldFont={HaranoAjiMincho-Bold},ItalicFont={},AltFont={\e@cjkalt}]}%
+  \IfFontExistsTF{Source Han Sans}
+    {\setsansjfont{Source Han Sans}[BoldFont={Source Han Sans Bold},ItalicFont={}]}
+    {\setsansjfont{HaranoAjiGothic}[BoldFont={HaranoAjiGothic-Bold},ItalicFont={}]}%
+  \begingroup\edef\@tempa{\endgroup
+    \noexpand\ltj@nofakeital{JY3}{\mcdefault}\noexpand\ltj@nofakeital{JT3}{\mcdefault}%
+    \noexpand\ltj@nofakeital{JY3}{\gtdefault}\noexpand\ltj@nofakeital{JT3}{\gtdefault}%
+  }\@tempa
+}
+
+% Default fast path: \e@cjkalt is empty, so the rare-glyph fallback fonts
+% (HanaMinB/Jigmo/Unifont) are NOT loaded. Source Han covers CJK Unified +
+% Ext-A -- effectively all real-world CJK. The extension ladder costs ~10-15s
+% of font indexing on EVERY document, so it is opt-in (see below).
+\e@setup@jfonts
+
+% Opt-in full rare-glyph coverage: add the HanaMinB/Jigmo/Unifont AltFont ladder
+% for supplementary-plane (Ext-B..H) ideographs and rebuild the main jfont.
+% Enabled by c113_cjk_engine (full CJK layout) and by documents that actually
+% typeset rare ideographs (\eEnableCJKExtensionFonts in the preamble). Idempotent.
+\newif\if@e@cjkext
+\newcommand{\eEnableCJKExtensionFonts}{%
+  \if@e@cjkext\else
+    \@e@cjkexttrue
+    \IfFontExistsTF{HanaMinB}{\g@addto@macro\e@cjkalt{{Range="20000-"2EBEF,Font=HanaMinB},}}{}%
+    \IfFontExistsTF{Jigmo2}{\g@addto@macro\e@cjkalt{{Range="2EBF0-"2EE5D,Font=Jigmo2},}}{}%
+    \IfFontExistsTF{Jigmo3}{\g@addto@macro\e@cjkalt{{Range="30000-"323AF,Font=Jigmo3},}}{}%
+    \IfFontExistsTF{Unifont Upper}{\g@addto@macro\e@cjkalt{{Range="323B0-"3FFFF,Font=Unifont Upper},}}{}%
+    \e@setup@jfonts
+  \fi
+}
 \makeatother
 
 % Inline script switches: no-op passthrough defaults, overridable per script

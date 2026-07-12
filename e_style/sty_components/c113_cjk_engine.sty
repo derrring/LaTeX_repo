@@ -37,7 +37,11 @@
 % suppression -- rather than re-issuing a bare \setmainjfont that would
 % silently drop that coverage (and hard-fail where Noto CJK is absent). Set
 % Noto defaults only when used standalone, without e_cjk.
-\@ifpackageloaded{e_cjk}{}{%
+\@ifpackageloaded{e_cjk}{%
+  % Full CJK layout: opt into e_cjk's rare-glyph extension ladder
+  % (HanaMinB/Jigmo/Unifont), which the standard profile leaves off for speed.
+  \eEnableCJKExtensionFonts
+}{%
   \setmainjfont{Noto Serif CJK JP}%
   \setsansjfont{Noto Sans CJK JP}%
 }

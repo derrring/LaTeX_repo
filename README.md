@@ -95,11 +95,16 @@ without replacing the renderer:
 ### CJK Support
 
 The standard document profile includes lightweight CJK glyph routing:
-- Source Han Serif/Sans fonts
-- HanaMin/Jigmo/Unifont fallbacks for rare characters when installed
+- Source Han Serif/Sans fonts (cover CJK Unified + Extension A — effectively all
+  real-world CJK)
+- Rare supplementary-plane fallbacks (HanaMin/Jigmo/Unifont) are **opt-in**: they
+  add ~10–15s of font loading per compile, so they are off by default. Enable
+  them with `\eEnableCJKExtensionFonts` in the preamble, or by loading
+  `c113_cjk_engine` (which turns them on).
 
 Load `c113_cjk_engine` explicitly for full Japanese layout features such as ruby
-and kenten. Load `c112_langfamily` to declare custom per-script CJK families.
+and kenten (it also enables the rare-glyph fallbacks). Load `c112_langfamily` to
+declare custom per-script CJK families.
 
 ## Other Templates
 
