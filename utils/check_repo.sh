@@ -100,6 +100,14 @@ if ! grep -Fq 'if@e@twelvept' "$ROOT/e_style/sty_features/e_heading_scale.sty"; 
     exit 1
 fi
 
+# The Japanese main/sans font has a single owner (e_cjk's guarded Source Han
+# stack). c113_cjk_engine must defer to it via \@ifpackageloaded{e_cjk} rather
+# than re-issuing a bare \setmainjfont that drops the extension-glyph fallback.
+if ! grep -Fq '@ifpackageloaded{e_cjk}' "$ROOT/e_style/sty_components/c113_cjk_engine.sty"; then
+    echo "FAIL: c113_cjk_engine must defer main/sans jfont to e_cjk (\\@ifpackageloaded{e_cjk} guard missing)" >&2
+    exit 1
+fi
+
 if [[ "${1:-}" == "--fonts" ]]; then
     (cd "$ROOT/e_style/test/fonts" && python3 check.py)
 fi
