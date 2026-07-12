@@ -169,6 +169,15 @@ if ! grep -Fq 'has no effect' "$ROOT/e_style/sty_components/e_class_prologue.tex
     exit 1
 fi
 
+# The per-author email fetch is single-sourced in e_frontbackmatter_core (the
+# \__efm_author_email:nn accessor); the simple/formal renderers must call it,
+# not re-inline \seq_item into the email seq.
+efm_fetch=$({ grep -rlF 'seq_item:Nn \g__efm_emails_seq' "$ROOT/e_style/sty_features" || true; } | wc -l | tr -d ' ')
+if [[ "$efm_fetch" != "1" ]]; then
+    echo "FAIL: author email fetch must live only in e_frontbackmatter_core, found in $efm_fetch files" >&2
+    exit 1
+fi
+
 if [[ "${1:-}" == "--fonts" ]]; then
     (cd "$ROOT/e_style/test/fonts" && python3 check.py)
 fi

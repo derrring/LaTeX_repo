@@ -210,14 +210,10 @@
         \seq_map_indexed_inline:Nn \g__efm_authors_seq
           {
             ##2
-            \tl_set:Nx \l_tmpa_tl
-              { \seq_item:Nn \g__efm_emails_seq { ##1 } }
-            \tl_if_blank:VF \l_tmpa_tl
+            \__efm_author_email:nn { ##1 }
               { \textsuperscript { ##1 } }
-            \tl_set:Nx \l_tmpb_tl
-              { \seq_item:Nn \g__efm_addresses_seq { ##1 } }
-            \tl_if_blank:VF \l_tmpb_tl
-              { \par {\small \l_tmpb_tl} }
+            \__efm_author_address:nn { ##1 }
+              { \par {\small \l__efm_address_tl} }
             \par \vspace{0.5em}
           }
 

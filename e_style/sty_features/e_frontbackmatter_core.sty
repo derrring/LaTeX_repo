@@ -137,6 +137,23 @@
     \tl_if_blank:nF { #2 } { \address{#2} }
   }
 
+% Read-side accessors shared by the simple/formal renderers: fetch author #1's
+% email/address by index into a scratch tl and run the emit body #2 only when
+% it is non-blank. Single-sources the fetch+blank skeleton both renderers had
+% copied verbatim.
+\tl_new:N \l__efm_email_tl
+\tl_new:N \l__efm_address_tl
+\cs_new_protected:Npn \__efm_author_email:nn #1 #2
+  {
+    \tl_set:Nx \l__efm_email_tl { \seq_item:Nn \g__efm_emails_seq { #1 } }
+    \tl_if_blank:VF \l__efm_email_tl { #2 }
+  }
+\cs_new_protected:Npn \__efm_author_address:nn #1 #2
+  {
+    \tl_set:Nx \l__efm_address_tl { \seq_item:Nn \g__efm_addresses_seq { #1 } }
+    \tl_if_blank:VF \l__efm_address_tl { #2 }
+  }
+
 
 % =================================================================
 % 3. Document-level metadata commands
