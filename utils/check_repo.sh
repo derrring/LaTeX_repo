@@ -137,6 +137,22 @@ if ! grep -Fq 'newcommand{\eEnableCJKExtensionFonts}' "$ROOT/e_style/sty_compone
     exit 1
 fi
 
+# e_math_env_deco declares its capability deps rather than relying on class load
+# order (it consumes tcolorbox/colors via e_visual and the wrapped envs via
+# e_theorems).
+if ! grep -Fq 'RequirePackage{e_theorems}' "$ROOT/e_style/sty_features/e_math_env_deco.sty"; then
+    echo "FAIL: e_math_env_deco must \\RequirePackage its deps (e_visual, e_theorems)" >&2
+    exit 1
+fi
+
+# The CV default palette is single-sourced in \__cv_theme_default:; the primary
+# hex must not be restated (init vs theme=default silent drift).
+cv_default_dups=$(grep -c '2b2b2b' "$ROOT/MyCV/cv_espresso_deedy_common.sty")
+if [[ "$cv_default_dups" != "1" ]]; then
+    echo "FAIL: CV default primary color 2b2b2b must appear once (single-source), found $cv_default_dups" >&2
+    exit 1
+fi
+
 if [[ "${1:-}" == "--fonts" ]]; then
     (cd "$ROOT/e_style/test/fonts" && python3 check.py)
 fi
