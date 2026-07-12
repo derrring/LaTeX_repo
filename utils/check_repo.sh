@@ -117,6 +117,18 @@ if [[ "$fence_sources" != "1" ]]; then
     exit 1
 fi
 
+# luatexja reserves \zh/\zw as length primitives; e_cjk must not (re)define \zh
+# (doing so silently breaks luatexja-ruby). Inline script switches use the
+# collision-safe \text<tag> convention.
+if grep -Eq '\\def\\zh([^a-zA-Z]|$)|\\newcommand\{?\\zh\}' "$ROOT/e_style/sty_components/e_cjk.sty"; then
+    echo "FAIL: e_cjk must not (re)define \\zh -- it is a luatexja length primitive (breaks ruby)" >&2
+    exit 1
+fi
+if ! grep -Fq 'text#1' "$ROOT/e_style/sty_components/c112_langfamily.sty"; then
+    echo "FAIL: \\newlangfamily must create \\text<tag> (collision-safe), not bare \\<tag>" >&2
+    exit 1
+fi
+
 if [[ "${1:-}" == "--fonts" ]]; then
     (cd "$ROOT/e_style/test/fonts" && python3 check.py)
 fi

@@ -4,8 +4,8 @@
 % Provides \newlangfamily for declaring inline font switches tied to
 % a tag (e.g., zh, ja, ar, he). Each call creates:
 %
-%     \<tag>font  -- NFSS font family switch (grouped scope)
-%     \<tag>{x}   -- typeset x in the tag font, grouped
+%     \<tag>font    -- NFSS font family switch (grouped scope)
+%     \text<tag>{x} -- typeset x in the tag font, grouped
 %
 % Implementation note: this package uses \newjfontfamily from
 % luatexja-fontspec, NOT plain \newfontfamily. The reason is that
@@ -14,13 +14,13 @@
 % codepoints in jachar ranges (CJK Unified Ideographs etc.). Only
 % font families declared via \newjfontfamily are honoured by the
 % reroute. This package is therefore CJK-aware by construction;
-% tags like \zh and \ja do what their name suggests.
+% tags like \textzh and \textja do what their name suggests.
 %
 % Typical usage in a document preamble:
 %
 %     \usepackage{c112_langfamily}
-%     \newlangfamily{zh}{Source Han Serif SC}
-%     % \ja is unnecessary unless overriding the class default
+%     \newlangfamily{zh}{Source Han Serif SC}   % defines \textzh{...}
+%     % \textja is unnecessary unless overriding the class default
 %     % (which is configured via \setmainjfont in e_cjk).
 %
 % Note on fallback: fontspec/luatexja-fontspec has no true coverage
@@ -39,9 +39,14 @@
 \RequirePackage{luatexja-fontspec}
 
 % \newlangfamily{tag}{font name}
+% Creates \<tag>font (NFSS family switch) and \text<tag>{x} (grouped inline
+% switch). The inline switch is \text<tag>, NOT bare \<tag>: luatexja reserves
+% \zh/\zw as length primitives, so \zh{...} would clobber a primitive and break
+% ruby. Redefinition is silent (\def) so \newlangfamily{zh} cleanly overrides
+% the no-op \textzh default that e_cjk installs.
 \newcommand{\newlangfamily}[2]{%
     \expandafter\newjfontfamily\csname #1font\endcsname{#2}%
-    \expandafter\def\csname #1\endcsname##1{{\csname #1font\endcsname ##1}}%
+    \expandafter\def\csname text#1\endcsname##1{{\csname #1font\endcsname ##1}}%
 }
 
 \endinput

@@ -47,10 +47,15 @@
 }\@tempa
 \makeatother
 
-\def\zh#1{#1}
-\def\ja#1{#1}
-\def\zhsans#1{{\sffamily #1}}
-\def\jasans#1{{\sffamily #1}}
+% Inline script switches: no-op passthrough defaults, overridable per script
+% via \newlangfamily (c112_langfamily). These MUST NOT be named \zh/\zw --
+% luatexja reserves those as length primitives (zenkaku height/width), and
+% redefining \zh silently breaks luatexja-ruby and any \ltjsetparameter that
+% uses \zh. Use the collision-safe \text<script> convention.
+\newcommand{\textzh}[1]{#1}
+\newcommand{\textja}[1]{#1}
+\newcommand{\textzhsans}[1]{{\sffamily #1}}
+\newcommand{\textjasans}[1]{{\sffamily #1}}
 
 % luatexja redirects \em to gothic. CJK emphasis in this profile remains
 % upright mincho; fail loudly if the upstream internal token sequence changes.
