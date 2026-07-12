@@ -78,6 +78,28 @@ if grep -Fq 'Custom First' "$BEAMER_TEXT"; then
     exit 1
 fi
 
+# --- Static single-source / tier invariants (audit pins) ---
+# toccolorpart is owned solely by c120_color.tex. The old dark-blue
+# \providecolor in c130_toc.tex was a second source that silently diverged
+# by load order; regressing it must fail here.
+tcp_sources=$(grep -rlE '\\(colorlet|definecolor|providecolor)\{toccolorpart\}' "$ROOT/e_style" | wc -l | tr -d ' ')
+if [[ "$tcp_sources" != "1" ]]; then
+    echo "FAIL: toccolorpart must have exactly one color source, found $tcp_sources" >&2
+    exit 1
+fi
+
+# The 12pt heading-size policy belongs in the e_heading_scale feature, not in
+# the e_document_layout component (a component must not apply presentation
+# \titleformat nor read class-option state).
+if grep -Eq '\\titleformat' "$ROOT/e_style/sty_components/e_document_layout.sty"; then
+    echo "FAIL: e_document_layout (component) must not \\titleformat; heading policy belongs in e_heading_scale (feature)" >&2
+    exit 1
+fi
+if ! grep -Fq 'if@e@twelvept' "$ROOT/e_style/sty_features/e_heading_scale.sty"; then
+    echo "FAIL: e_heading_scale feature is missing the 12pt heading policy" >&2
+    exit 1
+fi
+
 if [[ "${1:-}" == "--fonts" ]]; then
     (cd "$ROOT/e_style/test/fonts" && python3 check.py)
 fi
