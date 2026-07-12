@@ -5,7 +5,8 @@
 \ifLuaTeX\else
   \PackageError{e_kernel}
     {The e_style family requires LuaLaTeX}
-    {Compile with lualatex. XeLaTeX and pdfLaTeX are not supported.}
+    {Compile with lualatex. XeLaTeX and pdfLaTeX are not supported.}%
+  \expandafter\endinput  % stop here so expl3/xparse don't add secondary errors
 \fi
 
 \RequirePackage{expl3,xparse}
