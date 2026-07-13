@@ -78,6 +78,121 @@ if grep -Fq 'Custom First' "$BEAMER_TEXT"; then
     exit 1
 fi
 
+# --- Static single-source / tier invariants (audit pins) ---
+# toccolorpart is owned solely by c120_color.tex. The old dark-blue
+# \providecolor in c130_toc.tex was a second source that silently diverged
+# by load order; regressing it must fail here.
+tcp_sources=$({ grep -rlE '\\(colorlet|definecolor|providecolor)\{toccolorpart\}' "$ROOT/e_style" || true; } | wc -l | tr -d ' ')
+if [[ "$tcp_sources" != "1" ]]; then
+    echo "FAIL: toccolorpart must have exactly one color source, found $tcp_sources" >&2
+    exit 1
+fi
+
+# The 12pt heading-size policy belongs in the e_heading_scale feature, not in
+# the e_document_layout component (a component must not apply presentation
+# \titleformat nor read class-option state).
+if grep -Eq '\\titleformat' "$ROOT/e_style/sty_components/e_document_layout.sty"; then
+    echo "FAIL: e_document_layout (component) must not \\titleformat; heading policy belongs in e_heading_scale (feature)" >&2
+    exit 1
+fi
+if ! grep -Fq 'if@e@twelvept' "$ROOT/e_style/sty_features/e_heading_scale.sty"; then
+    echo "FAIL: e_heading_scale feature is missing the 12pt heading policy" >&2
+    exit 1
+fi
+
+# The Japanese main/sans font has a single owner (e_cjk's guarded Source Han
+# stack). c113_cjk_engine must defer to it via \@ifpackageloaded{e_cjk} rather
+# than re-issuing a bare \setmainjfont that drops the extension-glyph fallback.
+if ! grep -Fq '@ifpackageloaded{e_cjk}' "$ROOT/e_style/sty_components/c113_cjk_engine.sty"; then
+    echo "FAIL: c113_cjk_engine must defer main/sans jfont to e_cjk (\\@ifpackageloaded{e_cjk} guard missing)" >&2
+    exit 1
+fi
+
+# The fenced-title fence geometry (rules + gaps) is single-sourced in
+# e_title_fenced_core.sty; the section and chapter styles must call it rather
+# than re-inline their own vbox.
+fence_sources=$({ grep -rlF 'hrule height 1.5pt' "$ROOT/e_style/sty_features" || true; } | wc -l | tr -d ' ')
+if [[ "$fence_sources" != "1" ]]; then
+    echo "FAIL: fenced fence-box geometry must live only in e_title_fenced_core.sty, found in $fence_sources files" >&2
+    exit 1
+fi
+
+# luatexja reserves \zh/\zw as length primitives; e_cjk must not (re)define \zh
+# (doing so silently breaks luatexja-ruby). Inline script switches use the
+# collision-safe \text<tag> convention.
+if grep -Eq '\\def\\zh([^a-zA-Z]|$)|\\newcommand\{?\\zh\}' "$ROOT/e_style/sty_components/e_cjk.sty"; then
+    echo "FAIL: e_cjk must not (re)define \\zh -- it is a luatexja length primitive (breaks ruby)" >&2
+    exit 1
+fi
+if ! grep -Fq 'text#1' "$ROOT/e_style/sty_components/c112_langfamily.sty"; then
+    echo "FAIL: \\newlangfamily must create \\text<tag> (collision-safe), not bare \\<tag>" >&2
+    exit 1
+fi
+
+# The CJK rare-glyph extension ladder (HanaMinB/Jigmo/Unifont) is opt-in via
+# \eEnableCJKExtensionFonts, not loaded eagerly on every document (eager loading
+# adds ~10-15s/compile). e_cjk must keep the opt-in mechanism.
+if ! grep -Fq 'newcommand{\eEnableCJKExtensionFonts}' "$ROOT/e_style/sty_components/e_cjk.sty"; then
+    echo "FAIL: e_cjk must keep \\eEnableCJKExtensionFonts (extension ladder must stay opt-in, not eager)" >&2
+    exit 1
+fi
+
+# e_math_env_deco declares its capability deps rather than relying on class load
+# order (it consumes tcolorbox/colors via e_visual and the wrapped envs via
+# e_theorems).
+if ! grep -Fq 'RequirePackage{e_theorems}' "$ROOT/e_style/sty_features/e_math_env_deco.sty"; then
+    echo "FAIL: e_math_env_deco must \\RequirePackage its deps (e_visual, e_theorems)" >&2
+    exit 1
+fi
+
+# The CV default palette is single-sourced in \__cv_theme_default:; the primary
+# hex must not be restated (init vs theme=default silent drift).
+# grep returning 1 on "no match" must not abort under set -e/pipefail, so the
+# counting greps below are guarded with '|| true' (a zero count is a valid,
+# non-error result these pins test for).
+cv_default_dups=$({ grep -c '2b2b2b' "$ROOT/MyCV/cv_espresso_deedy_common.sty" || true; })
+if [[ "$cv_default_dups" != "1" ]]; then
+    echo "FAIL: CV default primary color 2b2b2b must appear once (single-source), found $cv_default_dups" >&2
+    exit 1
+fi
+
+# The class-option prologue (12pt switch + cjk/nocjk) is single-sourced in
+# sty_components/e_class_prologue.tex; no .cls may re-declare the switch.
+switch_in_cls=$({ grep -lF 'newif\if@e@twelvept' "$ROOT"/e_style/classes/*.cls 2>/dev/null || true; } | wc -l | tr -d ' ')
+if [[ "$switch_in_cls" != "0" ]]; then
+    echo "FAIL: \\if@e@twelvept must live only in e_class_prologue.tex, found in $switch_in_cls .cls" >&2
+    exit 1
+fi
+# [nocjk] must warn (it cannot disable the always-on CJK routing), not be silent.
+if ! grep -Fq 'has no effect' "$ROOT/e_style/sty_components/e_class_prologue.tex"; then
+    echo "FAIL: [nocjk] must emit a warning (not a silent no-op)" >&2
+    exit 1
+fi
+
+# The per-author email fetch is single-sourced in e_frontbackmatter_core (the
+# \__efm_author_email:nn accessor); the simple/formal renderers must call it,
+# not re-inline \seq_item into the email seq.
+efm_fetch=$({ grep -rlF 'seq_item:Nn \g__efm_emails_seq' "$ROOT/e_style/sty_features" || true; } | wc -l | tr -d ' ')
+if [[ "$efm_fetch" != "1" ]]; then
+    echo "FAIL: author email fetch must live only in e_frontbackmatter_core, found in $efm_fetch files" >&2
+    exit 1
+fi
+
+# ToC number columns grow for over-wide numbers via \e@settocnumeff instead of
+# clipping into fixed-width makeboxes that collide with the title (M14).
+if ! grep -Fq 'makebox[\e@tocnumeff]' "$ROOT/e_style/sty_components/c130_toc.tex"; then
+    echo "FAIL: c130_toc must route numbered ToC entries through \\e@tocnumeff (M14 overflow fix)" >&2
+    exit 1
+fi
+
+# c140_envs must not set a document-global \tcbset: it was meant as the callout's
+# style but \tcbset makes it global, leaking colback/breakable into every
+# tcolorbox (incl. the beamer theme boxes). The callout carries its own keys (M15).
+if grep -Eq '^\\tcbset\{' "$ROOT/e_style/sty_components/c140_envs.tex"; then
+    echo "FAIL: c140_envs must not set a document-global \\tcbset (fold keys into the callout)" >&2
+    exit 1
+fi
+
 if [[ "${1:-}" == "--fonts" ]]; then
     (cd "$ROOT/e_style/test/fonts" && python3 check.py)
 fi

@@ -5,13 +5,16 @@
 
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesPackage{e_title_fenced_chap}%
-  [2026/07/12 v1.3 Stable fenced chapter geometry]
+  [2026/07/12 v1.4 Stable fenced chapter geometry]
 
 % Direct dependency for \titleformat and \titlespacing.
 \RequirePackage{titlesec}
 
 % Shared \part formatting (Roman numerals, centered, colored)
 \RequirePackage{e_title_part}
+
+% Shared atomic fence-box geometry (rules + symmetric gaps).
+\RequirePackage{e_title_fenced_core}
 
 % =================================================================
 % Chapter title (numbered)
@@ -23,48 +26,24 @@
 % so changing the title size also scales the fence-to-text separation.
 \newcommand{\eFencedChapterFont}{\normalfont\bfseries\large}
 
-% titlesec's after-skip is followed by the document's paragraph glue. Compute
-% a compensated value after the preamble so the visible net separation remains
-% 1em even when the document changes \parskip.
+% Keep external rhythm tied to the final body baseline while the fence's own
+% geometry stays single-spaced. titlesec's after-skip is followed by paragraph
+% glue, so subtract \parskip once to retain the intended net separation.
 \newskip\e@fenced@chapter@afterskip
 \newcommand{\e@fenced@chapter@syncspacing}{%
   \begingroup
     \normalfont\normalsize
-    \skip@=1em plus .1em\relax
+    \skip@=.7\baselineskip plus .07\baselineskip\relax
     \advance\skip@ by -\parskip
     \global\e@fenced@chapter@afterskip=\skip@
   \endgroup
 }
 \AddToHook{begindocument/end}{\e@fenced@chapter@syncspacing}
 
-% Build the complete fence as one atomic box. Local single spacing and
-% zero paragraph glue isolate chapter heads from document-level setspace
-% and parskip settings; equal explicit kerns give symmetric rule gaps.
+% The atomic fence-box geometry is shared with the section style
+% (e_title_fenced_core.sty); this level only supplies its font hook.
 % Body text after the title retains the document's own paragraph spacing.
-\newcommand{\e@fenced@chapter@box}[1]{%
-  \begingroup
-    \linespread{1}\selectfont
-    \eFencedChapterFont
-    \parindent=0pt\relax
-    \parskip=0pt\relax
-    \noindent
-    \vbox{%
-      \hsize=\linewidth
-      \hrule height 1.5pt
-      \kern 1ex
-      \vbox{%
-        \hsize=\linewidth
-        \parindent=0pt\relax
-        \parskip=0pt\relax
-        \emergencystretch=2em\relax
-        \raggedright
-        \noindent#1\par
-      }%
-      \kern 1ex
-      \hrule height 1.5pt
-    }%
-  \endgroup
-}
+\newcommand{\e@fenced@chapter@box}[1]{\e@fenced@box{\eFencedChapterFont}{#1}}
 
 \newcommand{\e@fenced@chapter@numbered}[1]{%
   \e@fenced@chapter@box{\thechapter\quad\MakeUppercase{#1}}}

@@ -5,43 +5,16 @@
 % =================================================================
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesClass{e_class_article}[Article Class]
+\ProvidesClass{e_class_article}[2026/07/12 v1.0 Article class]
 
-% --- Class Options ---
-
-% The \makeatletter and \makeatother must wrap the entire block
-% where commands with "@" are defined and used.
-\makeatletter
-
-% 12pt switch
-\newif\if@e@twelvept
-\@e@twelveptfalse
-
-% Legacy CJK options are accepted but no-op in 2026 refactor.
-\DeclareOption{cjk}{\ClassWarning{e_class_article}{%
-    The [cjk] option is deprecated.\MessageBreak
-    The standard profile already provides CJK glyph routing.\MessageBreak
-    Use \string\usepackage{c113_cjk_engine} for full Japanese layout%
-    \MessageBreak or c112_langfamily for custom per-script font families}}
-\DeclareOption{nocjk}{}
-
-% When the '12pt' option is found, pass it to the base class
-\DeclareOption{12pt}{
-    \PassOptionsToClass{\CurrentOption}{article}
-    \@e@twelvepttrue
-}
-
-% Pass unknown options to base class
-\DeclareOption*{\PassOptionsToClass{\CurrentOption}{article}}
-
-\ProcessOptions\relax
-\LoadClass{article}
-
-\makeatother
+% --- Class Options (shared prologue: 12pt switch + deprecated cjk/nocjk) ---
+\def\e@baseclass{article}
+\input{sty_components/e_class_prologue.tex}
 
 % --- 2. Load the common style package ---
 \RequirePackage{e_profile_standard}
 \RequirePackage{e_frontbackmatter_simple}
+\RequirePackage{e_heading_scale}
 
 % --- 3. Article-specific Formatting ---
 \linespread{1.1}

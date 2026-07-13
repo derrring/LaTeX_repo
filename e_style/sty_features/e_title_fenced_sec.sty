@@ -1,9 +1,12 @@
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesPackage{e_title_fenced_sec}%
-  [2026/07/12 v1.3 Stable fenced section geometry]
+  [2026/07/12 v1.4 Stable fenced section geometry]
 
 % Direct dependency for \titleformat and \titlespacing.
 \RequirePackage{titlesec}
+
+% Shared atomic fence-box geometry (rules + symmetric gaps).
+\RequirePackage{e_title_fenced_core}
 
 % ====================================================================
 % == Fenced Section Title Style ==
@@ -18,7 +21,7 @@
 %   - Title gap: 1ex, measured in the selected heading font, on both sides.
 %   - External rhythm: treat the complete fence as the heading boundary. Its
 %     visible before/after distances follow ordinary section-heading rhythm;
-%     em units scale with the document font but not body line spreading.
+%     baseline-relative units follow the document's body line spreading.
 % ====================================================================
 
 \makeatletter
@@ -27,47 +30,27 @@
 % so changing the title size also scales the fence-to-text separation.
 \newcommand{\eFencedSectionFont}{\normalfont\bfseries\large}
 
-% titlesec's after-skip is followed by the document's paragraph glue. Compute
-% a compensated value after the preamble so the visible net separation remains
-% 1em even when the document changes \parskip.
+% Keep external rhythm tied to the final body baseline while the fence's own
+% geometry stays single-spaced. titlesec's after-skip is followed by paragraph
+% glue, so subtract \parskip once to retain the intended net separation.
+\newskip\e@fenced@section@beforeskip
 \newskip\e@fenced@section@afterskip
 \newcommand{\e@fenced@section@syncspacing}{%
   \begingroup
     \normalfont\normalsize
-    \skip@=1em plus .1em\relax
+    \skip@=1.56\baselineskip
+      plus .21\baselineskip minus .1\baselineskip\relax
+    \global\e@fenced@section@beforeskip=\skip@
+    \skip@=.7\baselineskip plus .07\baselineskip\relax
     \advance\skip@ by -\parskip
     \global\e@fenced@section@afterskip=\skip@
   \endgroup
 }
 \AddToHook{begindocument/end}{\e@fenced@section@syncspacing}
 
-% Keep the heading single-spaced and remove paragraph glue locally. The
-% nested vbox makes the visible gap exactly 1ex from each glyph box to its
-% rule, including for wrapped titles, and keeps the whole fence atomic.
-\newcommand{\e@fenced@section@box}[1]{%
-  \begingroup
-    \linespread{1}\selectfont
-    \eFencedSectionFont
-    \parindent=0pt\relax
-    \parskip=0pt\relax
-    \noindent
-    \vbox{%
-      \hsize=\linewidth
-      \hrule height 1.5pt
-      \kern 1ex
-      \vbox{%
-        \hsize=\linewidth
-        \parindent=0pt\relax
-        \parskip=0pt\relax
-        \emergencystretch=2em\relax
-        \raggedright
-        \noindent#1\par
-      }%
-      \kern 1ex
-      \hrule height 1.5pt
-    }%
-  \endgroup
-}
+% The atomic fence-box geometry is shared with the chapter style
+% (e_title_fenced_core.sty); this level only supplies its font hook.
+\newcommand{\e@fenced@section@box}[1]{\e@fenced@box{\eFencedSectionFont}{#1}}
 
 \newcommand{\e@fenced@section@numbered}[1]{%
   \e@fenced@section@box{\thesection\quad\MakeUppercase{#1}}}
@@ -94,7 +77,7 @@
 % with more space above than below. This declaration affects \section only;
 % lower heading levels retain their class defaults.
 \titlespacing*{\section}{0pt}
-  {2.25em plus .3em minus .15em}
+  {\e@fenced@section@beforeskip}
   {\e@fenced@section@afterskip}
 
 \makeatother

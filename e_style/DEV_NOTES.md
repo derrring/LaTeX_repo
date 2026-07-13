@@ -32,8 +32,10 @@ alongside but is the older idiom.
 
 ### e_class compatibility audit (2026-05-10)
 
-**Direct `\pdf...` primitive usage**: 0 in e_style/. (Single hit in
-`e_frontbackmatter_formal.sty:465` is a comment, not code.) e_class
+**Direct `\pdf...` primitive usage**: 0 in e_style/. (The `\pdf`-shaped hits
+are `\pdftitle` API mentions in comments in `e_frontbackmatter_core.sty`, not
+`\pdf...` primitives; the 2026-07 core/formal split moved them there from the
+old `formal.sty:465`.) e_class
 goes through `hyperref` exclusively, which is the
 `\DocumentMetadata`-cooperating path.
 
@@ -46,7 +48,7 @@ goes through `hyperref` exclusively, which is the
 | `geometry` | `e_document_layout` | ✓ unaffected |
 | `fancyhdr` | `e_document_layout` | ✓ unaffected |
 | `titlesec`, `titletoc`, `etoc` | `e_document_layout` | ✓ unaffected |
-| `tcolorbox` (+ skins, breakable, ...) | `c140_envs` / `e_math_env_deco` | ✓ metadata; ⚠ Tagged PDF (`testphase`) may produce untagged callout/theorem boxes |
+| `tcolorbox` (+ skins, breakable) | `e_visual` (base load); `c140_envs` (libraries); `e_math_env_deco` (consumer) | ✓ metadata; ⚠ Tagged PDF (`testphase`) may produce untagged callout/theorem boxes |
 | `microtype` | `e_fonts` / `e_cjk` | ✓ |
 | `unicode-math` | `e_fonts` / `e_cjk` | ✓ |
 | `fontspec` | `e_fonts` / `e_cjk` | ✓ |

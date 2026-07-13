@@ -113,10 +113,16 @@
 
 % Initialize default paper size and margins (will be set after functions are defined)
 
-\tl_set:Nn \l__cv_color_primary_tl { 2b2b2b }
-\tl_set:Nn \l__cv_color_headings_tl { 6A6A6A }
-\tl_set:Nn \l__cv_color_subheadings_tl { 333333 }
-\tl_set:Nn \l__cv_color_date_tl { 666666 }
+% Single-source the default palette so the initial values and
+% \cvsetup{theme=default} cannot drift apart.
+\cs_new:Npn \__cv_theme_default:
+  {
+    \tl_set:Nn \l__cv_color_primary_tl { 2b2b2b }
+    \tl_set:Nn \l__cv_color_headings_tl { 6A6A6A }
+    \tl_set:Nn \l__cv_color_subheadings_tl { 333333 }
+    \tl_set:Nn \l__cv_color_date_tl { 666666 }
+  }
+\__cv_theme_default:
 
 
 
@@ -238,10 +244,7 @@
   \str_case:nnF { #1 }
   {
     { default } {
-      \tl_set:Nn \l__cv_color_primary_tl { 2b2b2b }
-      \tl_set:Nn \l__cv_color_headings_tl { 6A6A6A }
-      \tl_set:Nn \l__cv_color_subheadings_tl { 333333 }
-      \tl_set:Nn \l__cv_color_date_tl { 666666 }
+      \__cv_theme_default:
     }
     { blue } {
       \tl_set:Nn \l__cv_color_primary_tl { 1e3a8a }

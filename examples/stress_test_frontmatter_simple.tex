@@ -1,0 +1,82 @@
+% =================================================================
+% Stress test: e_frontbackmatter_simple via e_class_article
+% Exercises the post-refactor API:
+%   - Multi-author via \addauthor with per-author email + address
+%   - Single-author via legacy \author{string} (push-as-1-entry)
+%   - \affilbreak for tight multi-line affiliations
+%   - \institution + \location (document-level)
+%   - \subtitle / \keywords (silently stored; populates PDF metadata
+%     via hyperref, NOT rendered in \@maketitle)
+%   - Thesis-only commands (\subjclass, \dedicatory, \setabstract,
+%     \setacknowledgements) emit the documented PackageWarning
+% =================================================================
+
+\documentclass{e_class_article}
+\usepackage{hyperref}
+
+\title{Frontmatter Stress Test (simple variant)}
+\subtitle{This subtitle is stored silently; check PDF pdfsubject metadata.}
+
+\addauthor[alice@example.edu]
+  [Department of Applied Mathematics]
+  {Alice Anderson}
+
+\addauthor[bob@example.edu]
+  [Department of Mechanical Engineering \affilbreak
+   Graduate School of Science and Technology]
+  {Bob Bauer}
+
+\addauthor[]
+  [Department of Theoretical Physics]
+  {Carol Chen (no email)}
+
+\addauthor[dave@example.edu][]{Dave Davis (no address)}
+
+\institution{Example University}
+\location{Yokohama 223-8522, Japan}
+\keywords{frontmatter, stress test, expl3, sequence iteration}
+\pdftitle{Frontmatter Stress Test (PDF-metadata-safe title)}
+
+% Confirm thesis-only commands warn-and-ignore without halting compile.
+\dedicatory{This dedication should NOT render in article mode.}
+\subjclass[2020]{65N06, 65N12}
+\setabstract{This abstract should NOT render in article mode either.}
+\setacknowledgements{Same goes for acknowledgements.}
+
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\section{What this sample verifies}
+
+\begin{enumerate}
+  \item Four authors render in stacked layout, each with optional
+        thanks-footnote (email) and italic small-text address below.
+  \item Carol's slot has empty email — no thanks-footnote should appear.
+  \item Dave's slot has empty address — no small-italic line below.
+  \item Bob's address spans two lines via \verb|\affilbreak|; spacing
+        should be tight (not the airy default \verb|\\|).
+  \item Institution ``Example University'' and location ``Yokohama...''
+        appear between author block and date.
+  \item \verb|\subtitle| and \verb|\keywords| are stored but NOT
+        rendered on the title page; they should populate
+        \texttt{pdfsubject} / \texttt{pdfkeywords} in the PDF (open the
+        PDF info dialog to verify).
+  \item Calls to \verb|\dedicatory|, \verb|\subjclass|,
+        \verb|\setabstract|, \verb|\setacknowledgements| emit a
+        \texttt{PackageWarning} at compile time but do not break the
+        build, and produce no visible output.
+\end{enumerate}
+
+\section{Legacy single-call \texttt{\textbackslash author} smoke test}
+
+The block above used \verb|\addauthor| four times. The legacy
+single-call form \verb|\author{Alice and Bob}| is also accepted as
+backward-compatible: it pushes one seq entry whose rendered string is
+\textit{exactly} what was passed in. To verify that path, comment out
+all \verb|\addauthor| lines and uncomment a single-author
+\verb|\author{...}| call before \verb|\maketitle|.
+
+\end{document}

@@ -1,0 +1,54 @@
+% =================================================================
+% e_heading_scale.sty
+% Class-selectable presentation policy: when the document class was
+% loaded with [12pt], scale the standard section/subsection/
+% subsubsection heading sizes.
+%
+% This block previously lived in e_document_layout.sty (a component),
+% where it read class-option state and reached up to the section title
+% feature by name -- a component->feature (wrong-way) tier edge. Heading
+% sizing is class-selectable presentation, so it belongs in a feature.
+%
+% The switch \if@e@twelvept is declared and set at class-option time by
+% the e_class_* classes. If this feature is loaded outside such a class,
+% it defaults the switch to false (no-op).
+%
+% Loaded by: e_class_article, e_class_noteShort, e_class_noteLong,
+%            e_class_thesis (each selects it explicitly).
+% =================================================================
+
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{e_heading_scale}%
+  [2026/07/12 v1.0 12pt heading-size policy (class-selected)]
+
+% titlesec provides \titleformat. Loaded transitively via e_profile_standard;
+% declared explicitly so this feature is self-contained.
+\RequirePackage{titlesec}
+
+\makeatletter
+\@ifundefined{if@e@twelvept}{%
+  \newif\if@e@twelvept
+  \@e@twelveptfalse
+}{}
+% \section may be owned by a section title feature (e_title_fenced_sec); do not
+% overwrite it in that case. The sub-levels are not owned by any current
+% feature. The check runs at begindocument so it observes every loaded package
+% regardless of feature load order.
+\AddToHook{begindocument/end}{%
+  \if@e@twelvept
+    \@ifpackageloaded{e_title_fenced_sec}{}{%
+      \titleformat{\section}
+        {\fontsize{14.4pt}{17.28pt}\selectfont\bfseries}
+        {\thesection}{1em}{}%
+    }%
+    \titleformat{\subsection}
+      {\fontsize{12pt}{14.4pt}\selectfont\bfseries}
+      {\thesubsection}{1em}{}%
+    \titleformat{\subsubsection}
+      {\fontsize{11pt}{13.2pt}\selectfont\bfseries}
+      {\thesubsubsection}{1em}{}%
+  \fi
+}
+\makeatother
+
+\endinput

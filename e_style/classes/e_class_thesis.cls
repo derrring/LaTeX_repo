@@ -6,44 +6,17 @@
 
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesClass{e_class_thesis}[Thesis Class]
+\ProvidesClass{e_class_thesis}[2026/07/12 v1.0 Thesis class]
 
-% --- Class Options ---
-
-% The \makeatletter and \makeatother must wrap the entire block
-% where commands with "@" are defined and used.
-\makeatletter
-
-% 12pt switch
-\newif\if@e@twelvept
-\@e@twelveptfalse
-
-% Legacy CJK options are accepted but no-op in 2026 refactor.
-\DeclareOption{cjk}{\ClassWarning{e_class_thesis}{%
-    The [cjk] option is deprecated.\MessageBreak
-    The standard profile already provides CJK glyph routing.\MessageBreak
-    Use \string\usepackage{c113_cjk_engine} for full Japanese layout%
-    \MessageBreak or c112_langfamily for custom per-script font families}}
-\DeclareOption{nocjk}{}
-
-% When the '12pt' option is found, pass it to the base class
-\DeclareOption{12pt}{
-    \PassOptionsToClass{\CurrentOption}{book}
-    \@e@twelvepttrue
-}
-
-% Pass unknown options to base class
-\DeclareOption*{\PassOptionsToClass{\CurrentOption}{book}}
-
-\ProcessOptions\relax
-\LoadClass{book}
-
-\makeatother
+% --- Class Options (shared prologue: 12pt switch + deprecated cjk/nocjk) ---
+\def\e@baseclass{book}
+\input{sty_components/e_class_prologue.tex}
 % --- 2. Load the common style package ---
 % This single command loads all your modular style components (packages, commands, colors, etc.).
 \RequirePackage{e_profile_standard}
 \RequirePackage{e_frontbackmatter_formal} % Load the front and back matter package
 \RequirePackage{e_title_caligraphy_chap}
+\RequirePackage{e_heading_scale}
 
 
 % --- 3. Define user-facing commands for thesis metadata ---

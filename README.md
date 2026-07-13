@@ -89,17 +89,22 @@ without replacing the renderer:
 
 ```latex
 \renewcommand{\eFencedSectionFont}{\normalfont\bfseries\Large} % noteShort
-\renewcommand{\eFencedChapterFont}{\normalfont\bfseries\Large} % noteLong/thesis
+\renewcommand{\eFencedChapterFont}{\normalfont\bfseries\Large} % noteLong (thesis chapters use calligraphy; no font hook)
 ```
 
 ### CJK Support
 
 The standard document profile includes lightweight CJK glyph routing:
-- Source Han Serif/Sans fonts
-- HanaMin/Jigmo/Unifont fallbacks for rare characters when installed
+- Source Han Serif/Sans fonts (cover CJK Unified + Extension A — effectively all
+  real-world CJK)
+- Rare supplementary-plane fallbacks (HanaMin/Jigmo/Unifont) are **opt-in**: they
+  add ~10–15s of font loading per compile, so they are off by default. Enable
+  them with `\eEnableCJKExtensionFonts` in the preamble, or by loading
+  `c113_cjk_engine` (which turns them on).
 
 Load `c113_cjk_engine` explicitly for full Japanese layout features such as ruby
-and kenten. Load `c112_langfamily` to declare custom per-script CJK families.
+and kenten (it also enables the rare-glyph fallbacks). Load `c112_langfamily` to
+declare custom per-script CJK families.
 
 ## Other Templates
 
@@ -111,9 +116,13 @@ and kenten. Load `c112_langfamily` to declare custom per-script CJK families.
 - LuaLaTeX (required)
 - For code listings/algorithms, load `e_code` explicitly; minted may require
   shell escape depending on the TeX installation
-- Text fonts: Noto Serif/Sans, Source Code Pro
+- Text fonts: Noto Serif/Sans, Source Code Pro; and, loaded unconditionally by
+  `e_fonts`, PT Serif/Sans (Cyrillic), Libertinus Serif/Sans (Greek), Shobhika
+  (Sanskrit)
 - Math fonts: STIX Two Math, New Computer Modern Math, XITS Math, IBM Plex Math
-- For CJK: Source Han Serif/Sans, HanaMinA/B
+- For CJK: Source Han Serif/Sans (Harano Aji Mincho/Gothic as fallback). Opt-in
+  rare supplementary-plane fallbacks (via `\eEnableCJKExtensionFonts` or
+  `c113_cjk_engine`): HanaMinB, Jigmo2, Jigmo3, Unifont Upper
 
 ## Examples
 

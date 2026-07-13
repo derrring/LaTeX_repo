@@ -54,14 +54,10 @@
     \seq_map_indexed_inline:Nn \g__efm_authors_seq
       {
         ##2
-        \tl_set:Nx \l_tmpa_tl
-          { \seq_item:Nn \g__efm_emails_seq { ##1 } }
-        \tl_if_blank:VF \l_tmpa_tl
-          { \thanks { \l_tmpa_tl } }
-        \tl_set:Nx \l_tmpb_tl
-          { \seq_item:Nn \g__efm_addresses_seq { ##1 } }
-        \tl_if_blank:VF \l_tmpb_tl
-          { \\ {\small \itshape \l_tmpb_tl } }
+        \__efm_author_email:nn { ##1 }
+          { \thanks { \l__efm_email_tl } }
+        \__efm_author_address:nn { ##1 }
+          { \\ {\small \itshape \l__efm_address_tl } }
         \par \vspace{0.3em}
       }
   }

@@ -13,8 +13,10 @@
 %   - Does NOT touch \emph. Latin \emph stays italic. For kenten
 %     (傍点) emphasis call \cjkemph{...} explicitly, or, if CJK is
 %     truly primary, call \makeemphkenten in the preamble.
-%   - Sets Noto Serif CJK JP / Noto Sans CJK JP as Japanese defaults,
-%     overridable via \setmainjfont{...}.
+%   - Defers the Japanese main/sans fonts to e_cjk when the standard
+%     document profile is active (e_cjk owns a guarded Source Han stack
+%     with an extension-glyph fallback ladder). Only when used standalone,
+%     without e_cjk, does it set Noto Serif/Sans CJK JP defaults.
 %
 % For occasional CJK glyph rendering (a few quotations), prefer
 % c112_langfamily alone: it already gives you correct line-breaking.
@@ -22,15 +24,27 @@
 
 \ProvidesPackage{c113_cjk_engine}[2026/04/13 Full CJK layout via luatexja]
 
-% c112_langfamily already loads luatexja in pass mode; we just add
-% the remaining companions.
+% Add the CJK-primary luatexja companions. On the standard document profile
+% e_cjk has already loaded luatexja in pass mode; c112_langfamily pulls
+% luatexja-fontspec. (Standalone, luatexja runs in its default mode.)
 \RequirePackage{c112_langfamily}
 \RequirePackage{luatexja-fontspec}
 \RequirePackage{luatexja-ruby}
 
-% Default CJK fonts (Noto Serif/Sans CJK JP, widely available).
-\setmainjfont{Noto Serif CJK JP}
-\setsansjfont{Noto Sans CJK JP}
+% Japanese main/sans fonts have a single owner. When e_cjk is loaded (the
+% standard profile), defer to its guarded Source Han stack -- which carries
+% the HanaMinB/Jigmo/Unifont extension-glyph AltFont ladder and fake-italic
+% suppression -- rather than re-issuing a bare \setmainjfont that would
+% silently drop that coverage (and hard-fail where Noto CJK is absent). Set
+% Noto defaults only when used standalone, without e_cjk.
+\@ifpackageloaded{e_cjk}{%
+  % Full CJK layout: opt into e_cjk's rare-glyph extension ladder
+  % (HanaMinB/Jigmo/Unifont), which the standard profile leaves off for speed.
+  \eEnableCJKExtensionFonts
+}{%
+  \setmainjfont{Noto Serif CJK JP}%
+  \setsansjfont{Noto Sans CJK JP}%
+}
 
 % Reasonable default kanji spacing
 \ltjsetparameter{kanjiskip={0.1\zw plus 0.04\zw minus 0.04\zw}}
