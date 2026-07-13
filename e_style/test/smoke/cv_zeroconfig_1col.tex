@@ -1,0 +1,19 @@
+% Acceptance test for LTX-2026-01 (1-column).
+% The advertised default/zero-config path must render with NO \cvsetup and NO
+% \setcv*font call. Before the fix, \cvlastupdated / \cvnamesection aborted with
+% xcolor "Undefined color `date'" because the four named colors were created
+% only inside \cvsetup and the legacy setters. This document exercises
+% \cvlastupdated, \cvnamesection, a section heading and an entry with zero
+% configuration, then applies a late explicit override to prove it still works.
+\documentclass[a4paper]{cv_espresso_deedy_1col}
+\begin{document}
+\cvlastupdated
+\cvnamesection{Default}{Configuration}{zero-config default path}
+\begin{cvsection}{education}
+    \cvtabentry{Some Institute}{Somewhere}{A Degree}{2020--2024}
+\end{cvsection}
+% A later explicit theme override must still apply on top of the load-time
+% defaults (backward compatibility of \cvsetup is preserved).
+\cvsetup{theme=blue}
+\cvnamesection{After}{Override}{explicit theme applied after defaults}
+\end{document}

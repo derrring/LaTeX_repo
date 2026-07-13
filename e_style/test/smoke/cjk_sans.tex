@@ -1,0 +1,17 @@
+% Acceptance test for LTX-2026-02.
+% (1) The sans CJK helpers must reach the Gothic jfont (Source Han Sans /
+%     Harano Aji Gothic), not silently stay on the mincho serif jfont. Under
+%     luatexja that requires \gtfamily, not \sffamily alone.
+% (2) The sans jfont must carry the same opt-in rare-glyph AltFont ladder as the
+%     main jfont, so a supplementary-plane ideograph typeset through the sans
+%     helper does not tofu.
+% check_repo.sh asserts: zero "Missing character" in the log; the rendered PDF
+% uses SourceHanSans (proof the helper reached Gothic) and no SourceHanSerif.
+\documentclass{e_class_article}
+\eEnableCJKExtensionFonts
+\pagestyle{empty}
+\begin{document}
+\textzhsans{\char"6F22\char"5B57}\par   % 漢字 via zh sans helper -> Source Han Sans
+\textjasans{\char"65E5\char"672C}\par   % 日本 via ja sans helper -> Source Han Sans
+{\sffamily\gtfamily\char"20000}\par     % Ext-B via sans -> must render (HanaMinB), no tofu
+\end{document}

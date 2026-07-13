@@ -5,7 +5,7 @@ ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 BUILD_ROOT="$(mktemp -d "${TMPDIR:-/tmp}/latex-repo-check.XXXXXX")"
 trap 'rm -rf "$BUILD_ROOT"' EXIT
 
-for tool in latexmk lualatex pdftotext; do
+for tool in latexmk lualatex pdftotext pdffonts; do
     command -v "$tool" >/dev/null || {
         echo "FAIL: required tool not found: $tool" >&2
         exit 1
@@ -190,6 +190,97 @@ fi
 # tcolorbox (incl. the beamer theme boxes). The callout carries its own keys (M15).
 if grep -Eq '^\\tcbset\{' "$ROOT/e_style/sty_components/c140_envs.tex"; then
     echo "FAIL: c140_envs must not set a document-global \\tcbset (fold keys into the callout)" >&2
+    exit 1
+fi
+
+# --- Acceptance tests for the 2026-07-13 audit (LTX-2026-01..04) ---
+
+# LTX-2026-01: both CV classes must render on the zero-config default path (no
+# \cvsetup, no \setcv*font). The named colors primary/headings/subheadings/date
+# were previously created only inside \cvsetup / the legacy setters, so the
+# default path aborted with xcolor "Undefined color `date'". compile() runs
+# latexmk -halt-on-error (a fatal recurrence fails the build); the grep also
+# catches a non-fatal-mode recurrence.
+for cvzc in cv_zeroconfig_1col cv_zeroconfig_2col; do
+    compile "$BUILD_ROOT/$cvzc" "$SMOKE/$cvzc.tex"
+    if grep -Fq 'Undefined color' "$BUILD_ROOT/$cvzc/$cvzc.log"; then
+        echo "FAIL: CV zero-config path ($cvzc) hit an undefined color (LTX-2026-01 regression)" >&2
+        exit 1
+    fi
+done
+
+# LTX-2026-02: the sans CJK helpers must reach the Gothic jfont (\gtfamily, not
+# \sffamily alone), and the sans jfont must carry the same opt-in rare-glyph
+# AltFont ladder as the main jfont. Assert no tofu, that the render uses Source
+# Han Sans / Harano Aji Gothic, and that it did NOT fall back to the serif.
+compile "$BUILD_ROOT/cjk-sans" "$SMOKE/cjk_sans.tex"
+if grep -Fq 'Missing character' "$BUILD_ROOT/cjk-sans/cjk_sans.log"; then
+    echo "FAIL: cjk_sans emitted 'Missing character' -- sans rare-glyph ladder gap (LTX-2026-02)" >&2
+    exit 1
+fi
+CJK_SANS_FONTS="$(pdffonts "$BUILD_ROOT/cjk-sans/cjk_sans.pdf")"
+if ! grep -Eq 'SourceHanSans|HaranoAjiGothic' <<<"$CJK_SANS_FONTS"; then
+    echo "FAIL: cjk_sans did not use the Gothic jfont -- \\textzhsans/\\textjasans not reaching \\gtfamily (LTX-2026-02)" >&2
+    exit 1
+fi
+if grep -Eq 'SourceHanSerif|HaranoAjiMincho' <<<"$CJK_SANS_FONTS"; then
+    echo "FAIL: cjk_sans fell back to the mincho serif jfont -- sans helper used \\sffamily only (LTX-2026-02)" >&2
+    exit 1
+fi
+
+# LTX-2026-03: an unnumbered subsection ToC entry must left-align with its
+# numbered peer's number (same ancestor-column left skip), not be outdented by a
+# chapter-number column. latexmk resolves the ToC across passes; compare bboxes:
+# the unnumbered subsection TITLE x must match the numbered subsection NUMBER x
+# (both sit at leftskip = chapter+section columns) within 2pt.
+compile "$BUILD_ROOT/toc-hier" "$SMOKE/toc_hierarchy.tex"
+TOC_HIER_BBOX="$(pdftotext -bbox "$BUILD_ROOT/toc-hier/toc_hierarchy.pdf" - 2>/dev/null)"
+toc_num_x="$(printf '%s\n' "$TOC_HIER_BBOX" | grep -m1 '>1.1.1<' | sed -E 's/.*xMin="([0-9.]+)".*/\1/')"
+toc_unn_x="$(printf '%s\n' "$TOC_HIER_BBOX" | grep -m1 '>UnnumberedSubsecMARK<' | sed -E 's/.*xMin="([0-9.]+)".*/\1/')"
+if [[ -z "$toc_num_x" || -z "$toc_unn_x" ]]; then
+    echo "FAIL: toc_hierarchy probe could not locate the numbered number or unnumbered title in the ToC" >&2
+    exit 1
+fi
+if ! awk -v a="$toc_num_x" -v b="$toc_unn_x" 'BEGIN{d=a-b; if(d<0)d=-d; exit !(d<2.0)}'; then
+    echo "FAIL: unnumbered subsection ToC entry not aligned with its numbered peer (num_x=$toc_num_x unn_x=$toc_unn_x, LTX-2026-03)" >&2
+    exit 1
+fi
+
+# --- Static pins for the same findings (source-level regression guards) ---
+
+# LTX-2026-02: sans helpers switch \gtfamily; both \setsansjfont branches carry
+# the AltFont ladder.
+if ! grep -Eq '\\newcommand\{\\textzhsans\}.*\\gtfamily' "$ROOT/e_style/sty_components/e_cjk.sty" ||
+   ! grep -Eq '\\newcommand\{\\textjasans\}.*\\gtfamily' "$ROOT/e_style/sty_components/e_cjk.sty"; then
+    echo "FAIL: \\textzhsans/\\textjasans must select \\gtfamily, not \\sffamily alone (LTX-2026-02)" >&2
+    exit 1
+fi
+sans_altfont="$(grep -c 'setsansjfont.*AltFont=' "$ROOT/e_style/sty_components/e_cjk.sty" || true)"
+if [[ "$sans_altfont" -lt 2 ]]; then
+    echo "FAIL: both \\setsansjfont branches must carry AltFont={\\e@cjkalt} (LTX-2026-02), found $sans_altfont" >&2
+    exit 1
+fi
+
+# LTX-2026-03: both subsection ToC branches (numbered + unnumbered peer) use the
+# chapter+section ancestor left skip. Exactly two lines carry this exact skip;
+# the subsubsection branch appends +\tocsubsectionnumwidth and does not match.
+toc_subsec_skip="$(grep -Ec 'leftskip\\dimexpr\\tocchapternumwidth\+\\tocsectionnumwidth\\relax' "$ROOT/e_style/sty_components/c130_toc.tex" || true)"
+if [[ "$toc_subsec_skip" -lt 2 ]]; then
+    echo "FAIL: both subsection ToC branches must use chapter+section leftskip (LTX-2026-03), found $toc_subsec_skip" >&2
+    exit 1
+fi
+
+# LTX-2026-04: the langfamily coverage comment must state the real contract
+# (opt-in ladder, no implicit fallback), not the false "extensions A-F" coverage
+# claim that contradicted e_cjk. Match the distinctive false phrase as a fixed
+# string -- the corrected comment legitimately uses "no implicit safety net",
+# so a bare "implicit safety net" match would flag its own fix.
+if grep -Fq 'extensions A-F' "$ROOT/e_style/sty_components/c112_langfamily.sty"; then
+    echo "FAIL: c112_langfamily comment still claims implicit A-F fallback (LTX-2026-04)" >&2
+    exit 1
+fi
+if ! grep -Fq 'eEnableCJKExtensionFonts' "$ROOT/e_style/sty_components/c112_langfamily.sty"; then
+    echo "FAIL: c112_langfamily comment must document the opt-in rare-glyph ladder (LTX-2026-04)" >&2
     exit 1
 fi
 

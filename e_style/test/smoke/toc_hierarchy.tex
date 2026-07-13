@@ -1,0 +1,17 @@
+% Acceptance test for LTX-2026-03.
+% An unnumbered subsection ToC entry must use the same ancestor-column left skip
+% (chapter + section number columns) as its numbered peer, so it is not
+% outdented by a chapter-number column. check_repo.sh verifies alignment via
+% bounding boxes: the unnumbered subsection TITLE must left-align with the
+% numbered subsection's NUMBER (both sit at leftskip = chapter+section columns).
+\documentclass{e_class_noteLong}
+\title{ToC hierarchy}\author{Test}\date{2026}
+\begin{document}
+\maketitle
+\mytoc
+\chapter{Chapter}
+\section{Section}
+\subsection{NumberedSubsecMARK}
+\addcontentsline{toc}{subsection}{UnnumberedSubsecMARK}
+Body.
+\end{document}

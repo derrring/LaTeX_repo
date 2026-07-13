@@ -414,8 +414,19 @@
 % Provide cvbold command - will be overridden by LaTeX3 configuration
 \providecommand{\cvbold}[1]{{\bfseries #1}}
 
-% LaTeX3 configuration is initialized only when \cvsetup is called
-% This allows backward compatibility with setcvmainfont etc. commands
+% Initialize a complete default configuration exactly once, now that the
+% fallback font commands (\cvmainfont ... \cvbold above) exist for
+% \__cv_apply_configuration: to \renewcommand. This \definecolors the four
+% named colors primary/headings/subheadings/date and sets the default
+% fonts/margins. Without it, the zero-config path -- \cvlastupdated,
+% \cvnamesection, section headings, entries with NO \cvsetup and NO
+% \setcv*font call -- aborts with xcolor's "Undefined color `date'" because
+% those colors were previously created only inside \cvsetup and the legacy
+% setters. A later \cvsetup{...} or \setcv*font{...} re-runs the applicator
+% and overrides these defaults, so backward compatibility is preserved.
+\ExplSyntaxOn
+\__cv_apply_configuration:
+\ExplSyntaxOff
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % TEXTPOS CONFIGURATION FOR DATE

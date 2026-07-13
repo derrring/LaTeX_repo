@@ -1,0 +1,14 @@
+% Acceptance test for LTX-2026-01 (2-column).
+% Both CV classes share cv_espresso_deedy_common.sty, so the zero-config fatal
+% color path affected both. Same contract as the 1-column fixture: render the
+% default path with no explicit setup, then override.
+\documentclass[a4paper]{cv_espresso_deedy_2col}
+\begin{document}
+\cvlastupdated
+\cvnamesection{Default}{Configuration}{zero-config default path}
+\begin{cvsection}{education}
+    \cvtabentry{Some Institute}{Somewhere}{A Degree}{2020--2024}
+\end{cvsection}
+\cvsetup{theme=blue}
+\cvnamesection{After}{Override}{explicit theme applied after defaults}
+\end{document}
