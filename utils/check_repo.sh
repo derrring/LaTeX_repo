@@ -185,6 +185,14 @@ if ! grep -Fq 'makebox[\e@tocnumeff]' "$ROOT/e_style/sty_components/c130_toc.tex
     exit 1
 fi
 
+# c140_envs must not set a document-global \tcbset: it was meant as the callout's
+# style but \tcbset makes it global, leaking colback/breakable into every
+# tcolorbox (incl. the beamer theme boxes). The callout carries its own keys (M15).
+if grep -Eq '^\\tcbset\{' "$ROOT/e_style/sty_components/c140_envs.tex"; then
+    echo "FAIL: c140_envs must not set a document-global \\tcbset (fold keys into the callout)" >&2
+    exit 1
+fi
+
 if [[ "${1:-}" == "--fonts" ]]; then
     (cd "$ROOT/e_style/test/fonts" && python3 check.py)
 fi

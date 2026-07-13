@@ -13,19 +13,18 @@
 % pulls the full listings package and external the externalization stack.
 \tcbuselibrary{skins,breakable}
 
-\tcbset{
-    colback=lightgray!15,
-    colframe=cyan!40!black,
-    fonttitle=\bfseries,
-    breakable, enhanced,
-    lines before break=5,
-}
+% M15: no document-global \tcbset. A global default in this fragment (\input by
+% e_visual on BOTH the standard and beamer profiles) leaked colback/breakable
+% into every tcolorbox that omits them, incl. the MyEspresso theme boxes. Each
+% box now carries its own keys (callout below; theme boxes get colback; the
+% decorated theorem envs get lines-before-break).
 
 \newtcolorbox[auto counter, number within=section, list inside=callouts]{callout}[2][]{%
     colback=lightgray!15,
     colframe=cyan!40!black,
     fonttitle=\bfseries,
     breakable, enhanced,
+    lines before break=5,
     title=Note: #2, #1%
 }
 
