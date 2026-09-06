@@ -14,6 +14,24 @@
 \usetikzlibrary{calc}
 
 % =================================================================
+% Shrink-to-fit for the rotated short title on the left bar
+% =================================================================
+% \insertshorttitle with no width= option expands to an unbreakable
+% hyperlink hbox (beamerbasetitle.sty), so a TikZ `text width' has
+% nothing to break and cannot cap it: a long title overruns the bar,
+% collides with the gauge and runs off the page top. Box it, measure
+% it, and scale down only when it exceeds the cap. Scaling keeps the
+% bar width — which feeds the body margin — independent of the title.
+\newsavebox\myespresso@titlebox
+\newcommand\myespresso@fitshorttitle[1]{%
+  \sbox\myespresso@titlebox{\tiny\insertshorttitle}%
+  \ifdim\wd\myespresso@titlebox>#1\relax
+    \resizebox{#1}{!}{\usebox\myespresso@titlebox}%
+  \else
+    \usebox\myespresso@titlebox
+  \fi}
+
+% =================================================================
 % Dimensions and margins
 % =================================================================
 
@@ -138,16 +156,18 @@
     \else
       % Non-sidebar: short title rotated on left bar.
       % - \tiny font and short-title-only minimize bar usage
-      % - text width caps the rotated extent at \paperheight-60pt
-      %   so the gauge area at the top is never overlapped, even
-      %   for unusually long short titles
+      % - \myespresso@fitshorttitle scales the title down when it would
+      %   exceed \paperheight-60pt, so the gauge area at the top is never
+      %   overlapped and nothing leaves the page, at any title length
       % - the 60pt reservation = ~40pt for the gauge + 20pt buffer
+      % - a short title is still the right authoring fix; this is the
+      %   fallback for when none is set
       \node [anchor=north~west, rotate=90, color=white,
              text~width=\dimexpr\paperheight-60pt\relax,
              align=left]
         at (current~page.south~west)
         (title)
-        { \tiny \insertshorttitle };
+        { \myespresso@fitshorttitle{\dimexpr\paperheight-60pt\relax} };
       \ifbeamer@me@showgauge
         \ifnum\insertframenumber>\insertmainframenumber
         \else
