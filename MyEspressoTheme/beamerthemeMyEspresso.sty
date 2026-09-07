@@ -38,6 +38,16 @@
 \DeclareOptionBeamer{randomseed}{\def\myespresso@randomseed{#1}}
 \DeclareOptionBeamer{randomize}{}% default behaviour; kept for compatibility
 \DeclareOptionBeamer{meshpoints}{\def\myespresso@meshpoints{#1}}
+% [meshdebug] makes \myespresso@drawmesh announce the seed it actually computed.
+% Off by default and silent in every ordinary build. It exists because the seed
+% is otherwise unobservable from outside: a test can re-derive what the seed
+% OUGHT to be and compare two overlays of it, but that measures beamer's counter
+% rather than this theme, and passes unchanged when the theme is keyed on
+% something else entirely -- which is how the overlay bug survived. Emitting the
+% computed value is the only form of this check that can go red.
+\newif\ifbeamer@me@meshdebug
+\beamer@me@meshdebugfalse
+\DeclareOptionBeamer{meshdebug}{\beamer@me@meshdebugtrue}
 
 \newif\ifbeamer@me@myespressoblue
 \beamer@me@myespressobluefalse
@@ -185,18 +195,28 @@
 % ornament. luamesh got this for free by advancing a shared RNG per call;
 % here the variation has to be asked for.
 %
-% That term is the frame number, NOT a counter this macro advances. Beamer
-% typesets a frame body once per overlay slide, so an advancing counter makes
-% a cover carrying \pause or \uncover redraw a different triangulation on
-% every slide of the same frame, and the whole field jumps as the presenter
-% steps through it. \value{framenumber} is constant across a frame's overlays
-% and distinct between frames, which is what the paragraph above actually
-% wants (measured: a three-overlay frame followed by a plain one gives
-% 1,1,1,2).
+% That term is the frame's START PAGE, NOT a counter this macro advances and
+% not the frame counter either. Both alternatives fail, in opposite directions,
+% and each one's failure is invisible from the other's test:
+%
+%   - A counter advanced here steps once per *typesetting*, and beamer typesets
+%     a frame body once per overlay slide. A cover carrying \pause then redraws
+%     a different triangulation on each of its slides and the field jumps as the
+%     presenter steps through it.
+%   - \value{framenumber} (and \insertframenumber) do not collide across
+%     overlays, but they have not stepped yet when a cover draws: measured at
+%     this call site, a title page and the \sepframe that follows it both report
+%     1, so two adjacent covers shared one mesh.
+%
+% \insertframestartpage is the page the current frame began on. It is constant
+% across that frame's overlays by construction and distinct between frames.
+% Measured at this call site over title page + two \sepframes: framenumber gives
+% 1,1,2 and startpage gives 1,2,4.
 %
 % The stride is 1440 because that is the range of \time (minutes in a day),
-% which makes (time, frame) -> seed injective: |time difference| <= 1439, so
-% no two (time, frame) pairs can land on the same seed. Below that they do --
+% which makes (time, page) -> seed injective: |time difference| <= 1439 and page
+% numbers differ by at least 1, so no two (time, page) pairs can land on the same
+% seed. Below that they do --
 % measured at stride 1, two builds one minute apart share 2 of 3 covers, the
 % ornaments merely shifting along by one frame.
 %
@@ -205,9 +225,13 @@
 % between point sets: 0.624 at seed gap 1, 0.638 at gap 100000), so only the
 % magnitude matters, not the number.
 \newcommand\myespresso@drawmesh{%
+  \ifbeamer@me@meshdebug
+    \typeout{E-MESH-SEED=\the\numexpr\myespresso@randomseed
+                          + 1440 * \insertframestartpage\relax}%
+  \fi
   \begin{tikzpicture}[x=1cm,y=1cm,color=structure!15,line width=0.35pt]
     \directlua{MyEspressoMesh.emit_tikz{seed=\myespresso@randomseed
-                                             + 1440 * \the\value{framenumber},
+                                             + 1440 * \insertframestartpage,
                                         n=\myespresso@meshpoints,
                                         width=16, height=4.5}}
   \end{tikzpicture}}
