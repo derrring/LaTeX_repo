@@ -180,14 +180,23 @@
 % mangle Lua source. A call with only digits, letters and commas has no such
 % edge.
 % Each cover gets its own mesh. The seed is stateless -- the same seed always
-% gives the same triangulation -- so without this counter the title page,
+% gives the same triangulation -- so without a per-cover term the title page,
 % every \sepframe and the closing frame would all carry the identical
 % ornament. luamesh got this for free by advancing a shared RNG per call;
 % here the variation has to be asked for.
 %
+% That term is the frame number, NOT a counter this macro advances. Beamer
+% typesets a frame body once per overlay slide, so an advancing counter makes
+% a cover carrying \pause or \uncover redraw a different triangulation on
+% every slide of the same frame, and the whole field jumps as the presenter
+% steps through it. \value{framenumber} is constant across a frame's overlays
+% and distinct between frames, which is what the paragraph above actually
+% wants (measured: a three-overlay frame followed by a plain one gives
+% 1,1,1,2).
+%
 % The stride is 1440 because that is the range of \time (minutes in a day),
-% which makes (time, cover) -> seed injective: |time difference| <= 1439, so
-% no two (time, cover) pairs can land on the same seed. Below that they do --
+% which makes (time, frame) -> seed injective: |time difference| <= 1439, so
+% no two (time, frame) pairs can land on the same seed. Below that they do --
 % measured at stride 1, two builds one minute apart share 2 of 3 covers, the
 % ornaments merely shifting along by one frame.
 %
@@ -195,12 +204,10 @@
 % as thoroughly as distant ones in this LCG (mean nearest-neighbour distance
 % between point sets: 0.624 at seed gap 1, 0.638 at gap 100000), so only the
 % magnitude matters, not the number.
-\newcount\myespresso@meshcount
 \newcommand\myespresso@drawmesh{%
-  \global\advance\myespresso@meshcount by 1\relax
   \begin{tikzpicture}[x=1cm,y=1cm,color=structure!15,line width=0.35pt]
     \directlua{MyEspressoMesh.emit_tikz{seed=\myespresso@randomseed
-                                             + 1440 * \the\myespresso@meshcount,
+                                             + 1440 * \the\value{framenumber},
                                         n=\myespresso@meshpoints,
                                         width=16, height=4.5}}
   \end{tikzpicture}}

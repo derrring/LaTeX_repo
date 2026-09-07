@@ -59,15 +59,24 @@ function M.triangulate(pts)
   -- edge -- which the empty-circumcircle test cannot see, because every
   -- triangle it does contain is correct. Only the coverage check catches it.
   --
-  -- Measured over 24 configurations (8 seeds x n in {12,44,120}), counting
-  -- how many tile the hull exactly:
-  --     K =     2   5    20   100   1000   10000   100000
-  --     pass =  0   3     9    19     23      24       24
-  --     worst area deficit: 9.09, 5.01, 1.35, 0.099, 0.022, 0, 0
-  -- The textbook K=20 is simply too small for this point distribution.
-  -- K=1e4 puts the super-vertices 4 orders of magnitude out, which double
-  -- precision absorbs without trouble (~15-16 significant digits).
-  local K = 10000
+  -- An earlier revision set K=1e4 on a 24-configuration sample (8 seeds x n
+  -- in {12,44,120}) that showed 24/24 passing. That sample was too small to
+  -- locate the knee, not wrong about those 24: sweeping the production
+  -- configuration (n=44, 16 x 4.5) over seeds 0..30000 gives
+  --     K =         1e4      1e5    1e6    1e7
+  --     failures =   74        5      0      0     (out of 30001)
+  -- i.e. 1 build in 405 lost a hull sliver at the shipped value. The failure
+  -- is invisible on the page -- the lost triangles are always hull slivers
+  -- spanning two corners of the mesh rectangle, and those border edges sit
+  -- off-page or under the sidebar fill -- but M.check rejects every one of
+  -- them, so the module was shipping a state its own invariant calls broken.
+  --
+  -- The largest K required to save any of those 74 cases is 783314, so 1e7
+  -- clears the observed worst case by more than an order of magnitude. Data
+  -- here spans ~1e0, so super-vertices at ~1e7 leave ~8 significant digits
+  -- of the ~15-16 double precision carries -- ample for a decorative mesh,
+  -- and M.check confirms it rather than assuming it.
+  local K = 10000000
   local minx, miny = math.huge, math.huge
   local maxx, maxy = -math.huge, -math.huge
   for _, p in ipairs(pts) do

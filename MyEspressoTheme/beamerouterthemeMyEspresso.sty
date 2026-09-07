@@ -103,9 +103,16 @@
       \vskip2pt%
     \fi%
   }%
-  % Margins are already set from \l_myespresso_margin_left above, which
-  % evaluates to \c_myespresso_margin in sidebar mode. Re-setting them here
-  % would silently discard that computation.
+  % A \setbeamersize{text margin left=0.5cm,text margin right=0.5cm} stood
+  % here and was removed as a duplicate: \useoutertheme{sidebar} above pulls
+  % in beamerouterthemesidebar.sty, whose line 177 sets exactly those two
+  % values already. Deleting it is a behavioural no-op.
+  %
+  % Note what that means, because it is not what the \setbeamersize at the
+  % top of this file suggests: in sidebar mode the body margins are beamer's
+  % 0.5cm (14.22636pt), NOT \c_myespresso_margin (15pt). The sidebar outer
+  % theme loads after that call and overwrites both. Do not align anything
+  % to \c_myespresso_margin expecting it to meet the body text edge here.
 \fi
 
 % =================================================================
