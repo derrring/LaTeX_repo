@@ -1,8 +1,9 @@
 # Font-stack render regression test
 
 Guards the CJK / multilingual / rare-character implementation in `e_cjk` and
-`e_fonts` (through the legacy `c111_fonts.tex` compatibility entrypoint)
-against silent breakage on TeX Live / package updates.
+`e_fonts` against silent breakage on TeX Live / package updates. The fixture
+loads `e_cjk` directly; it previously went through a `c111_fonts.tex`
+compatibility wrapper, which has been deleted.
 
 ## Why a *render* test (not a compile check)
 

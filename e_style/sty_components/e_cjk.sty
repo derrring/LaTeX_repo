@@ -57,7 +57,7 @@
 
 % Opt-in full rare-glyph coverage: add the HanaMinB/Jigmo/Unifont AltFont ladder
 % for supplementary-plane (Ext-B..H) ideographs and rebuild the main jfont.
-% Enabled by c113_cjk_engine (full CJK layout) and by documents that actually
+% Enabled by e_cjk_engine (full CJK layout) and by documents that actually
 % typeset rare ideographs (\eEnableCJKExtensionFonts in the preamble). Idempotent.
 \newif\if@e@cjkext
 \newcommand{\eEnableCJKExtensionFonts}{%
@@ -73,7 +73,7 @@
 \makeatother
 
 % Inline script switches: no-op passthrough defaults, overridable per script
-% via \newlangfamily (c112_langfamily). These MUST NOT be named \zh/\zw --
+% via \newlangfamily (e_langfamily). These MUST NOT be named \zh/\zw --
 % luatexja reserves those as length primitives (zenkaku height/width), and
 % redefining \zh silently breaks luatexja-ruby and any \ltjsetparameter that
 % uses \zh. Use the collision-safe \text<script> convention.

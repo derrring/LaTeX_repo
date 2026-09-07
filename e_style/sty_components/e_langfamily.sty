@@ -1,5 +1,5 @@
 % ===================================================================
-% c112_langfamily.sty — per-script font families honoured by luatexja
+% e_langfamily.sty — per-script font families honoured by luatexja
 %
 % Provides \newlangfamily for declaring inline font switches tied to
 % a tag (e.g., zh, ja, ar, he). Each call creates:
@@ -18,7 +18,7 @@
 %
 % Typical usage in a document preamble:
 %
-%     \usepackage{c112_langfamily}
+%     \usepackage{e_langfamily}
 %     \newlangfamily{zh}{Source Han Serif SC}   % defines \textzh{...}
 %     % \textja is unnecessary unless overriding the class default
 %     % (which is configured via \setmainjfont in e_cjk).
@@ -36,10 +36,10 @@
 %
 % CJK line-breaking and the jachar default font are configured in
 % e_cjk (luatexja[pass] + luatexja-fontspec + \setmainjfont).
-% For full Japanese layout (ruby, kenten emphasis) use c113_cjk_engine.
+% For full Japanese layout (ruby, kenten emphasis) use e_cjk_engine.
 % ===================================================================
 
-\ProvidesPackage{c112_langfamily}[2026/04/14 Per-script font families honoured by luatexja]
+\ProvidesPackage{e_langfamily}[2026/04/14 Per-script font families honoured by luatexja]
 \RequirePackage{luatexja-fontspec}
 
 % \newlangfamily{tag}{font name}

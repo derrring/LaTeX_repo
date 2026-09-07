@@ -44,8 +44,6 @@ e_style/
 │   ├── c130_toc.tex         # Table of contents styling
 │   ├── c310_math_symbol.tex # Math operators and symbols
 │   ├── c320_math_env.tex    # Theorem environments
-│   ├── e_core.sty           # Deprecated compatibility wrapper
-│   ├── e_standard_doc.sty   # Deprecated compatibility wrapper
 │   └── ...
 └── sty_features/            # Replaceable policies/renderers
     ├── e_title_fenced_*.sty # Fenced title styles
@@ -100,10 +98,10 @@ The standard document profile includes lightweight CJK glyph routing:
 - Rare supplementary-plane fallbacks (HanaMin/Jigmo/Unifont) are **opt-in**: they
   add ~10–15s of font loading per compile, so they are off by default. Enable
   them with `\eEnableCJKExtensionFonts` in the preamble, or by loading
-  `c113_cjk_engine` (which turns them on).
+  `e_cjk_engine` (which turns them on).
 
-Load `c113_cjk_engine` explicitly for full Japanese layout features such as ruby
-and kenten (it also enables the rare-glyph fallbacks). Load `c112_langfamily` to
+Load `e_cjk_engine` explicitly for full Japanese layout features such as ruby
+and kenten (it also enables the rare-glyph fallbacks). Load `e_langfamily` to
 declare custom per-script CJK families.
 
 ## Other Templates
@@ -122,7 +120,7 @@ declare custom per-script CJK families.
 - Math fonts: STIX Two Math, New Computer Modern Math, XITS Math, IBM Plex Math
 - For CJK: Source Han Serif/Sans (Harano Aji Mincho/Gothic as fallback). Opt-in
   rare supplementary-plane fallbacks (via `\eEnableCJKExtensionFonts` or
-  `c113_cjk_engine`): HanaMinB, Jigmo2, Jigmo3, Unifont Upper
+  `e_cjk_engine`): HanaMinB, Jigmo2, Jigmo3, Unifont Upper
 
 ## Examples
 

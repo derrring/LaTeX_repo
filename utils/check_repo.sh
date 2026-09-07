@@ -221,11 +221,12 @@ fi
 # of it reads as though there is no rule at all -- which is the actual cost of
 # the three that already sit there.
 #
-# Those three are listed so that a FOURTH cannot appear silently. c112 and c113
-# are grandfathered PUBLIC names: e_class_prologue.tex tells users to write
-# \usepackage{c113_cjk_engine}, so renaming them breaks documents this repository
-# cannot see. Shrinking this list is the goal; growing it needs a reason.
-naming_allowed="c112_langfamily.sty c113_cjk_engine.sty e_class_prologue.tex"
+# e_class_prologue.tex is the third role above, not an exception: it is a class
+# prologue, \input by all four .cls files. The two that WERE exceptions were
+# packages under a fragment's name and have been renamed (e_langfamily,
+# e_cjk_engine), so this list is empty. Keep it that way -- a file that wants to
+# be on it has the wrong name or the wrong role.
+naming_allowed="e_class_prologue.tex"
 
 # An allow-list silently goes stale when an entry is renamed away, and then it is
 # excusing a file that no longer exists while the real one goes unchecked.
@@ -258,6 +259,23 @@ if [[ -n "$naming_bad" ]]; then
     exit 1
 fi
 
+# --- Layering ---
+# classes/ is the entry point and everything loads downward: profiles load
+# components, features load components, classes load all three, and nothing
+# loads a class. A component reaching back up to a profile inverts that.
+#
+# Measured before this pin existed, the repository had exactly two such edges,
+# and both came from deprecated compatibility wrappers -- e_core.sty forwarding
+# to e_profile_common and e_standard_doc.sty to e_profile_standard. Both are
+# deleted, so the correct count is now zero and this keeps it there.
+layering_bad=$({ grep -rlE '\\(RequirePackage|input)\{[^}]*e_profile' "$ROOT/e_style/sty_components" || true; })
+if [[ -n "$layering_bad" ]]; then
+    echo "FAIL: sty_components must not load sty_profiles -- that inverts the layering." >&2
+    echo "      offending files:" >&2
+    printf '        %s\n' $layering_bad >&2
+    exit 1
+fi
+
 # --- Static single-source / tier invariants (audit pins) ---
 # toccolorpart is owned solely by c120_color.tex. The old dark-blue
 # \providecolor in c130_toc.tex was a second source that silently diverged
@@ -280,10 +298,10 @@ if ! grep -Fq 'if@e@twelvept' "$ROOT/e_style/sty_features/e_heading_scale.sty"; 
 fi
 
 # The Japanese main/sans font has a single owner (e_cjk's guarded Source Han
-# stack). c113_cjk_engine must defer to it via \@ifpackageloaded{e_cjk} rather
+# stack). e_cjk_engine must defer to it via \@ifpackageloaded{e_cjk} rather
 # than re-issuing a bare \setmainjfont that drops the extension-glyph fallback.
-if ! grep -Fq '@ifpackageloaded{e_cjk}' "$ROOT/e_style/sty_components/c113_cjk_engine.sty"; then
-    echo "FAIL: c113_cjk_engine must defer main/sans jfont to e_cjk (\\@ifpackageloaded{e_cjk} guard missing)" >&2
+if ! grep -Fq '@ifpackageloaded{e_cjk}' "$ROOT/e_style/sty_components/e_cjk_engine.sty"; then
+    echo "FAIL: e_cjk_engine must defer main/sans jfont to e_cjk (\\@ifpackageloaded{e_cjk} guard missing)" >&2
     exit 1
 fi
 
@@ -302,7 +320,7 @@ if grep -Eq '\\def\\zh([^a-zA-Z]|$)|\\newcommand\{?\\zh\}' "$PINNED"; then
     echo "FAIL: e_cjk must not (re)define \\zh -- it is a luatexja length primitive (breaks ruby)" >&2
     exit 1
 fi
-if ! grep -Fq 'text#1' "$ROOT/e_style/sty_components/c112_langfamily.sty"; then
+if ! grep -Fq 'text#1' "$ROOT/e_style/sty_components/e_langfamily.sty"; then
     echo "FAIL: \\newlangfamily must create \\text<tag> (collision-safe), not bare \\<tag>" >&2
     exit 1
 fi
@@ -452,13 +470,13 @@ fi
 # claim that contradicted e_cjk. Match the distinctive false phrase as a fixed
 # string -- the corrected comment legitimately uses "no implicit safety net",
 # so a bare "implicit safety net" match would flag its own fix.
-pin_file "$ROOT/e_style/sty_components/c112_langfamily.sty"
+pin_file "$ROOT/e_style/sty_components/e_langfamily.sty"
 if grep -Fq 'extensions A-F' "$PINNED"; then
-    echo "FAIL: c112_langfamily comment still claims implicit A-F fallback (LTX-2026-04)" >&2
+    echo "FAIL: e_langfamily comment still claims implicit A-F fallback (LTX-2026-04)" >&2
     exit 1
 fi
-if ! grep -Fq 'eEnableCJKExtensionFonts' "$ROOT/e_style/sty_components/c112_langfamily.sty"; then
-    echo "FAIL: c112_langfamily comment must document the opt-in rare-glyph ladder (LTX-2026-04)" >&2
+if ! grep -Fq 'eEnableCJKExtensionFonts' "$ROOT/e_style/sty_components/e_langfamily.sty"; then
+    echo "FAIL: e_langfamily comment must document the opt-in rare-glyph ladder (LTX-2026-04)" >&2
     exit 1
 fi
 
