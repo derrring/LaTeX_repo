@@ -65,12 +65,7 @@
       ([yshift=15pt]current~page.west)
       rectangle
       (current~page.north~east);
-    \ifbeamer@me@delaunay
-      \ifLuaTeX
-        \myespresso@buildpoints
-        \myespresso@buildmesh
-      \fi
-    \fi
+    \myespresso@maybemesh
     \fill [structure]
       ([yshift=15pt]current~page.west)
       rectangle
@@ -184,12 +179,7 @@
       ([yshift=15pt]current page.west)
       rectangle
       (current page.north east);
-    \ifbeamer@me@delaunay
-      \ifLuaTeX
-        \myespresso@buildpoints
-        \myespresso@buildmesh
-      \fi
-    \fi
+    \myespresso@maybemesh
     \fill[structure]
       ([yshift=15pt]current page.west)
       rectangle

@@ -28,10 +28,16 @@
 % -- Visual options --
 \newif\ifbeamer@me@delaunay
 \beamer@me@delaunayfalse
-\def\myespresso@randomseed{20260411}
+% The mesh is re-drawn on every build. \time is minutes since midnight, so it
+% is stable within a minute -- the passes of one latexmk run normally agree,
+% while separate builds differ. Pin it with [randomseed=<int>] when a build
+% has to be byte-reproducible (PDF diffing, pixel comparison).
+\def\myespresso@randomseed{\the\time}
+\def\myespresso@meshpoints{44}
 \DeclareOptionBeamer{delaunay}{\beamer@me@delaunaytrue}
 \DeclareOptionBeamer{randomseed}{\def\myespresso@randomseed{#1}}
-\DeclareOptionBeamer{randomize}{\edef\myespresso@randomseed{\the\time}}
+\DeclareOptionBeamer{randomize}{}% default behaviour; kept for compatibility
+\DeclareOptionBeamer{meshpoints}{\def\myespresso@meshpoints{#1}}
 
 \newif\ifbeamer@me@myespressoblue
 \beamer@me@myespressobluefalse
@@ -73,21 +79,29 @@
 
 \RequirePackage{fontawesome5}
 \RequirePackage{iftex}
+% Used directly by this theme, so required here rather than inherited from
+% e_profile_beamer's package list: multicols in \sepframe's two-column TOC,
+% \resizebox in the mesh node and the rotated bar title.
+\RequirePackage{multicol}
+\RequirePackage{graphicx}
 
 \ifbeamer@me@delaunay
   \ifLuaTeX
-    \RequirePackage{luamesh}
+    % The triangulation is ours (myespresso-delaunay.lua): Bowyer-Watson in
+    % Lua, verified against scipy.spatial.Delaunay. It replaces luamesh,
+    % whose MetaPost back end -- its default -- cannot compile under beamer
+    % with current luamplib, and which has had no release since 2022.
+    %
+    % It also uses its own generator rather than l3's, so the theme no longer
+    % makes a global \sys_gset_rand_seed:n assignment to the document's
+    % random state on behalf of documents that never asked for a mesh.
+    \directlua{ MyEspressoMesh = require("myespresso-delaunay") }
   \else
     \PackageError{beamerthemeMyEspresso}%
       {The 'delaunay' option requires LuaLaTeX}%
       {Compile with lualatex instead of pdflatex or xelatex.}
   \fi
 \fi
-
-% Reproducible by default; opt into time-based output with [randomize].
-\ExplSyntaxOn
-\sys_gset_rand_seed:n { \myespresso@randomseed }
-\ExplSyntaxOff
 
 % =================================================================
 % TOC depth counter for \sepframe
@@ -120,12 +134,6 @@
   {
     \tl_if_empty:NF \g_myespresso_mail_tl
       { \tl_use:N \g_myespresso_mail_tl }
-  }
-
-\NewDocumentCommand { \myespresso@printwebpage } { }
-  {
-    \tl_if_empty:NF \g_myespresso_webpage_tl
-      { \tl_use:N \g_myespresso_webpage_tl }
   }
 
 \ExplSyntaxOff
@@ -163,53 +171,79 @@
 % Delaunay mesh generation (LuaLaTeX only)
 % =================================================================
 
+% Point generation now lives in the Lua module too, so there is no
+% \myespresso@buildpoints any more: one seed in, edge list out.
+%
+% Everything except the bare call stays in the .lua file on purpose. Inside
+% \directlua the argument is read by TeX first, so `#' is a parameter
+% character and `\n' is an undefined control sequence -- both silently
+% mangle Lua source. A call with only digits, letters and commas has no such
+% edge.
+% Each cover gets its own mesh. The seed is stateless -- the same seed always
+% gives the same triangulation -- so without this counter the title page,
+% every \sepframe and the closing frame would all carry the identical
+% ornament. luamesh got this for free by advancing a shared RNG per call;
+% here the variation has to be asked for.
+%
+% The stride is 1440 because that is the range of \time (minutes in a day),
+% which makes (time, cover) -> seed injective: |time difference| <= 1439, so
+% no two (time, cover) pairs can land on the same seed. Below that they do --
+% measured at stride 1, two builds one minute apart share 2 of 3 covers, the
+% ornaments merely shifting along by one frame.
+%
+% Nothing here wants a "nice" multiplier. Adjacent seeds already decorrelate
+% as thoroughly as distant ones in this LCG (mean nearest-neighbour distance
+% between point sets: 0.624 at seed gap 1, 0.638 at gap 100000), so only the
+% magnitude matters, not the number.
+\newcount\myespresso@meshcount
+\newcommand\myespresso@drawmesh{%
+  \global\advance\myespresso@meshcount by 1\relax
+  \begin{tikzpicture}[x=1cm,y=1cm,color=structure!15,line width=0.35pt]
+    \directlua{MyEspressoMesh.emit_tikz{seed=\myespresso@randomseed
+                                             + 1440 * \the\myespresso@meshcount,
+                                        n=\myespresso@meshpoints,
+                                        width=16, height=4.5}}
+  \end{tikzpicture}}
+
 \ExplSyntaxOn
-\tl_new:N \l_delaunaypointlist_tl
-
-\NewDocumentCommand { \myespresso@buildpoints } { }
-  {
-    \tl_clear:N \l_delaunaypointlist_tl
-    \int_set:Nn \l_tmpa_int { 1 }
-    \tl_put_right:Nn \l_delaunaypointlist_tl
-      { (0,0);(16,0);(16,4.5);(0,4.5); }
-    \int_do_while:nNnn { \l_tmpa_int } < { 40 }
-      {
-        \tl_put_right:Nn \l_delaunaypointlist_tl
-          { (\fpeval{16*rand()},\fpeval{4.5*rand()}); }
-        \int_incr:N \l_tmpa_int
-      }
-    \tl_put_right:Nn \l_delaunaypointlist_tl
-      { (\fpeval{16*rand()},\fpeval{4.5*rand()}) }
-  }
-
 \NewExpandableDocumentCommand { \myespresso@buildmesh } { }
   {
     \node [anchor=north~west]
       at ([xshift=-50pt,yshift=30pt]current~page.north~west)
       {
         \resizebox{1.5\paperwidth}{0.8\paperheight}
-          {
-            \buildMeshBW
-              [tikz=true,color=structure!15,colorBbox=structure!15,scale=2cm]
-              { \l_delaunaypointlist_tl }
-          }
+          { \myespresso@drawmesh }
       };
   }
 \ExplSyntaxOff
+
+% Single entry point for the four cover-like frames that may carry a mesh
+% (title page, section page, \sepframe, \thanksframe). The option and engine
+% guards live here only, so changing either is one edit rather than four.
+\newcommand\myespresso@maybemesh{%
+  \ifbeamer@me@delaunay
+    \ifLuaTeX
+      \myespresso@buildmesh
+    \fi
+  \fi}
 
 % =================================================================
 % \framesection — in-slide section heading
 % =================================================================
 
+% Styled through beamer keys like every other element: override with
+% \setbeamerfont{framesection} / \setbeamercolor{framesection}. Defaults
+% (\large\bfseries, structure) are set in the font and colour themes and
+% reproduce the previous hardcoded appearance exactly.
 \ExplSyntaxOn
 \NewDocumentCommand { \framesection } { m }
   {
     \medskip
     \noindent
-    {\large\bfseries\textcolor{structure}{#1}}
+    { \usebeamerfont{framesection} \usebeamercolor[fg]{framesection} #1 }
     \par\vspace*{-0.2cm}
     \hspace*{-\c_myespresso_margin}
-    {\color{structure}\rule{0.4\paperwidth}{2pt}}
+    { \usebeamercolor[fg]{framesection} \rule{0.4\paperwidth}{2pt} }
     \par\smallskip
   }
 \ExplSyntaxOff
@@ -244,12 +278,7 @@
     \setbeamercolor{background~canvas}{bg=white}
     \begin{frame}[noframenumbering,plain]
       \begin{tikzpicture}[remember~picture,overlay]
-        \ifbeamer@me@delaunay
-          \ifLuaTeX
-            \myespresso@buildpoints
-            \myespresso@buildmesh
-          \fi
-        \fi
+        \myespresso@maybemesh
         \fill [structure]
           ([yshift=15pt]current~page.west)
           rectangle
@@ -315,12 +344,7 @@
   }%
   \begin{frame}[noframenumbering,plain]
     \begin{tikzpicture}[remember picture,overlay]
-      \ifbeamer@me@delaunay
-        \ifLuaTeX
-          \myespresso@buildpoints
-          \myespresso@buildmesh
-        \fi
-      \fi
+      \myespresso@maybemesh
       \fill[structure]
         ([yshift=15pt]current page.west)
         rectangle

@@ -103,7 +103,9 @@
       \vskip2pt%
     \fi%
   }%
-  \setbeamersize{text margin left=0.5cm,text margin right=0.5cm}
+  % Margins are already set from \l_myespresso_margin_left above, which
+  % evaluates to \c_myespresso_margin in sidebar mode. Re-setting them here
+  % would silently discard that computation.
 \fi
 
 % =================================================================
