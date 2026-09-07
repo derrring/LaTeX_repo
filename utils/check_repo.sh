@@ -5,7 +5,7 @@ ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 BUILD_ROOT="$(mktemp -d "${TMPDIR:-/tmp}/latex-repo-check.XXXXXX")"
 trap 'rm -rf "$BUILD_ROOT"' EXIT
 
-for tool in latexmk lualatex pdftotext pdffonts; do
+for tool in latexmk lualatex pdftotext pdffonts pdftoppm; do
     command -v "$tool" >/dev/null || {
         echo "FAIL: required tool not found: $tool" >&2
         exit 1
@@ -13,17 +13,13 @@ for tool in latexmk lualatex pdftotext pdffonts; do
 done
 
 # --fonts shells out to e_style/test/fonts/check.py at the very END of this
-# script. Its declared deps (check.py:37) are lualatex, pdftoppm and Pillow --
-# and of those, only lualatex is covered by the loop above. check.py does report
-# a missing Pillow properly rather than crashing, but it reports it after the
-# whole suite has run, and both facts are knowable at second zero. The python3
-# first on PATH is frequently not the one carrying Pillow, which is why AGENTS.md
+# script. Its declared deps (check.py:37) are lualatex, pdftoppm and Pillow; the
+# first two are in the loop above, Pillow is not and cannot be. check.py does
+# report a missing Pillow properly rather than crashing, but it reports it after
+# the whole suite has run, and that is knowable at second zero. The python3 first
+# on PATH is frequently not the one carrying Pillow, which is why AGENTS.md
 # documents the PATH=/opt/homebrew/bin:$PATH form.
 if [[ "${1:-}" == "--fonts" ]]; then
-    command -v pdftoppm >/dev/null || {
-        echo "FAIL: --fonts needs pdftoppm (poppler), which is not on PATH" >&2
-        exit 1
-    }
     command -v python3 >/dev/null || {
         echo "FAIL: --fonts needs python3, which is not on PATH" >&2
         exit 1
@@ -153,6 +149,35 @@ fi
 if [[ "$delaunay_distinct" != "3" ]]; then
     echo "FAIL: the three covers do not each get their own mesh (expected 3 distinct" >&2
     echo "      seeds, got $delaunay_distinct) -- seed key collides across adjacent covers" >&2
+    exit 1
+fi
+
+# The overlay half again, from the rendered page rather than the seed. Pages 1-3
+# are three overlays of ONE frame whose only visual difference is the mesh, so
+# byte-identical renders are a clean isolation -- and this tests the DRAWING,
+# so unlike the seed check it also catches a correct seed reaching a broken
+# emit_tikz. It does not replace the seed check: distinct covers differ in their
+# furniture too, so the same comparison cannot settle distinctness, which is why
+# both are here.
+( cd "$BUILD_ROOT/delaunay" && pdftoppm -f 1 -l 3 -r 100 -png beamer_delaunay.pdf ov )
+delaunay_ov1="$(find "$BUILD_ROOT/delaunay" -name 'ov-1.png' -o -name 'ov-01.png' | head -1)"
+delaunay_ov2="$(find "$BUILD_ROOT/delaunay" -name 'ov-2.png' -o -name 'ov-02.png' | head -1)"
+delaunay_ov3="$(find "$BUILD_ROOT/delaunay" -name 'ov-3.png' -o -name 'ov-03.png' | head -1)"
+if [[ ! -s "$delaunay_ov1" || ! -s "$delaunay_ov2" || ! -s "$delaunay_ov3" ]]; then
+    echo "FAIL: could not render the three overlay pages of the delaunay cover" >&2
+    exit 1
+fi
+# Guard against the null being vacuous: a blank crop compares equal to a blank
+# crop. A rendered cover carries a mesh and is far larger than a solid page.
+delaunay_ovsize=$(wc -c < "$delaunay_ov1" | tr -d ' ')
+if [[ "$delaunay_ovsize" -lt 5000 ]]; then
+    echo "FAIL: the rendered delaunay cover is $delaunay_ovsize bytes -- effectively blank," >&2
+    echo "      so comparing overlays would pass by drawing nothing at all" >&2
+    exit 1
+fi
+if ! cmp -s "$delaunay_ov1" "$delaunay_ov2" || ! cmp -s "$delaunay_ov2" "$delaunay_ov3"; then
+    echo "FAIL: the cover mesh is redrawn between overlays of one frame -- the three" >&2
+    echo "      overlay pages do not render identically" >&2
     exit 1
 fi
 
