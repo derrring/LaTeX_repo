@@ -23,12 +23,16 @@
 %     % \textja is unnecessary unless overriding the class default
 %     % (which is configured via \setmainjfont in e_cjk).
 %
-% Note on fallback: fontspec/luatexja-fontspec has no true coverage
-% fallback (AltFont is range-override, not "use only if missing").
-% In practice Source Han Serif SC and Harano Aji Mincho both cover
-% CJK Unified + extensions A-F, so .notdef glyphs in body text do
-% not occur. Rare extension-G/H ideographs fall through to luatexja's
-% \setmainjfont default (Harano Aji), which is the implicit safety net.
+% Note on coverage/fallback: fontspec/luatexja-fontspec has no true
+% coverage-based fallback -- AltFont is a range override, not "use only if
+% the primary lacks the glyph" -- so there is no implicit safety net. The
+% e_cjk fast path (Source Han / Harano Aji) covers CJK Unified + Ext-A,
+% which is effectively all real-world CJK; supplementary-plane ideographs
+% (Ext-B..H) are NOT covered by those families. Rare-glyph coverage requires
+% the explicit opt-in AltFont ladder (HanaMinB/Jigmo/Unifont) installed by
+% \eEnableCJKExtensionFonts in e_cjk, which is wired into BOTH the main
+% (mincho) and sans (gothic) jfonts. A \newlangfamily declared here shares
+% none of that ladder unless it is itself given an AltFont range.
 %
 % CJK line-breaking and the jachar default font are configured in
 % e_cjk (luatexja[pass] + luatexja-fontspec + \setmainjfont).

@@ -41,8 +41,8 @@
     {\setmainjfont{Source Han Serif}[BoldFont={Source Han Serif Bold},ItalicFont={},AltFont={\e@cjkalt}]}
     {\setmainjfont{HaranoAjiMincho}[BoldFont={HaranoAjiMincho-Bold},ItalicFont={},AltFont={\e@cjkalt}]}%
   \IfFontExistsTF{Source Han Sans}
-    {\setsansjfont{Source Han Sans}[BoldFont={Source Han Sans Bold},ItalicFont={}]}
-    {\setsansjfont{HaranoAjiGothic}[BoldFont={HaranoAjiGothic-Bold},ItalicFont={}]}%
+    {\setsansjfont{Source Han Sans}[BoldFont={Source Han Sans Bold},ItalicFont={},AltFont={\e@cjkalt}]}
+    {\setsansjfont{HaranoAjiGothic}[BoldFont={HaranoAjiGothic-Bold},ItalicFont={},AltFont={\e@cjkalt}]}%
   \begingroup\edef\@tempa{\endgroup
     \noexpand\ltj@nofakeital{JY3}{\mcdefault}\noexpand\ltj@nofakeital{JT3}{\mcdefault}%
     \noexpand\ltj@nofakeital{JY3}{\gtdefault}\noexpand\ltj@nofakeital{JT3}{\gtdefault}%
@@ -79,8 +79,12 @@
 % uses \zh. Use the collision-safe \text<script> convention.
 \newcommand{\textzh}[1]{#1}
 \newcommand{\textja}[1]{#1}
-\newcommand{\textzhsans}[1]{{\sffamily #1}}
-\newcommand{\textjasans}[1]{{\sffamily #1}}
+% \sffamily alone only switches the Latin family; under luatexja the Japanese
+% (CJK) family is selected by \gtfamily. Both are needed so the sans helpers
+% actually reach the configured Gothic jfont (Source Han Sans / Harano Aji
+% Gothic) instead of silently staying on the mincho serif jfont.
+\newcommand{\textzhsans}[1]{{\sffamily\gtfamily #1}}
+\newcommand{\textjasans}[1]{{\sffamily\gtfamily #1}}
 
 % luatexja redirects \em to gothic. CJK emphasis in this profile remains
 % upright mincho; fail loudly if the upstream internal token sequence changes.

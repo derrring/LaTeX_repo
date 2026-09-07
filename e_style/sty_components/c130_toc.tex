@@ -304,7 +304,12 @@
         \etocname\mydotfill
         \makebox[2.5em][r]{\etocpage}\par
     }{%
-        \leftskip\dimexpr\tocsectionnumwidth\relax
+        % Unnumbered peer: same ancestor-column left skip as the numbered
+        % branch above (chapter + section number columns) so the title starts
+        % at the same x; only the current-level number box is dropped. Mirrors
+        % the subsubsection unnumbered branch, which already uses the full
+        % ancestor width.
+        \leftskip\dimexpr\tocchapternumwidth+\tocsectionnumwidth\relax
         \rightskip\tocrightmargin\parfillskip-\rightskip
         \etocname\hfill \etocpage\par
 }}
