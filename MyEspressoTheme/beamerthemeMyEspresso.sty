@@ -39,12 +39,20 @@
 \DeclareOptionBeamer{randomize}{}% default behaviour; kept for compatibility
 \DeclareOptionBeamer{meshpoints}{\def\myespresso@meshpoints{#1}}
 % [meshdebug] makes \myespresso@drawmesh announce the seed it actually computed.
-% Off by default and silent in every ordinary build. It exists because the seed
-% is otherwise unobservable from outside: a test can re-derive what the seed
-% OUGHT to be and compare two overlays of it, but that measures beamer's counter
-% rather than this theme, and passes unchanged when the theme is keyed on
-% something else entirely -- which is how the overlay bug survived. Emitting the
-% computed value is the only form of this check that can go red.
+% Off by default and silent in every ordinary build.
+%
+% What it is NOT needed for: overlay stability. Two overlays of one frame differ
+% in nothing but the mesh, so rendering them and comparing the images settles it
+% without this option, and settles it better -- an image tests the drawing, and
+% would also catch a correct seed reaching a broken emit_tikz. check_repo.sh does
+% exactly that, and this option does not replace it.
+%
+% What it IS needed for: telling two DIFFERENT covers apart. They differ in their
+% furniture as well as their mesh, so a whole-page comparison cannot say which
+% changed, and the seed has no other witness from outside. Re-deriving the
+% expected seed in the test document is not one: that measures beamer's counters
+% rather than this theme, and passes unchanged with the theme keyed on something
+% else entirely -- measured, twice, which is how the two seed bugs survived.
 \newif\ifbeamer@me@meshdebug
 \beamer@me@meshdebugfalse
 \DeclareOptionBeamer{meshdebug}{\beamer@me@meshdebugtrue}
