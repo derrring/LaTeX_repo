@@ -76,6 +76,28 @@ pin_file() {
     PINNED="$1"
 }
 
+# A "single source" pin that counts matching FILES answers a weaker question than
+# its own comment does. `found N files, want 1' stays satisfied when the
+# definition is moved wholesale into some other file: the count is still 1, the
+# named owner in the comment is now wrong, and nothing fails. Name the owner and
+# compare against it instead of counting.
+#
+# The search command is passed as arguments rather than a string, so the patterns
+# below keep their backslashes without a second layer of shell quoting.
+sole_owner() {
+    local owner="$1" what="$2"; shift 2
+    pin_file "$ROOT/$owner"
+    local found
+    found="$( "$@" || true )"
+    found="$(printf '%s\n' "$found" | sed -n "s#^$ROOT/##p" | sort -u)"
+    if [[ "$found" != "$owner" ]]; then
+        echo "FAIL: $what" >&2
+        echo "      expected exactly one source, and it must be $owner" >&2
+        echo "      found: ${found:-(nothing)}" >&2
+        exit 1
+    fi
+}
+
 # The same problem in a smaller register: the anchor/ToC/beamer assertions below
 # carried no diagnosis of their own and relied on set -e, so a regression exited
 # 1 printing nothing. Give them the FAIL line every other check here has.
@@ -193,11 +215,9 @@ fi
 # toccolorpart is owned solely by c120_color.tex. The old dark-blue
 # \providecolor in c130_toc.tex was a second source that silently diverged
 # by load order; regressing it must fail here.
-tcp_sources=$({ grep -rlE '\\(colorlet|definecolor|providecolor)\{toccolorpart\}' "$ROOT/e_style" || true; } | wc -l | tr -d ' ')
-if [[ "$tcp_sources" != "1" ]]; then
-    echo "FAIL: toccolorpart must have exactly one color source, found $tcp_sources" >&2
-    exit 1
-fi
+sole_owner 'e_style/sty_components/c120_color.tex' \
+    'toccolorpart must have exactly one color source' \
+    grep -rlE '\\(colorlet|definecolor|providecolor)\{toccolorpart\}' "$ROOT/e_style"
 
 # The 12pt heading-size policy belongs in the e_heading_scale feature, not in
 # the e_document_layout component (a component must not apply presentation
@@ -223,11 +243,9 @@ fi
 # The fenced-title fence geometry (rules + gaps) is single-sourced in
 # e_title_fenced_core.sty; the section and chapter styles must call it rather
 # than re-inline their own vbox.
-fence_sources=$({ grep -rlF 'hrule height 1.5pt' "$ROOT/e_style/sty_features" || true; } | wc -l | tr -d ' ')
-if [[ "$fence_sources" != "1" ]]; then
-    echo "FAIL: fenced fence-box geometry must live only in e_title_fenced_core.sty, found in $fence_sources files" >&2
-    exit 1
-fi
+sole_owner 'e_style/sty_features/e_title_fenced_core.sty' \
+    'fenced fence-box geometry must live in one file' \
+    grep -rlF 'hrule height 1.5pt' "$ROOT/e_style/sty_features"
 
 # luatexja reserves \zh/\zw as length primitives; e_cjk must not (re)define \zh
 # (doing so silently breaks luatexja-ruby). Inline script switches use the
@@ -285,11 +303,9 @@ fi
 # The per-author email fetch is single-sourced in e_frontbackmatter_core (the
 # \__efm_author_email:nn accessor); the simple/formal renderers must call it,
 # not re-inline \seq_item into the email seq.
-efm_fetch=$({ grep -rlF 'seq_item:Nn \g__efm_emails_seq' "$ROOT/e_style/sty_features" || true; } | wc -l | tr -d ' ')
-if [[ "$efm_fetch" != "1" ]]; then
-    echo "FAIL: author email fetch must live only in e_frontbackmatter_core, found in $efm_fetch files" >&2
-    exit 1
-fi
+sole_owner 'e_style/sty_features/e_frontbackmatter_core.sty' \
+    'the per-author email fetch must live in one file' \
+    grep -rlF 'seq_item:Nn \g__efm_emails_seq' "$ROOT/e_style/sty_features"
 
 # ToC number columns grow for over-wide numbers via \e@settocnumeff instead of
 # clipping into fixed-width makeboxes that collide with the title (M14).
