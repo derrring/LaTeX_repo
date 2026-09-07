@@ -12,6 +12,29 @@ for tool in latexmk lualatex pdftotext pdffonts; do
     }
 done
 
+# --fonts shells out to e_style/test/fonts/check.py at the very END of this
+# script. Its declared deps (check.py:37) are lualatex, pdftoppm and Pillow --
+# and of those, only lualatex is covered by the loop above. check.py does report
+# a missing Pillow properly rather than crashing, but it reports it after the
+# whole suite has run, and both facts are knowable at second zero. The python3
+# first on PATH is frequently not the one carrying Pillow, which is why AGENTS.md
+# documents the PATH=/opt/homebrew/bin:$PATH form.
+if [[ "${1:-}" == "--fonts" ]]; then
+    command -v pdftoppm >/dev/null || {
+        echo "FAIL: --fonts needs pdftoppm (poppler), which is not on PATH" >&2
+        exit 1
+    }
+    command -v python3 >/dev/null || {
+        echo "FAIL: --fonts needs python3, which is not on PATH" >&2
+        exit 1
+    }
+    python3 -c 'from PIL import Image' 2>/dev/null || {
+        echo "FAIL: --fonts needs Pillow, and $(command -v python3) cannot import PIL" >&2
+        echo "      try: PATH=/opt/homebrew/bin:\$PATH $0 --fonts" >&2
+        exit 1
+    }
+fi
+
 export TEXINPUTS="$ROOT//:${TEXINPUTS:-}"
 
 run_latexmk() {
@@ -33,6 +56,39 @@ compile() {
     mkdir -p "$work"
     cp "$source" "$work/"
     run_latexmk "$work" "$(basename "$source")"
+}
+
+# An audit pin phrased as "this pattern must NOT appear" passes when the file
+# cannot be read at all: commands in an `if' condition are exempt from set -e,
+# so a renamed or moved file makes grep exit 2, the condition false, and the
+# check silently succeed -- precisely during the refactor the pin exists to
+# catch. (Positive pins, `if ! grep', fail correctly; the asymmetry is only in
+# the negative ones.) So assert the population before testing it.
+#
+# pin_file sets PINNED rather than echoing the path, and that is load-bearing:
+# an `exit 1' inside $(...) leaves only the subshell, so the FAIL message would
+# print, the substitution would expand to the empty string, grep would error on
+# "" and the pin would pass anyway -- the same silent pass, one layer down.
+# Measured: that form reaches the end of the script with exit 0.
+PINNED=""
+pin_file() {
+    [[ -f "$1" ]] || {
+        echo "FAIL: audit pin references a file that does not exist: ${1#$ROOT/}" >&2
+        echo "      (a pin whose file has moved passes silently -- fix the path)" >&2
+        exit 1
+    }
+    PINNED="$1"
+}
+
+# The same problem in a smaller register: the anchor/ToC/beamer assertions below
+# carried no diagnosis of their own and relied on set -e, so a regression exited
+# 1 printing nothing. Give them the FAIL line every other check here has.
+assert_in() {
+    local needle="$1" file="$2" what="$3"
+    grep -Fq "$needle" "$file" || {
+        echo "FAIL: $what (expected '$needle' in ${file#$BUILD_ROOT/})" >&2
+        exit 1
+    }
 }
 
 STANDARD="$BUILD_ROOT/standard"
@@ -63,16 +119,46 @@ compile "$BUILD_ROOT/toc-state" "$SMOKE/toc_state.tex"
 compile "$BUILD_ROOT/beamer" "$SMOKE/sample_beamer.tex"
 
 ANCHOR_AUX="$BUILD_ROOT/anchors/numberless_anchor.aux"
-grep -Fq '{section*.1}' "$ANCHOR_AUX"
-grep -Fq '{section*.2}' "$ANCHOR_AUX"
+assert_in '{section*.1}' "$ANCHOR_AUX" 'numberless anchor 1 lost its hyperref destination'
+assert_in '{section*.2}' "$ANCHOR_AUX" 'numberless anchor 2 lost its hyperref destination'
 
 TOC_LOG="$BUILD_ROOT/toc-state/toc_state.log"
-grep -Fq 'E-TOC-BEFORE=1' "$TOC_LOG"
-grep -Fq 'E-TOC-AFTER=1' "$TOC_LOG"
+assert_in 'E-TOC-BEFORE=1' "$TOC_LOG" 'ToC state probe did not report BEFORE=1'
+assert_in 'E-TOC-AFTER=1' "$TOC_LOG" 'ToC state leaked: probe did not report AFTER=1'
+
+# The delaunay cover ornament. sample_beamer.tex above runs the theme with the
+# option OFF, so without this document myespresso-delaunay.lua and the frame-keyed
+# seed are executed zero times by this suite. The document pins randomseed and
+# turns on meshdebug so the theme announces the seed it computed.
+compile "$BUILD_ROOT/delaunay" "$SMOKE/beamer_delaunay.tex"
+DELAUNAY_LOG="$BUILD_ROOT/delaunay/beamer_delaunay.log"
+
+# The module's own three invariants, over four point counts.
+assert_in 'E-DELAUNAY-OK=4/4' "$DELAUNAY_LOG" \
+    'delaunay invariants failed (Euler / hull coverage / empty circumcircle)'
+
+# Two numbers, because either alone is passed by a real bug the other catches.
+# Measured against two mutations of the seed key:
+#   per-typesetting counter -> overlay=3, distinct=5   (overlay check catches it)
+#   \value{framenumber}     -> overlay=1, distinct=2   (ONLY distinctness catches it)
+# The second shipped. One assertion would not have found it.
+DELAUNAY_SEEDS="$(grep -h 'E-MESH-SEED=' "$DELAUNAY_LOG" | sed 's/.*=//')"
+delaunay_overlay=$(printf '%s\n' "$DELAUNAY_SEEDS" | head -3 | sort -u | wc -l | tr -d ' ')
+delaunay_distinct=$(printf '%s\n' "$DELAUNAY_SEEDS" | sort -u | wc -l | tr -d ' ')
+if [[ "$delaunay_overlay" != "1" ]]; then
+    echo "FAIL: cover mesh changes between overlays of one frame -- the seed is keyed" >&2
+    echo "      on something that advances per typesetting (got $delaunay_overlay distinct seeds across 3 overlays)" >&2
+    exit 1
+fi
+if [[ "$delaunay_distinct" != "3" ]]; then
+    echo "FAIL: the three covers do not each get their own mesh (expected 3 distinct" >&2
+    echo "      seeds, got $delaunay_distinct) -- seed key collides across adjacent covers" >&2
+    exit 1
+fi
 
 BEAMER_TEXT="$BUILD_ROOT/beamer/second-separator.txt"
 pdftotext -f 3 -l 3 -layout "$BUILD_ROOT/beamer/sample_beamer.pdf" "$BEAMER_TEXT"
-grep -Fq 'Second' "$BEAMER_TEXT"
+assert_in 'Second' "$BEAMER_TEXT" 'second \sepframe did not render its title on page 3'
 if grep -Fq 'Custom First' "$BEAMER_TEXT"; then
     echo "FAIL: sepframe option state leaked into the next call" >&2
     exit 1
@@ -91,7 +177,8 @@ fi
 # The 12pt heading-size policy belongs in the e_heading_scale feature, not in
 # the e_document_layout component (a component must not apply presentation
 # \titleformat nor read class-option state).
-if grep -Eq '\\titleformat' "$ROOT/e_style/sty_components/e_document_layout.sty"; then
+pin_file "$ROOT/e_style/sty_components/e_document_layout.sty"
+if grep -Eq '\\titleformat' "$PINNED"; then
     echo "FAIL: e_document_layout (component) must not \\titleformat; heading policy belongs in e_heading_scale (feature)" >&2
     exit 1
 fi
@@ -120,7 +207,8 @@ fi
 # luatexja reserves \zh/\zw as length primitives; e_cjk must not (re)define \zh
 # (doing so silently breaks luatexja-ruby). Inline script switches use the
 # collision-safe \text<tag> convention.
-if grep -Eq '\\def\\zh([^a-zA-Z]|$)|\\newcommand\{?\\zh\}' "$ROOT/e_style/sty_components/e_cjk.sty"; then
+pin_file "$ROOT/e_style/sty_components/e_cjk.sty"
+if grep -Eq '\\def\\zh([^a-zA-Z]|$)|\\newcommand\{?\\zh\}' "$PINNED"; then
     echo "FAIL: e_cjk must not (re)define \\zh -- it is a luatexja length primitive (breaks ruby)" >&2
     exit 1
 fi
@@ -188,7 +276,8 @@ fi
 # c140_envs must not set a document-global \tcbset: it was meant as the callout's
 # style but \tcbset makes it global, leaking colback/breakable into every
 # tcolorbox (incl. the beamer theme boxes). The callout carries its own keys (M15).
-if grep -Eq '^\\tcbset\{' "$ROOT/e_style/sty_components/c140_envs.tex"; then
+pin_file "$ROOT/e_style/sty_components/c140_envs.tex"
+if grep -Eq '^\\tcbset\{' "$PINNED"; then
     echo "FAIL: c140_envs must not set a document-global \\tcbset (fold keys into the callout)" >&2
     exit 1
 fi
@@ -275,7 +364,8 @@ fi
 # claim that contradicted e_cjk. Match the distinctive false phrase as a fixed
 # string -- the corrected comment legitimately uses "no implicit safety net",
 # so a bare "implicit safety net" match would flag its own fix.
-if grep -Fq 'extensions A-F' "$ROOT/e_style/sty_components/c112_langfamily.sty"; then
+pin_file "$ROOT/e_style/sty_components/c112_langfamily.sty"
+if grep -Fq 'extensions A-F' "$PINNED"; then
     echo "FAIL: c112_langfamily comment still claims implicit A-F fallback (LTX-2026-04)" >&2
     exit 1
 fi
