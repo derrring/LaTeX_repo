@@ -1,8 +1,8 @@
 % ===================================================================
-% c113_cjk_engine.sty — full CJK layout engine (luatexja full)
+% e_cjk_engine.sty — full CJK layout engine (luatexja full)
 %
 % Use this package when CJK is the primary script of the document.
-% It loads c112_langfamily (which already brings luatexja in pass
+% It loads e_langfamily (which already brings luatexja in pass
 % mode for line-breaking) and then adds the remaining luatexja
 % companions that are only appropriate for CJK-primary text:
 %
@@ -19,15 +19,15 @@
 %     without e_cjk, does it set Noto Serif/Sans CJK JP defaults.
 %
 % For occasional CJK glyph rendering (a few quotations), prefer
-% c112_langfamily alone: it already gives you correct line-breaking.
+% e_langfamily alone: it already gives you correct line-breaking.
 % ===================================================================
 
-\ProvidesPackage{c113_cjk_engine}[2026/04/13 Full CJK layout via luatexja]
+\ProvidesPackage{e_cjk_engine}[2026/04/13 Full CJK layout via luatexja]
 
 % Add the CJK-primary luatexja companions. On the standard document profile
-% e_cjk has already loaded luatexja in pass mode; c112_langfamily pulls
+% e_cjk has already loaded luatexja in pass mode; e_langfamily pulls
 % luatexja-fontspec. (Standalone, luatexja runs in its default mode.)
-\RequirePackage{c112_langfamily}
+\RequirePackage{e_langfamily}
 \RequirePackage{luatexja-fontspec}
 \RequirePackage{luatexja-ruby}
 
