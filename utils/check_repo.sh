@@ -211,6 +211,53 @@ if grep -Fq 'Custom First' "$BEAMER_TEXT"; then
     exit 1
 fi
 
+# --- sty_components naming convention ---
+# Two prefixes marking package versus fragment, documented in AGENTS.md. The
+# extension, the \ProvidesPackage line and the load mechanism move together:
+#   e_<topic>.sty      package  -- \ProvidesPackage, \RequirePackage{e_visual}
+#   c<NNN>_<topic>.tex fragment -- no \ProvidesPackage, \input{sty_components/...}
+# The distinction is load-bearing (\input is ordered textual inclusion,
+# \RequirePackage is idempotent and takes options), so a file on the wrong side
+# of it reads as though there is no rule at all -- which is the actual cost of
+# the three that already sit there.
+#
+# Those three are listed so that a FOURTH cannot appear silently. c112 and c113
+# are grandfathered PUBLIC names: e_class_prologue.tex tells users to write
+# \usepackage{c113_cjk_engine}, so renaming them breaks documents this repository
+# cannot see. Shrinking this list is the goal; growing it needs a reason.
+naming_allowed="c112_langfamily.sty c113_cjk_engine.sty e_class_prologue.tex"
+
+# An allow-list silently goes stale when an entry is renamed away, and then it is
+# excusing a file that no longer exists while the real one goes unchecked.
+for naming_ex in $naming_allowed; do
+    pin_file "$ROOT/e_style/sty_components/$naming_ex"
+done
+
+naming_bad=""
+for naming_f in "$ROOT"/e_style/sty_components/*; do
+    naming_b="$(basename "$naming_f")"
+    case " $naming_allowed " in *" $naming_b "*) continue ;; esac
+    naming_stem="${naming_b%.*}"
+    naming_ext="${naming_b##*.}"
+    naming_pp=$(grep -c 'ProvidesPackage' "$naming_f" || true)
+    case "$naming_stem" in
+        c[0-9][0-9][0-9]_*)
+            [[ "$naming_ext" == "tex" && "$naming_pp" -eq 0 ]] ||
+                naming_bad="$naming_bad $naming_b(fragment name, but .$naming_ext/ProvidesPackage=$naming_pp)" ;;
+        e_*)
+            [[ "$naming_ext" == "sty" && "$naming_pp" -ge 1 ]] ||
+                naming_bad="$naming_bad $naming_b(package name, but .$naming_ext/ProvidesPackage=$naming_pp)" ;;
+        *)
+            naming_bad="$naming_bad $naming_b(neither e_* nor c<NNN>_*)" ;;
+    esac
+done
+if [[ -n "$naming_bad" ]]; then
+    echo "FAIL: sty_components naming convention broken by:$naming_bad" >&2
+    echo "      e_<topic>.sty = package (\\ProvidesPackage, \\RequirePackage);" >&2
+    echo "      c<NNN>_<topic>.tex = fragment (no \\ProvidesPackage, \\input). See AGENTS.md." >&2
+    exit 1
+fi
+
 # --- Static single-source / tier invariants (audit pins) ---
 # toccolorpart is owned solely by c120_color.tex. The old dark-blue
 # \providecolor in c130_toc.tex was a second source that silently diverged

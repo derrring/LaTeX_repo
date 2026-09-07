@@ -16,6 +16,32 @@ project manifest.
 - Do not redefine LuaTeX-ja's `\zh` or `\zw` primitives. Use collision-safe command names such as
   `\text<tag>` for inline script switches.
 
+### File naming inside `sty_components/`
+
+Two prefixes, and they are not cosmetic. They mark **package versus fragment**, and the extension,
+the `\ProvidesPackage` line and the load mechanism all move together:
+
+| name | is a | declares | loaded by |
+| --- | --- | --- | --- |
+| `e_<topic>.sty` | LaTeX package, the public capability unit | `\ProvidesPackage` | `\RequirePackage{e_visual}` |
+| `c<NNN>_<topic>.tex` | fragment, private implementation | nothing | `\input{sty_components/c120_color.tex}` |
+
+`\input` of a fragment is ordered textual inclusion; `\RequirePackage` is idempotent and handles
+options. They are not interchangeable, so the name says which one you are getting. `<NNN>` orders
+the fragment layer: 110 layout, 111 fonts, 120 color, 130 toc, 140 envs, 150 commands, 160
+listings, 210 tikz, 310/320 math, 410 hyphenation, 510 ref/bib.
+
+Note that a fragment is `\input` **with its `sty_components/` prefix**, not by bare filename.
+
+Three files predate the rule. `check_repo.sh` carries them as an explicit allow-list so a fourth
+cannot appear silently:
+
+- `c112_langfamily.sty` and `c113_cjk_engine.sty` are packages under a fragment's name. **Do not
+  rename them.** They are public: `e_class_prologue.tex` tells users to write
+  `\usepackage{c113_cjk_engine}`, so a rename breaks documents outside this repository.
+- `e_class_prologue.tex` is a fragment under a package's name. It has no public name to break, so it
+  is the only one of the three that is safe to rename.
+
 ## Verification
 
 - Run `./utils/check_repo.sh`; success requires the final `PASS: repository smoke checks` line.
