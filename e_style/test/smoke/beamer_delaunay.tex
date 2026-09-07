@@ -1,0 +1,70 @@
+% Coverage for the delaunay cover ornament (MyEspresso theme).
+%
+% sample_beamer.tex runs the theme in its default configuration, which never
+% passes `delaunay' -- so myespresso-delaunay.lua, the three invariants in
+% M.check, and the frame-keyed mesh seed were executed zero times by this suite
+% while being the largest single piece of the theme. This document is that
+% coverage, and it carries its own oracle rather than a golden image.
+%
+% randomseed is pinned: the default is \the\time, so an unpinned document draws
+% a different mesh on every build and nothing about it is assertable. meshdebug
+% makes the theme announce the seed it actually COMPUTED -- re-deriving the
+% expected seed here instead would measure beamer's counters rather than this
+% theme, and would pass unchanged with the bug reinstated. Measured: it did.
+\documentclass{beamer}
+\usetheme[myespressoblue,delaunay,randomseed=20260907,meshdebug]{MyEspresso}
+\title[Delaunay smoke]{Delaunay Cover Smoke Test}
+\author{Regression Test}
+
+\begin{document}
+
+% Cover 1: ONE frame, THREE overlay slides. Beamer typesets a frame body once
+% per overlay, so a seed that advances per typesetting redraws a different
+% triangulation on each slide and the field jumps as the presenter steps
+% through it. All three must report the same seed.
+\begin{frame}[plain]
+  \titlepage
+  \pause
+  \mbox{}
+  \pause
+  \mbox{}
+\end{frame}
+
+% Covers 2 and 3. These exist because overlay stability alone is passed by a
+% seed that never varies at all: keying on \value{framenumber} keeps overlays
+% identical AND collides a title page with the \sepframe after it, since neither
+% counter has stepped when a cover draws. Only distinctness across covers
+% catches that, so the suite asserts both numbers.
+\section{First}
+\sepframe
+
+\begin{frame}{Content}
+Done.
+\end{frame}
+
+\section{Second}
+\sepframe
+
+% The module's own invariants (Euler relation, coverage against hull area, empty
+% circumcircle) over a spread of point counts, including n=300 where the
+% super-triangle sizing is most strained.
+%
+% \directlua reads its body as TeX first, so this deliberately uses neither `#'
+% (a parameter character, which would need doubling) nor `%' (a comment, which
+% rules out string.format) -- concatenation and ipairs only.
+\directlua{
+  local okc, tot = 0, 0
+  for _, cfg in ipairs{
+      {seed=20260907, n=12,  width=16, height=4.5},
+      {seed=20260908, n=44,  width=16, height=4.5},
+      {seed=20260909, n=120, width=16, height=4.5},
+      {seed=20260910, n=300, width=16, height=4.5} } do
+    tot = tot + 1
+    local pts = MyEspressoMesh.points(cfg)
+    local ok  = MyEspressoMesh.check(pts, MyEspressoMesh.triangulate(pts))
+    if ok then okc = okc + 1 end
+  end
+  texio.write_nl("E-DELAUNAY-OK=" .. okc .. "/" .. tot)
+}
+
+\end{document}
