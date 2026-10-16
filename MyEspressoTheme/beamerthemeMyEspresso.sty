@@ -106,9 +106,7 @@
 \ifbeamer@me@delaunay
   \ifLuaTeX
     % The triangulation is ours (myespresso-delaunay.lua): Bowyer-Watson in
-    % Lua, verified against scipy.spatial.Delaunay. It replaces luamesh,
-    % whose MetaPost back end -- its default -- cannot compile under beamer
-    % with current luamplib, and which has had no release since 2022.
+    % Lua, verified against scipy.spatial.Delaunay.
     %
     % It also uses its own generator rather than l3's, so the theme no longer
     % makes a global \sys_gset_rand_seed:n assignment to the document's

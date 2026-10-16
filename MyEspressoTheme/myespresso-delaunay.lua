@@ -28,12 +28,21 @@ end
 -- ------------------------------------------------------------ geometry ----
 -- Circumcentre and squared circumradius of (a,b,c). Returns nil when the
 -- three points are collinear (zero-area triangle).
+--
+-- d is twice the cross product of the edges a->b and a->c, so it scales with
+-- the product of their lengths. The collinearity test is relative to that
+-- product: an absolute threshold calls every triangle collinear once the
+-- data is small enough (at a 1e-6 scale it broke the triangulation), and a
+-- threshold on the triangle's overall size would misjudge the long, thin
+-- triangles that join the data to the far super-triangle vertices.
 local function circumcircle(a, b, c)
   local ax, ay = a[1], a[2]
   local bx, by = b[1], b[2]
   local cx, cy = c[1], c[2]
   local d = 2 * (ax * (by - cy) + bx * (cy - ay) + cx * (ay - by))
-  if math.abs(d) < 1e-12 then return nil end
+  local eb = math.max(math.abs(bx - ax), math.abs(by - ay))
+  local ec = math.max(math.abs(cx - ax), math.abs(cy - ay))
+  if math.abs(d) <= 1e-12 * eb * ec then return nil end
   local a2 = ax * ax + ay * ay
   local b2 = bx * bx + by * by
   local c2 = cx * cx + cy * cy
