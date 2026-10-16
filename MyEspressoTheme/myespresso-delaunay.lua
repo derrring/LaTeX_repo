@@ -283,10 +283,10 @@ function M.points(opts)
 end
 
 -- ------------------------------------------------------------ invariants ----
--- Two oracles that need no reference implementation.
+-- Oracles that need no reference implementation.
 
--- Convex hull (monotone chain). Used by both the Euler relation and the
--- coverage check, so it lives in one place.
+-- Convex hull (monotone chain, exact orient): its corners only, counter-
+-- clockwise. Fewer than three when the points do not span a plane.
 local function hull_points(pts)
   local p = {}
   for i, q in ipairs(pts) do p[i] = { q[1], q[2] } end
@@ -294,13 +294,10 @@ local function hull_points(pts)
     if a[1] ~= b[1] then return a[1] < b[1] end
     return a[2] < b[2]
   end)
-  local function cross(o, a, b)
-    return (a[1] - o[1]) * (b[2] - o[2]) - (a[2] - o[2]) * (b[1] - o[1])
-  end
   local function build(src)
     local st = {}
     for _, q in ipairs(src) do
-      while #st >= 2 and cross(st[#st - 1], st[#st], q) <= 0 do
+      while #st >= 2 and orient(st[#st - 1], st[#st], q) <= 0 do
         table.remove(st)
       end
       st[#st + 1] = q
@@ -315,7 +312,24 @@ local function hull_points(pts)
   return lower
 end
 
-local function hull_size(pts) return #hull_points(pts) end
+-- The Euler relation counts every point on the hull's boundary: its corners,
+-- and any point lying on an edge between two of them.
+local function boundary_count(pts, hp)
+  local count = #hp
+  for _, p in ipairs(pts) do
+    for i = 1, #hp do
+      local a, b = hp[i], hp[i % #hp + 1]
+      local inside_x = math.min(a[1], b[1]) <= p[1] and p[1] <= math.max(a[1], b[1])
+      local inside_y = math.min(a[2], b[2]) <= p[2] and p[2] <= math.max(a[2], b[2])
+      local at_end = (p[1] == a[1] and p[2] == a[2]) or (p[1] == b[1] and p[2] == b[2])
+      if inside_x and inside_y and not at_end and orient(a, b, p) == 0 then
+        count = count + 1
+        break
+      end
+    end
+  end
+  return count
+end
 
 -- Three oracles, and they catch different things:
 -- (1) Euler relation  -- wrong triangle/edge COUNT
@@ -325,10 +339,18 @@ local function hull_size(pts) return #hull_points(pts) end
 -- valid-but-incomplete triangulation on 11 of 15 configurations, and (3)
 -- passed on every triangle it did produce.
 function M.check(pts, tris)
-  local n, h = #pts, hull_size(pts)
-  local expect_t = 2 * n - h - 2
+  -- A repeated point is one vertex: the triangulation inserts it once.
+  local seen, distinct = {}, {}
+  for _, p in ipairs(pts) do
+    local key = ("%.17g:%.17g"):format(p[1], p[2])
+    if not seen[key] then seen[key] = true; distinct[#distinct + 1] = p end
+  end
+  local hp = hull_points(distinct)
+  local n, h = #distinct, (#hp >= 3) and boundary_count(distinct, hp) or #distinct
+  -- Points that span no plane have no triangulation.
+  local expect_t = (#hp >= 3) and 2 * n - h - 2 or 0
   local edges = M.edges(tris)
-  local expect_e = 3 * n - h - 3
+  local expect_e = (#hp >= 3) and 3 * n - h - 3 or 0
   if #tris ~= expect_t then
     return false, ("triangle count %d, Euler expects %d (n=%d, h=%d)")
       :format(#tris, expect_t, n, h)
@@ -344,14 +366,15 @@ function M.check(pts, tris)
     tri_area = tri_area
       + math.abs((b[1] - a[1]) * (c[2] - a[2]) - (c[1] - a[1]) * (b[2] - a[2])) / 2
   end
-  local hp = hull_points(pts)
+  -- Fanned from the first corner, so the products stay at the data's span
+  -- rather than its distance from the origin.
   local hull_area = 0
-  for i = 1, #hp do
-    local a, b = hp[i], hp[i % #hp + 1]
-    hull_area = hull_area + (a[1] * b[2] - b[1] * a[2])
+  for i = 2, #hp - 1 do
+    local o, a, b = hp[1], hp[i], hp[i + 1]
+    hull_area = hull_area + ((a[1] - o[1]) * (b[2] - o[2]) - (b[1] - o[1]) * (a[2] - o[2]))
   end
   hull_area = math.abs(hull_area) / 2
-  if math.abs(tri_area - hull_area) > 1e-9 * math.max(1, hull_area) then
+  if math.abs(tri_area - hull_area) > 1e-9 * hull_area then
     return false, ("coverage: triangles total %.9f, hull is %.9f (deficit %.9f)")
       :format(tri_area, hull_area, hull_area - tri_area)
   end
