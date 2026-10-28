@@ -26,31 +26,26 @@
 % Color scheme selection (default: red)
 % =================================================================
 
+% Only structure follows the scheme. The semantic roles keep one hue in
+% every scheme, at hues no scheme takes, and name the e_style colors so a
+% paper and a deck share them.
 \colorlet{MyEspresso@structure}{MyEspressoRed}
 \colorlet{MyEspresso@alert}{MyEspressoOrange}
-\colorlet{MyEspresso@info}{MyEspressoBlue}
-\colorlet{MyEspresso@example}{MyEspressoGreen}
+\colorlet{MyEspresso@info}{mycalloutcolor}
+\colorlet{MyEspresso@example}{mypurple}
+\colorlet{MyEspresso@definition}{mydefinitioncolor}
 \colorlet{MyEspresso@rule}{\myespresso@rulecolor}
 
 \ifbeamer@me@myespressoblue
   \colorlet{MyEspresso@structure}{MyEspressoBlue!80!black}
-  \colorlet{MyEspresso@alert}{MyEspressoOrange}
-  \colorlet{MyEspresso@info}{MyEspressoRed}
-  \colorlet{MyEspresso@example}{MyEspressoGreen}
 \fi
 
 \ifbeamer@me@myespressogreen
   \colorlet{MyEspresso@structure}{MyEspressoGreen!80!black}
-  \colorlet{MyEspresso@alert}{MyEspressoOrange}
-  \colorlet{MyEspresso@info}{MyEspressoRed}
-  \colorlet{MyEspresso@example}{MyEspressoBlue}
 \fi
 
 \ifbeamer@me@myespressoblack
   \colorlet{MyEspresso@structure}{MyEspressoBlack}
-  \colorlet{MyEspresso@alert}{MyEspressoOrange}
-  \colorlet{MyEspresso@info}{MyEspressoRed}
-  \colorlet{MyEspresso@example}{MyEspressoBlue}
   \setbeamercolor{description item}{bg=white,fg=MyEspresso@info}
 \fi
 
@@ -74,7 +69,7 @@
 % Block colors for mathematical environments
 \setbeamercolor{block title alerted}{use=structure,fg=white,bg=MyEspresso@alert}
 \setbeamercolor{block body alerted}{parent=normal text,use=block title,bg=gray!10}
-\setbeamercolor{block title example}{fg=MyEspresso@example}
+\setbeamercolor{example text}{fg=MyEspresso@example}
 
 % Sidebar colors (conditional)
 \ifbeamer@me@sidebar

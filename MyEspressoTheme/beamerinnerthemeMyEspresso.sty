@@ -304,17 +304,23 @@
 % Mathematical environment block colors
 % =================================================================
 
-\AtBeginEnvironment{theorem}{%
-  \setbeamercolor{block body}{fg=black,bg=gray!20}
-  \setbeamercolor{block title}{fg=white,bg=structure}
+% Hooked on the theorem style rather than the environment name, so every
+% \newtheorem of that style is covered, a document's own among them.
+% Beamer's \@thm runs the style at each environment start, after any
+% \AtBeginEnvironment hook, which is why theorem's solid title is set here.
+\def\MyEspresso@theoremenv{theorem}
+\g@addto@macro\th@plain{%
+  \ifx\@currenvir\MyEspresso@theoremenv
+    \setbeamercolor{block body}{fg=black,bg=gray!20}%
+    \setbeamercolor{block title}{fg=white,bg=structure}%
+  \else
+    \setbeamercolor{block body}{fg=black,bg=gray!10}%
+    \setbeamercolor{block title}{fg=structure,bg=structure!30}%
+  \fi
 }
-\AtBeginEnvironment{definition}{%
-  \setbeamercolor{block body}{fg=black,bg=gray!10}
-  \setbeamercolor{block title}{fg=MyEspresso@example!40!black,bg=MyEspresso@example!40!white}
-}
-\AtBeginEnvironment{corollary}{%
-  \setbeamercolor{block body}{fg=black,bg=gray!10}
-  \setbeamercolor{block title}{fg=structure,bg=structure!30}
+\g@addto@macro\th@definition{%
+  \setbeamercolor{block body}{fg=black,bg=gray!10}%
+  \setbeamercolor{block title}{fg=MyEspressoBlack,bg=MyEspresso@definition!40!white}%
 }
 
 \mode<all>
