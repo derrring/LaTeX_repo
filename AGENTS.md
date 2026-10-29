@@ -50,7 +50,8 @@ layer, not by a component, and its `e_class_*` name is the one it shares with th
 `e_class_*.cls` files it serves. Renaming it `c100_*` would file it under component-fragment
 numbering and assert a consumer relationship it does not have.
 
-**There are no exceptions, and `check_repo.sh` enforces that.** The allow-list is empty. If you find
+**There are no exceptions, and `check_repo.sh` enforces that.** The allow-list holds only
+`e_class_prologue.tex`, the third role above, which the two-prefix check cannot express. If you find
 yourself wanting to add one, the file is telling you it has the wrong name or the wrong role. The
 three that used to be there were resolved rather than excused: `c112_langfamily.sty` and
 `c113_cjk_engine.sty` were packages under a fragment's name and are now `e_langfamily.sty` and

@@ -99,6 +99,20 @@ pin_file() {
     PINNED="$1"
 }
 
+# A negative pin over several files has the same hole one level down: grep
+# exits 2 when a file cannot be read, and `|| true' would turn that into "no
+# match". grep_files keeps exit 0 and 1, fails on anything else, and leaves the
+# matching file names in GREP_FILES.
+GREP_FILES=""
+grep_files() {
+    local rc=0
+    GREP_FILES=$(grep -l "$@") || rc=$?
+    (( rc <= 1 )) || {
+        echo "FAIL: grep could not read every file it was given (exit $rc): grep -l $*" >&2
+        exit 1
+    }
+}
+
 # A "single source" pin that counts matching FILES answers a weaker question than
 # its own comment does. `found N files, want 1' stays satisfied when the
 # definition is moved wholesale into some other file: the count is still 1, the
@@ -142,7 +156,7 @@ done
 for log in sample_noteLong sample_thesis; do
     pin_file "$STANDARD/$log.log"
     if grep -Fq 'No \author given' "$PINNED"; then
-        echo "FAIL: formal-class maketitle lost author metadata ($log)" >&2
+        echo "FAIL: formal class fell back to LaTeX's \\maketitle, which found no author ($log)" >&2
         exit 1
     fi
 done
@@ -264,8 +278,9 @@ fi
 # e_class_prologue.tex is the third role above, not an exception: it is a class
 # prologue, \input by all four .cls files. The two that WERE exceptions were
 # packages under a fragment's name and have been renamed (e_langfamily,
-# e_cjk_engine), so this list is empty. Keep it that way -- a file that wants to
-# be on it has the wrong name or the wrong role.
+# e_cjk_engine), so the list holds no exception: its one entry is the third
+# role, which the two-prefix check below does not express. Keep it that way --
+# a file that wants to be on it has the wrong name or the wrong role.
 naming_allowed="e_class_prologue.tex"
 
 # An allow-list silently goes stale when an entry is renamed away, and then it is
@@ -308,7 +323,12 @@ fi
 # and both came from deprecated compatibility wrappers -- e_core.sty forwarding
 # to e_profile_common and e_standard_doc.sty to e_profile_standard. Both are
 # deleted, so the correct count is now zero and this keeps it there.
-layering_bad=$({ grep -rlE '\\(RequirePackage|input)\{[^}]*e_profile' "$ROOT/e_style/sty_components" || true; })
+compgen -G "$ROOT/e_style/sty_components/*.sty" >/dev/null || {
+    echo "FAIL: no .sty under e_style/sty_components -- the layering pin below would pass on nothing" >&2
+    exit 1
+}
+grep_files -rE '\\(RequirePackage|input)\{[^}]*e_profile' "$ROOT/e_style/sty_components"
+layering_bad=$GREP_FILES
 if [[ -n "$layering_bad" ]]; then
     echo "FAIL: sty_components must not load sty_profiles -- that inverts the layering." >&2
     echo "      offending files:" >&2
@@ -394,14 +414,18 @@ fi
 
 # The class-option prologue (12pt switch + cjk/nocjk) is single-sourced in
 # sty_components/e_class_prologue.tex; no .cls may re-declare the switch.
-cls_files=("$ROOT"/e_style/classes/*.cls)
-[[ -f "${cls_files[0]}" ]] || {
-    echo "FAIL: no .cls under e_style/classes -- the switch pin below would pass on nothing" >&2
+cls_files=()
+for f in "$ROOT"/e_style/classes/*.cls; do
+    [[ -f "$f" ]] && cls_files+=("$f")
+done
+(( ${#cls_files[@]} > 0 )) || {
+    echo "FAIL: no .cls file under e_style/classes -- the switch pin below would pass on nothing" >&2
     exit 1
 }
-switch_in_cls=$({ grep -lF 'newif\if@e@twelvept' "${cls_files[@]}" || true; } | wc -l | tr -d ' ')
-if [[ "$switch_in_cls" != "0" ]]; then
-    echo "FAIL: \\if@e@twelvept must live only in e_class_prologue.tex, found in $switch_in_cls .cls" >&2
+grep_files -F 'newif\if@e@twelvept' "${cls_files[@]}"
+if [[ -n "$GREP_FILES" ]]; then
+    echo "FAIL: \\if@e@twelvept must live only in e_class_prologue.tex, found in:" >&2
+    printf '        %s\n' $GREP_FILES >&2
     exit 1
 fi
 # [nocjk] must warn (it cannot disable the always-on CJK routing), not be silent.
