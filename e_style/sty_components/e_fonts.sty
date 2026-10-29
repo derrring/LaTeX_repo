@@ -75,18 +75,18 @@
 \AtEndPreamble{%
   \setmathfont[StylisticSet=01]{STIX Two Math}%
   \setmathfont[version=bold,StylisticSet=01,FakeBold=1.5]{STIX Two Math}%
-  % Give every range override an NFSS bold face as well.  In particular, do
-  % not express the IBM override as range=... together with version=bold:
-  % unicode-math documents that combination as problematic, and it replaces
-  % the bold version's main symbol font with cmr.  The resulting
-  % \boldsymbol{\sigma} then emits missing U+1D70E glyphs.  BoldFont and
-  % BoldFeatures keep the range local while leaving the STIX bold version
-  % intact.
-  \setmathfont[range={bb},BoldFont={New Computer Modern Math}]{New Computer Modern Math}%
-  \setmathfont[range={scr,bfscr},Scale=MatchUppercase,BoldFont={XITS Math}]{XITS Math}%
+  % IBM Plex Math ships a regular face only, so its overrides name their bold
+  % face through BoldFont and BoldFeatures.  Do not express this as range=...
+  % together with version=bold: unicode-math documents that combination as
+  % problematic, and it replaces the bold version's main symbol font with cmr,
+  % so \boldsymbol{\sigma} emits missing U+1D70E glyphs.  New Computer Modern
+  % and XITS ship bold faces that fontspec finds unaided; a BoldFont naming
+  % them would pin the bold version to the regular face.
+  \setmathfont[range={bb}]{New Computer Modern Math}%
+  \setmathfont[range={scr,bfscr},Scale=MatchUppercase]{XITS Math}%
   \setmathfont[range={cal,bfcal},BoldFont={IBM Plex Math},BoldFeatures={FakeBold=1.5}]{IBM Plex Math}%
   \setmathfont[range={bfcal},FakeBold=1.5,BoldFont={IBM Plex Math},BoldFeatures={FakeBold=1.5}]{IBM Plex Math}%
-  \setmathfont[range={frak,bffrak},BoldFont={New Computer Modern Math}]{New Computer Modern Math}%
+  \setmathfont[range={frak,bffrak}]{New Computer Modern Math}%
 }
 
 \input{sty_components/c410_hyphenation.tex}
