@@ -7,7 +7,7 @@ renders WRONG" mode, invisible to any compile-time assertion:
     silently revert to gothic;
   - the ssub matrix relies on an UNDOCUMENTED luatexja side effect to make the
     AltFont rare-char fallback reach emph/bold/sc;
-  - AltFont ranges + Renderer=Harfbuzz are experimental (AltFont broke silently
+  - AltFont ranges are experimental (AltFont broke silently
     across a TeX Live update once).
 Only rasterizing the output and diffing it catches this class.
 
@@ -17,8 +17,7 @@ TWO assertions:
      so it catches any rare glyph that fell through the AltFont chain, however
      small.
   2. shape guard -- a pixel diff of the raster against a committed golden, with
-     a tolerance tuned to catch a glyph-FAMILY swap (mincho->gothic emph) or a
-     reshaped Devanagari cluster -- the regressions that render a *valid* glyph
+     a tolerance tuned to catch a glyph-FAMILY swap (mincho->gothic emph) -- the regressions that render a *valid* glyph
      in the *wrong* shape and therefore emit no "Missing character".
 
 FAIL-LOUD CONTRACT. Every external step (lualatex, pdftoppm) has its exit code

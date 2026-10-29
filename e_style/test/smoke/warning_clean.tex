@@ -1,7 +1,7 @@
-% Standard multiline titles must serialize to clean PDF metadata, and the
-% always-registered Sanskrit language must have a real biblatex localization
-% fallback.  This test needs only one LuaLaTeX pass; no bibliography backend is
-% run because there are no resources or citations.
+% Standard multiline titles must serialize to clean PDF metadata, and every
+% language e_fonts registers must have biblatex strings.  This test needs only
+% one LuaLaTeX pass; no bibliography backend is run because there are no
+% resources or citations.
 \documentclass{e_class_article}
 \usepackage[backend=biber]{biblatex}
 \title{First Line \\ Second Line}

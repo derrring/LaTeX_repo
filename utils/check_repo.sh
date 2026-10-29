@@ -184,8 +184,8 @@ if grep -Eq 'Missing character|LaTeX Font Warning|patch FAILED' "$PINNED"; then
 fi
 
 pin_file "$BUILD_ROOT/warning-clean/warning_clean.log"
-if grep -Eq "Token not allowed in a PDF string|Language 'sanskrit' not supported" "$PINNED"; then
-    echo "FAIL: multiline-title metadata or Sanskrit biblatex fallback emitted a warning" >&2
+if grep -Eq "Token not allowed in a PDF string|Language '[^']*' not supported" "$PINNED"; then
+    echo "FAIL: multiline-title metadata, or a language e_fonts registers without biblatex strings, emitted a warning" >&2
     exit 1
 fi
 

@@ -13,7 +13,7 @@ Three mechanisms in `c111` depend on things no compile-time assertion can see:
 |---|---|---|
 | `\em` reverse-patch | string-matches a luatexja internal (`\gtfamily\itshape`) | CJK `\emph` silently reverts to **gothic** |
 | ssub → AltFont all-shape reach | UNDOCUMENTED luatexja side effect (fake shapes share the jfont-id that carries the AltFont) | rare hanzi tofu in **bold / emph / sc** only |
-| AltFont ranges + `Renderer=Harfbuzz` | experimental; AltFont broke silently once (TL2019) | tofu / mis-ordered Devanagari |
+| AltFont ranges | experimental; AltFont broke silently once (TL2019) | tofu |
 
 Every one fails as **"compiles clean, renders wrong."** Only rasterizing and
 pixel-diffing the output catches it. The 2019 luatexja-fontspec AltFont break
@@ -35,8 +35,7 @@ an explicit `TEXINPUTS`, so a fresh clone does not depend on an installed
 symlink. It exercises: the CJK
 AltFont chain (one glyph each for Ext-B / Ext-I / Ext-G / Ext-J), CJK
 `\emph` (must stay upright mincho), `\textbf` + `\textsc` (ssub + AltFont must
-reach them), a Devanagari conjunct + Vedic svara (HarfBuzz), and polytonic
-Greek + Russian italic.
+reach them), and polytonic Greek + Russian italic.
 
 ## Golden
 

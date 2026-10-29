@@ -115,8 +115,7 @@ declare custom per-script CJK families.
 - For code listings/algorithms, load `e_code` explicitly; minted may require
   shell escape depending on the TeX installation
 - Text fonts: Noto Serif/Sans, Source Code Pro; and, loaded unconditionally by
-  `e_fonts`, PT Serif/Sans (Cyrillic), Libertinus Serif/Sans (Greek), Shobhika
-  (Sanskrit)
+  `e_fonts`, PT Serif/Sans (Cyrillic), Libertinus Serif/Sans (Greek)
 - Math fonts: STIX Two Math, New Computer Modern Math, XITS Math, IBM Plex Math
 - For CJK: Source Han Serif/Sans (Harano Aji Mincho/Gothic as fallback). Opt-in
   rare supplementary-plane fallbacks (via `\eEnableCJKExtensionFonts` or
