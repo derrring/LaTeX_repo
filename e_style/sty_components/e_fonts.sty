@@ -13,41 +13,11 @@
 \RequirePackage{polyglossia}
 
 \setdefaultlanguage{english}
-\setotherlanguages{german,french,russian,greek,sanskrit}
+\setotherlanguages{german,french,russian,greek}
 % Russian is loaded for Cyrillic text only.  Its default mathfunctions=true
 % redefines \Prob, \Variance, \tg, \th, ... at \begin{document}, silently
 % overriding c310_math_symbol.tex (\Prob would become a sans-serif P).
 \SetGlossOptions{russian}{mathfunctions=false}
-% biblatex ships no sanskrit.lbx.  Use English bibliography strings as the
-% non-lossy fallback, unless the document or a style has already supplied an
-% explicit Sanskrit mapping.  Here rather than in c510, which only the
-% standard profile loads, so a beamer deck gets it too.  Sanskrit is mapped to
-% the file of English's own explicit mapping when a style or the document sets
-% one and that file exists, else to english with the style's mapping suffix
-% (apa's -apa) when that file exists, else to english.  An explicit mapping
-% overrides the suffix, which is why it is carried over by hand.  When
-% English's explicit mapping names a missing file, biblatex falls back to
-% plain english for English, so Sanskrit may then load a suffixed file that
-% English does not.
-\makeatletter
-\def\e@sanskrit@suffixmap{%
-  \IfFileExists{english\blx@lng@suff.lbx}
-    {\begingroup\edef\x{\endgroup
-       \noexpand\DeclareLanguageMapping{sanskrit}{english\blx@lng@suff}}\x}
-    {\DeclareLanguageMapping{sanskrit}{english}}}
-\AtEndPreamble{%
-  \@ifpackageloaded{biblatex}{%
-    \ifcsundef{blx@lng@explicit@sanskrit}
-      {\ifcsdef{blx@lng@explicit@english}
-         {\IfFileExists{\csname blx@lng@explicit@english\endcsname.lbx}
-            {\begingroup\edef\x{\endgroup\noexpand\DeclareLanguageMapping
-               {sanskrit}{\csname blx@lng@explicit@english\endcsname}}\x}
-            {\e@sanskrit@suffixmap}}
-         {\e@sanskrit@suffixmap}}
-      {}%
-  }{}%
-}
-\makeatother
 
 \setmainfont{Noto Serif}[
   UprightFont=*-Regular,
@@ -92,11 +62,6 @@
   ItalicFont=*-Italic,
   Ligatures=TeX,
 ]
-\newfontfamily\sanskritfont{Shobhika}[
-  Script=Devanagari,
-  Renderer=Harfbuzz,
-]
-
 \def\ru#1{{\russianfont #1}}
 \def\el#1{{\greekfont #1}}
 \def\rusans#1{{\russiansansfont #1}}

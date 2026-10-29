@@ -90,13 +90,48 @@ compile_once() {
 # Measured: that form reaches the end of the script with exit 0.
 PINNED=""
 pin_file() {
-    [[ -f "$1" ]] || {
+    [[ -f "$1" && -r "$1" ]] || {
         local shown="${1#$ROOT/}"
-        echo "FAIL: audit pin references a file that does not exist: ${shown#$BUILD_ROOT/}" >&2
+        echo "FAIL: audit pin references a file that does not exist or cannot be read: ${shown#$BUILD_ROOT/}" >&2
         echo "      (without this check the pin would pass -- fix the path or the build)" >&2
         exit 1
     }
     PINNED="$1"
+}
+
+# A negative pin over several files has the same hole one level down: grep
+# exits 2 when a file cannot be read, and `|| true' would turn that into "no
+# match". grep_files keeps exit 0 and 1, fails on anything else, and leaves the
+# matching file names in GREP_FILES.
+GREP_FILES=""
+grep_files() {
+    local rc=0
+    GREP_FILES=$(grep -l "$@") || rc=$?
+    (( rc <= 1 )) || {
+        echo "FAIL: grep failed with exit $rc; its message above says why" >&2
+        exit 1
+    }
+}
+
+# grep -r skips symlinks and the shell's * skips dotfiles, so a pin over a
+# directory would miss both. files_under lists every regular file below a
+# directory, following symlinks, into FILES. It fails when find cannot read
+# part of the tree -- find then drops those files and exits 1, which
+# < <(...) would discard and a pipe under pipefail would turn into a silent
+# exit -- and when the list is empty.
+FILES=()
+files_under() {
+    FILES=()
+    local f list="$BUILD_ROOT/files_under.list"
+    find -L "$1" -type f -print0 >"$list" || {
+        echo "FAIL: could not list every file under ${1#$ROOT/}; find's message above names what it could not read" >&2
+        exit 1
+    }
+    while IFS= read -r -d '' f; do FILES+=("$f"); done <"$list"
+    (( ${#FILES[@]} > 0 )) || {
+        echo "FAIL: no file under ${1#$ROOT/} -- a pin over it would pass on nothing" >&2
+        exit 1
+    }
 }
 
 # A "single source" pin that counts matching FILES answers a weaker question than
@@ -110,8 +145,12 @@ pin_file() {
 sole_owner() {
     local owner="$1" what="$2"; shift 2
     pin_file "$ROOT/$owner"
-    local found
-    found="$( "$@" || true )"
+    local found rc=0
+    found="$( "$@" )" || rc=$?
+    (( rc <= 1 )) || {
+        echo "FAIL: $what -- the search failed with exit $rc; its message above says why" >&2
+        exit 1
+    }
     found="$(printf '%s\n' "$found" | sed -n "s#^$ROOT/##p" | sort -u)"
     if [[ "$found" != "$owner" ]]; then
         echo "FAIL: $what" >&2
@@ -142,7 +181,7 @@ done
 for log in sample_noteLong sample_thesis; do
     pin_file "$STANDARD/$log.log"
     if grep -Fq 'No \author given' "$PINNED"; then
-        echo "FAIL: formal-class maketitle lost author metadata ($log)" >&2
+        echo "FAIL: formal class fell back to LaTeX's \\maketitle, which found no author ($log)" >&2
         exit 1
     fi
 done
@@ -170,8 +209,8 @@ if grep -Eq 'Missing character|LaTeX Font Warning|patch FAILED' "$PINNED"; then
 fi
 
 pin_file "$BUILD_ROOT/warning-clean/warning_clean.log"
-if grep -Eq "Token not allowed in a PDF string|Language 'sanskrit' not supported" "$PINNED"; then
-    echo "FAIL: multiline-title metadata or Sanskrit biblatex fallback emitted a warning" >&2
+if grep -Eq "Token not allowed in a PDF string|Language '[^']*' not supported" "$PINNED"; then
+    echo "FAIL: multiline-title metadata, or a language e_fonts registers without biblatex strings, emitted a warning" >&2
     exit 1
 fi
 
@@ -258,14 +297,14 @@ fi
 #   c<NNN>_<topic>.tex fragment -- no \ProvidesPackage, \input{sty_components/...}
 # The distinction is load-bearing (\input is ordered textual inclusion,
 # \RequirePackage is idempotent and takes options), so a file on the wrong side
-# of it reads as though there is no rule at all -- which is the actual cost of
-# the three that already sit there.
+# of it reads as though there is no rule at all.
 #
-# e_class_prologue.tex is the third role above, not an exception: it is a class
-# prologue, \input by all four .cls files. The two that WERE exceptions were
-# packages under a fragment's name and have been renamed (e_langfamily,
-# e_cjk_engine), so this list is empty. Keep it that way -- a file that wants to
-# be on it has the wrong name or the wrong role.
+# e_class_prologue.tex has a third role, not an exception: it is a class
+# prologue, \input by all four .cls files, which the two-prefix check below
+# does not express, so it is the one entry on the allow-list. The two files
+# that WERE exceptions were packages under a fragment's name and have been
+# renamed (e_langfamily, e_cjk_engine). Keep it that way -- a file that wants
+# to be on the list has the wrong name or the wrong role.
 naming_allowed="e_class_prologue.tex"
 
 # An allow-list silently goes stale when an entry is renamed away, and then it is
@@ -280,7 +319,16 @@ for naming_f in "$ROOT"/e_style/sty_components/*; do
     case " $naming_allowed " in *" $naming_b "*) continue ;; esac
     naming_stem="${naming_b%.*}"
     naming_ext="${naming_b##*.}"
-    naming_pp=$(grep -c 'ProvidesPackage' "$naming_f" || true)
+    [[ -f "$naming_f" ]] || {
+        naming_bad="$naming_bad $naming_b(not a regular file)"
+        continue
+    }
+    pin_file "$naming_f"
+    naming_pp=$(grep -c '^[^%]*\\ProvidesPackage' "$PINNED" || true)
+    [[ -n "$naming_pp" ]] || {
+        echo "FAIL: could not count \\ProvidesPackage in sty_components/$naming_b" >&2
+        exit 1
+    }
     case "$naming_stem" in
         c[0-9][0-9][0-9]_*)
             [[ "$naming_ext" == "tex" && "$naming_pp" -eq 0 ]] ||
@@ -308,11 +356,17 @@ fi
 # and both came from deprecated compatibility wrappers -- e_core.sty forwarding
 # to e_profile_common and e_standard_doc.sty to e_profile_standard. Both are
 # deleted, so the correct count is now zero and this keeps it there.
-layering_bad=$({ grep -rlE '\\(RequirePackage|input)\{[^}]*e_profile' "$ROOT/e_style/sty_components" || true; })
+compgen -G "$ROOT/e_style/sty_components/*.sty" >/dev/null || {
+    echo "FAIL: no .sty under e_style/sty_components -- the layering pin below would pass on nothing" >&2
+    exit 1
+}
+files_under "$ROOT/e_style/sty_components"
+grep_files -E '\\(RequirePackage|input)\{[^}]*e_profile' "${FILES[@]}"
+layering_bad=$GREP_FILES
 if [[ -n "$layering_bad" ]]; then
     echo "FAIL: sty_components must not load sty_profiles -- that inverts the layering." >&2
     echo "      offending files:" >&2
-    printf '        %s\n' $layering_bad >&2
+    sed 's/^/        /' <<<"$layering_bad" >&2
     exit 1
 fi
 
@@ -320,9 +374,10 @@ fi
 # toccolorpart is owned solely by c120_color.tex. The old dark-blue
 # \providecolor in c130_toc.tex was a second source that silently diverged
 # by load order; regressing it must fail here.
+files_under "$ROOT/e_style"
 sole_owner 'e_style/sty_components/c120_color.tex' \
     'toccolorpart must have exactly one color source' \
-    grep -rlE '\\(colorlet|definecolor|providecolor)\{toccolorpart\}' "$ROOT/e_style"
+    grep -lE '\\(colorlet|definecolor|providecolor)\{toccolorpart\}' "${FILES[@]}"
 
 # The 12pt heading-size policy belongs in the e_heading_scale feature, not in
 # the e_document_layout component (a component must not apply presentation
@@ -348,9 +403,10 @@ fi
 # The fenced-title fence geometry (rules + gaps) is single-sourced in
 # e_title_fenced_core.sty; the section and chapter styles must call it rather
 # than re-inline their own vbox.
+files_under "$ROOT/e_style/sty_features"
 sole_owner 'e_style/sty_features/e_title_fenced_core.sty' \
     'fenced fence-box geometry must live in one file' \
-    grep -rlF 'hrule height 1.5pt' "$ROOT/e_style/sty_features"
+    grep -lF 'hrule height 1.5pt' "${FILES[@]}"
 
 # luatexja reserves \zh/\zw as length primitives; e_cjk must not (re)define \zh
 # (doing so silently breaks luatexja-ruby). Inline script switches use the
@@ -392,30 +448,30 @@ if [[ "$cv_default_dups" != "1" ]]; then
     exit 1
 fi
 
-# The class-option prologue (12pt switch + cjk/nocjk) is single-sourced in
+# The class-option prologue (12pt switch + cjk) is single-sourced in
 # sty_components/e_class_prologue.tex; no .cls may re-declare the switch.
-cls_files=("$ROOT"/e_style/classes/*.cls)
-[[ -f "${cls_files[0]}" ]] || {
-    echo "FAIL: no .cls under e_style/classes -- the switch pin below would pass on nothing" >&2
+cls_files=()
+for f in "$ROOT"/e_style/classes/*.cls; do
+    [[ -f "$f" ]] && cls_files+=("$f")
+done
+(( ${#cls_files[@]} > 0 )) || {
+    echo "FAIL: no .cls file under e_style/classes -- the switch pin below would pass on nothing" >&2
     exit 1
 }
-switch_in_cls=$({ grep -lF 'newif\if@e@twelvept' "${cls_files[@]}" || true; } | wc -l | tr -d ' ')
-if [[ "$switch_in_cls" != "0" ]]; then
-    echo "FAIL: \\if@e@twelvept must live only in e_class_prologue.tex, found in $switch_in_cls .cls" >&2
-    exit 1
-fi
-# [nocjk] must warn (it cannot disable the always-on CJK routing), not be silent.
-if ! grep -Fq 'has no effect' "$ROOT/e_style/sty_components/e_class_prologue.tex"; then
-    echo "FAIL: [nocjk] must emit a warning (not a silent no-op)" >&2
+grep_files -F 'newif\if@e@twelvept' "${cls_files[@]}"
+if [[ -n "$GREP_FILES" ]]; then
+    echo "FAIL: \\if@e@twelvept must live only in e_class_prologue.tex, found in:" >&2
+    sed 's/^/        /' <<<"$GREP_FILES" >&2
     exit 1
 fi
 
 # The per-author email fetch is single-sourced in e_frontbackmatter_core (the
 # \__efm_author_email:nn accessor); the simple/formal renderers must call it,
 # not re-inline \seq_item into the email seq.
+files_under "$ROOT/e_style/sty_features"
 sole_owner 'e_style/sty_features/e_frontbackmatter_core.sty' \
     'the per-author email fetch must live in one file' \
-    grep -rlF 'seq_item:Nn \g__efm_emails_seq' "$ROOT/e_style/sty_features"
+    grep -lF 'seq_item:Nn \g__efm_emails_seq' "${FILES[@]}"
 
 # ToC number columns grow for over-wide numbers via \e@settocnumeff instead of
 # clipping into fixed-width makeboxes that collide with the title (M14).

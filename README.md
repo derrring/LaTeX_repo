@@ -22,7 +22,7 @@ A modular LaTeX template system with document classes, style components, and the
 ### Options
 
 - `12pt` - Adjusted font sizes for section headings
-- `cjk` / `nocjk` - Deprecated compatibility options; both are no-ops
+- `cjk` - Deprecated; it warns and points to `e_cjk_engine`. CJK glyph routing is always on, and no option disables it
 
 ## Architecture
 
@@ -115,8 +115,7 @@ declare custom per-script CJK families.
 - For code listings/algorithms, load `e_code` explicitly; minted may require
   shell escape depending on the TeX installation
 - Text fonts: Noto Serif/Sans, Source Code Pro; and, loaded unconditionally by
-  `e_fonts`, PT Serif/Sans (Cyrillic), Libertinus Serif/Sans (Greek), Shobhika
-  (Sanskrit)
+  `e_fonts`, PT Serif/Sans (Cyrillic), Libertinus Serif/Sans (Greek)
 - Math fonts: STIX Two Math, New Computer Modern Math, XITS Math, IBM Plex Math
 - For CJK: Source Han Serif/Sans (Harano Aji Mincho/Gothic as fallback). Opt-in
   rare supplementary-plane fallbacks (via `\eEnableCJKExtensionFonts` or

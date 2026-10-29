@@ -31,10 +31,11 @@ end
 -- orient(a,b,c) > 0 when a,b,c turn counter-clockwise, < 0 clockwise, 0 on a
 -- line. incircle(a,b,c,d) > 0 when d lies strictly inside the circle through
 -- a,b,c taken counter-clockwise, < 0 outside, 0 on it. Both return the EXACT
--- sign provided no product they form underflows and no product or sum
--- overflows, the assumption Shewchuk's analysis makes. The predicates see the
--- ornament's points (16 x 4.5) and the super-triangle's vertices, about 2^27,
--- far from either limit. A floating-point evaluation is
+-- sign provided the arithmetic is binary with exact rounding, no product they
+-- form underflows and no product or sum overflows: the assumptions Shewchuk's
+-- analysis makes. The predicates see the ornament's points, in 16 x 4.5 and
+-- each coordinate a multiple of 2^-32, and the super-triangle's vertices,
+-- about 2^27; both limits are far away. A floating-point evaluation is
 -- accepted when it clears Shewchuk's error bound, and otherwise the
 -- determinant is recomputed exactly as an expansion -- a sum of
 -- non-overlapping doubles -- built from two_sum and two_product. Lua has no

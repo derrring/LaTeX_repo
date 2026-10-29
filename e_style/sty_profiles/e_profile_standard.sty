@@ -6,8 +6,7 @@
 % not load them, and the e_core all-in-one bundle that did has been deleted.
 \RequirePackage{e_theorem_base}
 % Load array/table support first so LuaTeX-ja can apply its array patch on the
-% established table macros.  LuaTeX-ja itself must still precede e_visual:
-% paracol wraps \@outputpage and saves the then-current definition internally.
+% established table macros.
 \RequirePackage{e_tables}
 \RequirePackage{e_cjk}
 \RequirePackage{e_visual}

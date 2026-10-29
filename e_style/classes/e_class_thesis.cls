@@ -8,7 +8,7 @@
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesClass{e_class_thesis}[2026/07/12 v1.0 Thesis class]
 
-% --- Class Options (shared prologue: 12pt switch + deprecated cjk/nocjk) ---
+% --- Class Options (shared prologue: 12pt switch + deprecated cjk) ---
 \def\e@baseclass{book}
 \input{sty_components/e_class_prologue.tex}
 % --- 2. Load the common style package ---
