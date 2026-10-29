@@ -116,9 +116,9 @@ grep_files() {
 # grep -r skips symlinks and the shell's * skips dotfiles, so a pin over a
 # directory would miss both. files_under lists every regular file below a
 # directory, following symlinks, into FILES. It fails when find cannot read
-# part of the tree -- find then drops those files and exits 1, a status that
-# reading its output through a pipe or < <(...) would discard -- and when the
-# list is empty.
+# part of the tree -- find then drops those files and exits 1, which
+# < <(...) would discard and a pipe under pipefail would turn into a silent
+# exit -- and when the list is empty.
 FILES=()
 files_under() {
     FILES=()
@@ -324,7 +324,7 @@ for naming_f in "$ROOT"/e_style/sty_components/*; do
         continue
     }
     pin_file "$naming_f"
-    naming_pp=$(grep -c '^[[:space:]]*\\ProvidesPackage' "$PINNED" || true)
+    naming_pp=$(grep -c '^[^%]*\\ProvidesPackage' "$PINNED" || true)
     [[ -n "$naming_pp" ]] || {
         echo "FAIL: could not count \\ProvidesPackage in sty_components/$naming_b" >&2
         exit 1
