@@ -108,19 +108,26 @@ grep_files() {
     local rc=0
     GREP_FILES=$(grep -l "$@") || rc=$?
     (( rc <= 1 )) || {
-        echo "FAIL: grep failed with exit $rc; its message above names the unreadable file or the bad pattern" >&2
+        echo "FAIL: grep failed with exit $rc; its message above says why" >&2
         exit 1
     }
 }
 
 # grep -r skips symlinks and the shell's * skips dotfiles, so a pin over a
 # directory would miss both. files_under lists every regular file below a
-# directory, following symlinks, into FILES, and fails when there is none.
+# directory, following symlinks, into FILES. It fails when find cannot read
+# part of the tree -- find then drops those files and exits 1, a status that
+# reading its output through a pipe or < <(...) would discard -- and when the
+# list is empty.
 FILES=()
 files_under() {
     FILES=()
-    local f
-    while IFS= read -r -d '' f; do FILES+=("$f"); done < <(find -L "$1" -type f -print0)
+    local f list="$BUILD_ROOT/files_under.list"
+    find -L "$1" -type f -print0 >"$list" || {
+        echo "FAIL: could not list every file under ${1#$ROOT/}; find's message above names what it could not read" >&2
+        exit 1
+    }
+    while IFS= read -r -d '' f; do FILES+=("$f"); done <"$list"
     (( ${#FILES[@]} > 0 )) || {
         echo "FAIL: no file under ${1#$ROOT/} -- a pin over it would pass on nothing" >&2
         exit 1
@@ -141,7 +148,7 @@ sole_owner() {
     local found rc=0
     found="$( "$@" )" || rc=$?
     (( rc <= 1 )) || {
-        echo "FAIL: $what -- the search failed with exit $rc; its message above names the unreadable file or the bad pattern" >&2
+        echo "FAIL: $what -- the search failed with exit $rc; its message above says why" >&2
         exit 1
     }
     found="$(printf '%s\n' "$found" | sed -n "s#^$ROOT/##p" | sort -u)"
@@ -317,7 +324,7 @@ for naming_f in "$ROOT"/e_style/sty_components/*; do
         continue
     }
     pin_file "$naming_f"
-    naming_pp=$(grep -c 'ProvidesPackage' "$PINNED" || true)
+    naming_pp=$(grep -c '^[[:space:]]*\\ProvidesPackage' "$PINNED" || true)
     [[ -n "$naming_pp" ]] || {
         echo "FAIL: could not count \\ProvidesPackage in sty_components/$naming_b" >&2
         exit 1
