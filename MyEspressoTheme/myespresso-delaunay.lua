@@ -4,7 +4,8 @@
 -- Scope: a decorative triangle field, N in the tens, random points in a
 -- rectangle. NOT a meshing library. Its two geometric decisions -- which side
 -- of a line a point lies on, and whether it lies inside a circumcircle -- are
--- exact (Shewchuk's adaptive predicates, below): a plain floating-point
+-- exact (a filter on Shewchuk's error bound with an exact fallback, below): a
+-- plain floating-point
 -- in-circle test, evaluated next to super-triangle vertices ~1e7 times the
 -- data's span away, misjudged points often enough that a third of random
 -- point sets without the rectangle's corners came out not Delaunay.
@@ -30,8 +31,9 @@ end
 -- orient(a,b,c) > 0 when a,b,c turn counter-clockwise, < 0 clockwise, 0 on a
 -- line. incircle(a,b,c,d) > 0 when d lies strictly inside the circle through
 -- a,b,c taken counter-clockwise, < 0 outside, 0 on it. Both return the EXACT
--- sign for any doubles: a floating-point evaluation is accepted when it clears
--- Shewchuk's error bound, and otherwise the determinant is recomputed exactly
+-- sign for doubles whose products neither overflow nor underflow: a
+-- floating-point evaluation is accepted when it clears Shewchuk's error
+-- bound, and otherwise the determinant is recomputed exactly
 -- as an expansion -- a sum of non-overlapping doubles -- built from two_sum and
 -- two_product. Lua has no fused multiply-add, so two_product uses Dekker's
 -- split. Reference: J. R. Shewchuk, "Adaptive Precision Floating-Point
@@ -163,11 +165,21 @@ local function in_circumcircle(a, b, c, d)
   return o ~= 0 and o * incircle(a, b, c, d) > 0
 end
 
+-- Lua 5.3 keeps integer coordinates as integers, whose products wrap instead
+-- of rounding, so the predicates see doubles only. x + 0.0 also turns -0.0
+-- into 0.0, which M.check's duplicate key relies on.
+local function as_doubles(pts)
+  local out = {}
+  for i, p in ipairs(pts) do out[i] = { p[1] + 0.0, p[2] + 0.0 } end
+  return out
+end
+
 -- ---------------------------------------------------------- Bowyer-Watson ----
 -- pts: array of {x, y}. Returns an array of triangles as index triples into
 -- pts. Points are indices so the caller can recover coordinates and so the
 -- edge de-duplication below can key on integers.
 function M.triangulate(pts)
+  pts = as_doubles(pts)
   local n = #pts
   if n < 3 then return {} end
 
@@ -187,7 +199,10 @@ function M.triangulate(pts)
   --     holes =  1886/435   434/52    8/0     1/0     0/0
   -- The production configuration needs the larger K: its corners and the
   -- points near the rectangle's edges make long, flat hull triangles, whose
-  -- circumcircles are the ones that reach the super-vertices.
+  -- circumcircles are the ones that reach the super-vertices. Zero in that
+  -- sample is not zero for every seed: a point very close to the rectangle's
+  -- edge can lose a sliver at any finite K (seed 258815: 81 triangles where
+  -- Euler expects 82). M.check reports it.
   local K = 10000000
   local minx, miny = math.huge, math.huge
   local maxx, maxy = -math.huge, -math.huge
@@ -339,6 +354,7 @@ end
 -- valid-but-incomplete triangulation on 11 of 15 configurations, and (3)
 -- passed on every triangle it did produce.
 function M.check(pts, tris)
+  pts = as_doubles(pts)
   -- A repeated point is one vertex: the triangulation inserts it once.
   local seen, distinct = {}, {}
   for _, p in ipairs(pts) do
