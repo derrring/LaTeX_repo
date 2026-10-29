@@ -9,7 +9,9 @@
 
 \mode<presentation>
 
-% e_profile_beamer is already loaded by beamerthemeMyEspresso.
+% Loaded only by beamerthemeMyEspresso, which supplies the e_style palette
+% (through e_profile_beamer) and the scheme options below; \usecolortheme
+% {MyEspresso} on its own is not supported.
 
 % =================================================================
 % Theme color palette
@@ -26,8 +28,10 @@
 % Color scheme selection (default: red)
 % =================================================================
 
-% Only structure follows the scheme. The semantic roles keep one hue in
-% every scheme and name the e_style colors so a paper and a deck share them.
+% Only structure follows the scheme, apart from the black scheme's description
+% items. The semantic roles keep one hue in every scheme: info, example and
+% definition name e_style colors so a paper and a deck share them, and alert
+% is the theme's own orange.
 \colorlet{MyEspresso@structure}{MyEspressoRed}
 \colorlet{MyEspresso@alert}{MyEspressoOrange}
 \colorlet{MyEspresso@info}{mycalloutcolor}
