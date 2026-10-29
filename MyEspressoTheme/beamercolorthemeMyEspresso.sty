@@ -27,8 +27,7 @@
 % =================================================================
 
 % Only structure follows the scheme. The semantic roles keep one hue in
-% every scheme, at hues no scheme takes, and name the e_style colors so a
-% paper and a deck share them.
+% every scheme and name the e_style colors so a paper and a deck share them.
 \colorlet{MyEspresso@structure}{MyEspressoRed}
 \colorlet{MyEspresso@alert}{MyEspressoOrange}
 \colorlet{MyEspresso@info}{mycalloutcolor}
@@ -46,7 +45,7 @@
 
 \ifbeamer@me@myespressoblack
   \colorlet{MyEspresso@structure}{MyEspressoBlack}
-  \setbeamercolor{description item}{bg=white,fg=MyEspresso@info}
+  \setbeamercolor{description item}{bg=white,fg=MyEspressoRed}
 \fi
 
 % =================================================================
@@ -71,9 +70,10 @@
 \setbeamercolor{block body alerted}{parent=normal text,use=block title,bg=gray!10}
 \setbeamercolor{example text}{fg=MyEspresso@example}
 
-% Theorem-like blocks by amsthm style, theorem itself with a solid title. The
-% inner theme points block title and block body at these, so a document
-% recolours such a block by setting one of them, not block title.
+% Theorem-like blocks by amsthm style, theorem itself with a solid title.
+% Unless noamsthm is given, the inner theme points block title and block body
+% at these, so a document recolours such a block by setting one of them, not
+% block title.
 \setbeamercolor{block title theorem}{fg=white,bg=structure}
 \setbeamercolor{block body theorem}{fg=black,bg=gray!20}
 \setbeamercolor{block title plain}{fg=structure,bg=structure!30}

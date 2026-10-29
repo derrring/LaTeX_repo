@@ -18,6 +18,19 @@
 % redefines \Prob, \Variance, \tg, \th, ... at \begin{document}, silently
 % overriding c310_math_symbol.tex (\Prob would become a sans-serif P).
 \SetGlossOptions{russian}{mathfunctions=false}
+% biblatex ships no sanskrit.lbx.  Use English bibliography strings as the
+% non-lossy fallback, unless the document or a style has already supplied an
+% explicit Sanskrit mapping.  Here rather than in c510, which only the
+% standard profile loads, so a beamer deck gets it too.
+\makeatletter
+\AtEndPreamble{%
+  \@ifpackageloaded{biblatex}{%
+    \ifcsundef{blx@lng@explicit@sanskrit}
+      {\DeclareLanguageMapping{sanskrit}{english}}
+      {}%
+  }{}%
+}
+\makeatother
 
 \setmainfont{Noto Serif}[
   UprightFont=*-Regular,

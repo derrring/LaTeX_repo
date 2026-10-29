@@ -17,8 +17,7 @@ done
 # first two are in the loop above, Pillow is not and cannot be. check.py does
 # report a missing Pillow properly rather than crashing, but it reports it after
 # the whole suite has run, and that is knowable at second zero. The python3 first
-# on PATH is frequently not the one carrying Pillow, which is why AGENTS.md
-# documents the PATH=/opt/homebrew/bin:$PATH form.
+# on PATH is frequently not the one carrying Pillow.
 if [[ "${1:-}" == "--fonts" ]]; then
     command -v python3 >/dev/null || {
         echo "FAIL: --fonts needs python3, which is not on PATH" >&2
@@ -26,12 +25,16 @@ if [[ "${1:-}" == "--fonts" ]]; then
     }
     python3 -c 'from PIL import Image' 2>/dev/null || {
         echo "FAIL: --fonts needs Pillow, and $(command -v python3) cannot import PIL" >&2
-        echo "      try: PATH=/opt/homebrew/bin:\$PATH $0 --fonts" >&2
+        echo "      put a python3 that has Pillow first on PATH and rerun" >&2
         exit 1
     }
 fi
 
 export TEXINPUTS="$ROOT//:${TEXINPUTS:-}"
+# kpathsea finds .lua files through LUAINPUTS, which does not include
+# TEXINPUTS. Without this line a copy or worktree tests the Delaunay module
+# that ~/Library/texmf links to, which is the live working tree.
+export LUAINPUTS="$ROOT//:${LUAINPUTS:-}"
 
 run_latexmk() {
     local work="$1"
@@ -155,13 +158,14 @@ compile "$BUILD_ROOT/beamer" "$SMOKE/sample_beamer.tex"
 compile "$BUILD_ROOT/bold-math" "$SMOKE/bold_math.tex"
 compile_once "$BUILD_ROOT/warning-clean" "$SMOKE/warning_clean.tex"
 
-if grep -Eq 'Missing character|LaTeX Font Warning|patch FAILED' "$BUILD_ROOT/bold-math/bold_math.log"; then
+pin_file "$BUILD_ROOT/bold-math/bold_math.log"
+if grep -Eq 'Missing character|LaTeX Font Warning|patch FAILED' "$PINNED"; then
     echo "FAIL: bold math lost a glyph/font face, or LuaTeX-ja missed an output-routine patch" >&2
     exit 1
 fi
 
-if grep -Eq "Token not allowed in a PDF string|Language 'sanskrit' not supported" \
-        "$BUILD_ROOT/warning-clean/warning_clean.log"; then
+pin_file "$BUILD_ROOT/warning-clean/warning_clean.log"
+if grep -Eq "Token not allowed in a PDF string|Language 'sanskrit' not supported" "$PINNED"; then
     echo "FAIL: multiline-title metadata or Sanskrit biblatex fallback emitted a warning" >&2
     exit 1
 fi

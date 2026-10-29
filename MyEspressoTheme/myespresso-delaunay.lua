@@ -5,10 +5,10 @@
 -- rectangle. NOT a meshing library. Its two geometric decisions -- which side
 -- of a line a point lies on, and whether it lies inside a circumcircle -- are
 -- exact (a filter on Shewchuk's error bound with an exact fallback, below): a
--- plain floating-point
--- in-circle test, evaluated next to super-triangle vertices ~1e7 times the
--- data's span away, misjudged points often enough that a third of random
--- point sets without the rectangle's corners came out not Delaunay.
+-- plain floating-point in-circle test, evaluated next to super-triangle
+-- vertices ~1e7 times the data's span away, misjudged points often enough
+-- that a third of random point sets without the rectangle's corners came out
+-- not Delaunay.
 --
 -- Determinism is a requirement, not a nicety: the same document must rebuild
 -- to a byte-identical PDF. Hence the explicit LCG below rather than
@@ -31,12 +31,13 @@ end
 -- orient(a,b,c) > 0 when a,b,c turn counter-clockwise, < 0 clockwise, 0 on a
 -- line. incircle(a,b,c,d) > 0 when d lies strictly inside the circle through
 -- a,b,c taken counter-clockwise, < 0 outside, 0 on it. Both return the EXACT
--- sign for doubles whose products neither overflow nor underflow: a
--- floating-point evaluation is accepted when it clears Shewchuk's error
--- bound, and otherwise the determinant is recomputed exactly
--- as an expansion -- a sum of non-overlapping doubles -- built from two_sum and
--- two_product. Lua has no fused multiply-add, so two_product uses Dekker's
--- split. Reference: J. R. Shewchuk, "Adaptive Precision Floating-Point
+-- sign for doubles whose products up to the fourth degree, incircle's lifted
+-- terms, neither overflow nor underflow: a floating-point evaluation is
+-- accepted when it clears Shewchuk's error bound, and otherwise the
+-- determinant is recomputed exactly as an expansion -- a sum of
+-- non-overlapping doubles -- built from two_sum and two_product. Lua has no
+-- fused multiply-add, so two_product uses Dekker's split.
+-- Reference: J. R. Shewchuk, "Adaptive Precision Floating-Point
 -- Arithmetic and Fast Robust Geometric Predicates", DCG 18 (1997).
 local EPS = 2.0 ^ -53
 local CCW_BOUND = (3 + 16 * EPS) * EPS
@@ -463,6 +464,7 @@ if run_as_script then
     :format(tostring(same), tostring(differ)))
   if not same or not differ then fail = fail + 1 end
   print(fail == 0 and "ALL PASS" or (fail .. " FAILURE(S)"))
+  if fail > 0 then os.exit(1) end
 end
 
 return M
