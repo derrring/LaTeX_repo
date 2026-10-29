@@ -90,9 +90,9 @@ compile_once() {
 # Measured: that form reaches the end of the script with exit 0.
 PINNED=""
 pin_file() {
-    [[ -f "$1" ]] || {
+    [[ -f "$1" && -r "$1" ]] || {
         local shown="${1#$ROOT/}"
-        echo "FAIL: audit pin references a file that does not exist: ${shown#$BUILD_ROOT/}" >&2
+        echo "FAIL: audit pin references a file that does not exist or cannot be read: ${shown#$BUILD_ROOT/}" >&2
         echo "      (without this check the pin would pass -- fix the path or the build)" >&2
         exit 1
     }
@@ -124,8 +124,12 @@ grep_files() {
 sole_owner() {
     local owner="$1" what="$2"; shift 2
     pin_file "$ROOT/$owner"
-    local found
-    found="$( "$@" || true )"
+    local found rc=0
+    found="$( "$@" )" || rc=$?
+    (( rc <= 1 )) || {
+        echo "FAIL: $what -- the search could not read every file (exit $rc)" >&2
+        exit 1
+    }
     found="$(printf '%s\n' "$found" | sed -n "s#^$ROOT/##p" | sort -u)"
     if [[ "$found" != "$owner" ]]; then
         echo "FAIL: $what" >&2
@@ -272,15 +276,14 @@ fi
 #   c<NNN>_<topic>.tex fragment -- no \ProvidesPackage, \input{sty_components/...}
 # The distinction is load-bearing (\input is ordered textual inclusion,
 # \RequirePackage is idempotent and takes options), so a file on the wrong side
-# of it reads as though there is no rule at all -- which is the actual cost of
-# the three that already sit there.
+# of it reads as though there is no rule at all.
 #
-# e_class_prologue.tex is the third role above, not an exception: it is a class
-# prologue, \input by all four .cls files. The two that WERE exceptions were
-# packages under a fragment's name and have been renamed (e_langfamily,
-# e_cjk_engine), so the list holds no exception: its one entry is the third
-# role, which the two-prefix check below does not express. Keep it that way --
-# a file that wants to be on it has the wrong name or the wrong role.
+# e_class_prologue.tex has a third role, not an exception: it is a class
+# prologue, \input by all four .cls files, which the two-prefix check below
+# does not express, so it is the one entry on the allow-list. The two files
+# that WERE exceptions were packages under a fragment's name and have been
+# renamed (e_langfamily, e_cjk_engine). Keep it that way -- a file that wants
+# to be on the list has the wrong name or the wrong role.
 naming_allowed="e_class_prologue.tex"
 
 # An allow-list silently goes stale when an entry is renamed away, and then it is
@@ -295,7 +298,8 @@ for naming_f in "$ROOT"/e_style/sty_components/*; do
     case " $naming_allowed " in *" $naming_b "*) continue ;; esac
     naming_stem="${naming_b%.*}"
     naming_ext="${naming_b##*.}"
-    naming_pp=$(grep -c 'ProvidesPackage' "$naming_f" || true)
+    pin_file "$naming_f"
+    naming_pp=$(grep -c 'ProvidesPackage' "$PINNED" || true)
     case "$naming_stem" in
         c[0-9][0-9][0-9]_*)
             [[ "$naming_ext" == "tex" && "$naming_pp" -eq 0 ]] ||
@@ -327,12 +331,13 @@ compgen -G "$ROOT/e_style/sty_components/*.sty" >/dev/null || {
     echo "FAIL: no .sty under e_style/sty_components -- the layering pin below would pass on nothing" >&2
     exit 1
 }
-grep_files -rE '\\(RequirePackage|input)\{[^}]*e_profile' "$ROOT/e_style/sty_components"
+# Files named on the command line, not grep -r: a recursive grep skips symlinks.
+grep_files -E '\\(RequirePackage|input)\{[^}]*e_profile' "$ROOT"/e_style/sty_components/*
 layering_bad=$GREP_FILES
 if [[ -n "$layering_bad" ]]; then
     echo "FAIL: sty_components must not load sty_profiles -- that inverts the layering." >&2
     echo "      offending files:" >&2
-    printf '        %s\n' $layering_bad >&2
+    sed 's/^/        /' <<<"$layering_bad" >&2
     exit 1
 fi
 
@@ -425,7 +430,7 @@ done
 grep_files -F 'newif\if@e@twelvept' "${cls_files[@]}"
 if [[ -n "$GREP_FILES" ]]; then
     echo "FAIL: \\if@e@twelvept must live only in e_class_prologue.tex, found in:" >&2
-    printf '        %s\n' $GREP_FILES >&2
+    sed 's/^/        /' <<<"$GREP_FILES" >&2
     exit 1
 fi
 
