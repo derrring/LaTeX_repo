@@ -1,6 +1,14 @@
 % Biblatex customizations - must use \AtEndPreamble (not begindocument hooks)
 % because \renewbibmacro, \DeclareCiteCommand, \AtEveryBibitem are preamble-only.
 \makeatletter
+% Polyglossia registers Sanskrit as a secondary document language, but
+% biblatex ships no sanskrit.lbx.  Use English bibliography strings as the
+% non-lossy fallback instead of dummy definitions, unless the document or a
+% style has already supplied an explicit Sanskrit mapping.
+\ifcsundef{blx@lng@explicit@sanskrit}
+  {\DeclareLanguageMapping{sanskrit}{english}}
+  {}
+
 \AtEndPreamble{%
     % Check if using authoryear by testing for the style file name
     \ifdefstring{\blx@bbxfile}{authoryear}{%

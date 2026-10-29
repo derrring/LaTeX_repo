@@ -1,0 +1,225 @@
+% MyEspresso showcase: every environment and element the theme colours.
+%
+% One PDF per colour scheme, the default (red) when nothing is predefined:
+%   latexmk -lualatex -jobname=showcase-blue \
+%     -usepretex='\def\MEscheme{myespressoblue}\def\MElabel{blue}' showcase.tex
+%
+% Side by side, each slide in red, blue, green and black (generated, not tracked):
+%   args=(); for i in {1..15}; do for s in red blue green black; do
+%     args+=(showcase-$s.pdf $i); done; done
+%   pdfjam "${args[@]}" --nup 2x2 --papersize '{320mm,180mm}' --frame true \
+%     --outfile showcase-compare.pdf
+\providecommand\MEscheme{}
+\providecommand\MElabel{red}
+\documentclass[aspectratio=169]{beamer}
+
+\edef\MEoptions{\MEscheme,delaunay,randomseed=1}
+\expandafter\usetheme\expandafter[\MEoptions]{MyEspresso}
+
+\newtheorem{proposition}[theorem]{Proposition}
+
+% A swatch row: colour, role, where the theme uses it. The hex is read back
+% from xcolor in the last cell, since each cell is its own group.
+\newcommand\swatch[3]{%
+  \textcolor{#1}{\rule{2.4em}{1.1em}} & #2 & #3 &
+  \extractcolorspecs{#1}{\swm}{\sws}\convertcolorspec{\swm}{\sws}{HTML}\swh
+  \texttt{\#\swh}\\}
+
+\title[MyEspresso \MElabel]{MyEspresso Showcase}
+\subtitle{Colour scheme: \MElabel}
+\author{A.~Author}
+\institute{Department of Examples}
+\mail{author@example.org}
+\date{October 2026}
+
+\begin{document}
+
+\begin{frame}[plain]
+  \titlepage
+\end{frame}
+
+\section{Colours and Text}
+\sepframe
+
+\begin{frame}[label=palette]{Role colours}
+  \footnotesize
+  \begin{tabular}{@{}lllr@{}}
+    & \textbf{role} & \textbf{used by} & \\
+    \swatch{structure}{structure}{titles, block titles, theorem family, covers}
+    \swatch{structure!60}{structure!60}{list markers, links}
+    \swatch{alerted text.fg}{theme alert}{\texttt{\textbackslash alert}, alertblock, \texttt{\textbackslash boxalert}, citations}
+    \swatch{alert}{xcolor \texttt{alert}}{beamer's fixed red, \texttt{\textbackslash textcolor\{alert\}}}
+    \swatch{MyEspresso@definition}{definition}{definition titles (\texttt{mydefinitioncolor})}
+    \swatch{MyEspresso@example}{example}{example, exampleblock (\texttt{mypurple})}
+    \swatch{MyEspresso@info}{info}{information (\texttt{mycalloutcolor})}
+    \swatch{MyEspressoRemarkColor}{remark}{remark box}
+  \end{tabular}
+\end{frame}
+
+\begin{frame}{Inline highlights and links}
+  \begin{itemize}
+    \item \texttt{\textbackslash alert}: an \alert{alerted phrase}
+    \item \texttt{\textbackslash boxalert}: a \boxalert{boxed alert}
+    \item \texttt{\textbackslash textcolor\{alert\}}: a \textcolor{alert}{red highlight}
+    \item \texttt{\textbackslash structure}: a \structure{structure phrase}
+    \item \texttt{\textbackslash emph}: an \emph{emphasised phrase}
+    \item A link to the \hyperlink{palette}{role colours}, a URL \url{https://example.org}, and a citation \cite{Halmos1974}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Lists}
+  \begin{columns}[T]
+    \begin{column}{0.48\textwidth}
+      \begin{itemize}
+        \item First item
+        \begin{itemize}
+          \item Nested item
+        \end{itemize}
+        \item Second item
+      \end{itemize}
+      \begin{enumerate}
+        \item First step
+        \begin{enumerate}
+          \item Nested step
+        \end{enumerate}
+        \item Second step
+      \end{enumerate}
+    \end{column}
+    \begin{column}{0.48\textwidth}
+      \begin{description}
+        \item[Term] A description.
+        \item[Longer term] Another description.
+      \end{description}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\begin{frame}{Frame sections and buttons}
+  \framesection{A frame section}
+  Text under an in-frame heading.
+
+  \medskip
+  \beamerbutton{Button}\quad
+  \hyperlink{palette}{\beamergotobutton{Go to}}\quad
+  \beamerreturnbutton{Return}\quad
+  \beamerskipbutton{Skip}
+\end{frame}
+
+\section{Theorem-like Environments}
+\sepframe
+
+\begin{frame}{The theorem family}
+  \begin{columns}[T]
+    \begin{column}{0.48\textwidth}
+      \begin{theorem}[Main result]
+        The headline statement.
+      \end{theorem}
+      \begin{proposition}[Supporting]
+        A statement declared by the document.
+      \end{proposition}
+    \end{column}
+    \begin{column}{0.48\textwidth}
+      \begin{lemma}[Technical]
+        A step on the way.
+      \end{lemma}
+      \begin{corollary}
+        A consequence.
+      \end{corollary}
+      \begin{fact}
+        A known fact.
+      \end{fact}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\begin{frame}{Definitions, examples and proofs}
+  \begin{columns}[T]
+    \begin{column}{0.48\textwidth}
+      \begin{definition}[Admitted pair]
+        A named object.
+      \end{definition}
+      \begin{definitions}
+        Several named objects.
+      \end{definitions}
+      \begin{proof}
+        A short argument.
+      \end{proof}
+    \end{column}
+    \begin{column}{0.48\textwidth}
+      \begin{example}[Torus]
+        \begin{itemize}
+          \item A list inside an example
+        \end{itemize}
+      \end{example}
+      \begin{examples}
+        Several instances.
+      \end{examples}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\section{Blocks and Asides}
+\sepframe
+
+\begin{frame}{Blocks}
+  \begin{columns}[T]
+    \begin{column}{0.31\textwidth}
+      \begin{block}{block}
+        \begin{itemize}
+          \item Plain block
+        \end{itemize}
+      \end{block}
+    \end{column}
+    \begin{column}{0.31\textwidth}
+      \begin{alertblock}{alertblock}
+        \begin{itemize}
+          \item Alerted block
+        \end{itemize}
+      \end{alertblock}
+    \end{column}
+    \begin{column}{0.31\textwidth}
+      \begin{exampleblock}{exampleblock}
+        \begin{itemize}
+          \item Example block
+        \end{itemize}
+      \end{exampleblock}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\begin{frame}{Asides}
+  \begin{columns}[T]
+    \begin{column}{0.48\textwidth}
+      \begin{information}
+        An informational aside.
+      \end{information}
+      \begin{remark}[Scope]
+        A remark box.
+      \end{remark}
+    \end{column}
+    \begin{column}{0.48\textwidth}
+      \begin{callout}{e\_class callout}
+        The e\_class note box, framed in \texttt{mycalloutcolor}.
+      \end{callout}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\begin{frame}{Quotation and abstract}
+  \begin{quotation}[Halmos]
+    Less is more.
+  \end{quotation}
+  \begin{abstract}
+    An abstract set between two rules.
+  \end{abstract}
+\end{frame}
+
+\begin{frame}{References}
+  \begin{thebibliography}{9}
+    \bibitem{Halmos1974} P.~R.~Halmos. How to talk mathematics. \emph{Notices AMS} 21 (1974) 155--158.
+  \end{thebibliography}
+\end{frame}
+
+\thanksframe{Thank you}
+
+\end{document}

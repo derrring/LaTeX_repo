@@ -134,16 +134,10 @@
 
 \colorlet{mylinkcolor}{yaleblue} %#0F4D92
 \colorlet{mycitecolor}{mint}   %#00A693
+\definecolor{mycalloutcolor}{HTML}{006666} %#006666
 
 \colorlet{bg_minted_yellow}{lemonchiffon!50!white}
 \colorlet{bg_minted_gray}{silver!20!white}
-
-% --- my theorem colors ---
-\colorlet{mydefinitioncolor}{amber} %#FFBF00
-\colorlet{mytheoremcolor}{palatinatepurple}
-\colorlet{mypropositioncolor}{bleudefrance}
-\colorlet{mycorollarycolor}{bleudefrance}
-\colorlet{mylemmacolor}{persiangreen}
 
 % --- Washi-Ink Palette: Traditional Japanese Paper Aesthetic ---
 % 19 colors | Warm-dominant + Cool extensions | DISTINCT from Oceanic (all ΔE ≥ 18)
@@ -318,5 +312,14 @@
 \definecolor{oceanicSand3}{HTML}{F7ECD4}       % OKLCH(0.95,0.034,87) - L+0.05, C×1.2
 \definecolor{oceanicSlate3}{HTML}{7A8DA8}      % OKLCH(0.64,0.046,258) - L+0.25, C×1.5
 \definecolor{oceanicInk3}{HTML}{54687B}        % OKLCH(0.51,0.039,249) - L+0.25, C×1.5
+
+% --- my theorem colors ---
+% Placed after every palette: \colorlet resolves at definition time, so an alias
+% naming a Washi or Oceanic colour has to follow that colour's \definecolor.
+\colorlet{mydefinitioncolor}{amber} %#FFBF00
+\colorlet{mytheoremcolor}{palatinatepurple}
+\colorlet{mypropositioncolor}{bleudefrance}
+\colorlet{mycorollarycolor}{oceanicMist1} %#8FAABE
+\colorlet{mylemmacolor}{persiangreen}
 
 \endinput

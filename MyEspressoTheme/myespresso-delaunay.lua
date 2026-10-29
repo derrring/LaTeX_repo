@@ -2,11 +2,13 @@
 -- Delaunay triangulation for the MyEspresso cover ornament.
 --
 -- Scope: a decorative triangle field, N in the tens, random points in a
--- rectangle. NOT a meshing library. The floating-point robustness work that
--- makes general Delaunay hard (exact/adaptive in-circle predicates) is
--- deliberately absent: with random doubles the degenerate configurations it
--- guards against do not occur, and if one did the visible result would be one
--- oddly shaped triangle in a background pattern.
+-- rectangle. NOT a meshing library. Its two geometric decisions -- which side
+-- of a line a point lies on, and whether it lies inside a circumcircle -- are
+-- exact (a filter on Shewchuk's error bound with an exact fallback, below): a
+-- plain floating-point
+-- in-circle test, evaluated next to super-triangle vertices ~1e7 times the
+-- data's span away, misjudged points often enough that a third of random
+-- point sets without the rectangle's corners came out not Delaunay.
 --
 -- Determinism is a requirement, not a nicety: the same document must rebuild
 -- to a byte-identical PDF. Hence the explicit LCG below rather than
@@ -25,22 +27,151 @@ local function new_rng(seed)
   end
 end
 
--- ------------------------------------------------------------ geometry ----
--- Circumcentre and squared circumradius of (a,b,c). Returns nil when the
--- three points are collinear (zero-area triangle).
-local function circumcircle(a, b, c)
-  local ax, ay = a[1], a[2]
-  local bx, by = b[1], b[2]
-  local cx, cy = c[1], c[2]
-  local d = 2 * (ax * (by - cy) + bx * (cy - ay) + cx * (ay - by))
-  if math.abs(d) < 1e-12 then return nil end
-  local a2 = ax * ax + ay * ay
-  local b2 = bx * bx + by * by
-  local c2 = cx * cx + cy * cy
-  local ux = (a2 * (by - cy) + b2 * (cy - ay) + c2 * (ay - by)) / d
-  local uy = (a2 * (cx - bx) + b2 * (ax - cx) + c2 * (bx - ax)) / d
-  local dx, dy = ax - ux, ay - uy
-  return ux, uy, dx * dx + dy * dy
+-- ---------------------------------------------------------- predicates ----
+-- orient(a,b,c) > 0 when a,b,c turn counter-clockwise, < 0 clockwise, 0 on a
+-- line. incircle(a,b,c,d) > 0 when d lies strictly inside the circle through
+-- a,b,c taken counter-clockwise, < 0 outside, 0 on it. Both return the EXACT
+-- sign for doubles whose products neither overflow nor underflow: a
+-- floating-point evaluation is accepted when it clears Shewchuk's error
+-- bound, and otherwise the determinant is recomputed exactly
+-- as an expansion -- a sum of non-overlapping doubles -- built from two_sum and
+-- two_product. Lua has no fused multiply-add, so two_product uses Dekker's
+-- split. Reference: J. R. Shewchuk, "Adaptive Precision Floating-Point
+-- Arithmetic and Fast Robust Geometric Predicates", DCG 18 (1997).
+local EPS = 2.0 ^ -53
+local CCW_BOUND = (3 + 16 * EPS) * EPS
+local ICC_BOUND = (10 + 96 * EPS) * EPS
+local SPLITTER = 2.0 ^ 27 + 1
+
+local function two_sum(a, b)
+  local x = a + b
+  local bv = x - a
+  local av = x - bv
+  return x, (a - av) + (b - bv)
+end
+
+local function split(a)
+  local c = SPLITTER * a
+  local hi = c - (c - a)
+  return hi, a - hi
+end
+
+local function two_product(a, b)
+  local x = a * b
+  local ahi, alo = split(a)
+  local bhi, blo = split(b)
+  local err = ((x - ahi * bhi) - alo * bhi) - ahi * blo
+  return x, alo * blo - err
+end
+
+-- e + b for an expansion e, zero components dropped.
+local function grow(e, b)
+  local h, q = {}, b
+  for i = 1, #e do
+    local r
+    q, r = two_sum(q, e[i])
+    if r ~= 0 then h[#h + 1] = r end
+  end
+  if q ~= 0 or #h == 0 then h[#h + 1] = q end
+  return h
+end
+
+local function add_product(e, a, b, s)   -- e + s*a*b, s = +1 or -1
+  local x, y = two_product(a, b)
+  return grow(grow(e, s * y), s * x)
+end
+
+local function times(e, f)               -- e * f, both expansions
+  local h = { 0 }
+  for i = 1, #e do
+    for j = 1, #f do h = add_product(h, e[i], f[j], 1) end
+  end
+  return h
+end
+
+local function sum(e, f, s)              -- e + s*f
+  for i = 1, #f do e = grow(e, s * f[i]) end
+  return e
+end
+
+local function sign(e)
+  for i = #e, 1, -1 do
+    if e[i] ~= 0 then return e[i] > 0 and 1 or -1 end
+  end
+  return 0
+end
+
+local function sgn(x) return x > 0 and 1 or (x < 0 and -1 or 0) end
+
+-- |px py 1; qx qy 1; rx ry 1| as an exact expansion.
+local function det3(p, q, r)
+  local e = { 0 }
+  e = add_product(e, p[1], q[2], 1); e = add_product(e, p[2], q[1], -1)
+  e = add_product(e, q[1], r[2], 1); e = add_product(e, q[2], r[1], -1)
+  e = add_product(e, r[1], p[2], 1); e = add_product(e, r[2], p[1], -1)
+  return e
+end
+
+local function orient(a, b, c)
+  local detleft = (a[1] - c[1]) * (b[2] - c[2])
+  local detright = (a[2] - c[2]) * (b[1] - c[1])
+  local det = detleft - detright
+  local detsum
+  if detleft > 0 then
+    if detright <= 0 then return sgn(det) end
+    detsum = detleft + detright
+  elseif detleft < 0 then
+    if detright >= 0 then return sgn(det) end
+    detsum = -detleft - detright
+  else
+    return sgn(det)
+  end
+  if math.abs(det) >= CCW_BOUND * detsum then return sgn(det) end
+  return sign(det3(a, b, c))
+end
+
+local function lift(p)                   -- px^2 + py^2, exact
+  return add_product(add_product({ 0 }, p[1], p[1], 1), p[2], p[2], 1)
+end
+
+local function incircle(a, b, c, d)
+  local adx, ady = a[1] - d[1], a[2] - d[2]
+  local bdx, bdy = b[1] - d[1], b[2] - d[2]
+  local cdx, cdy = c[1] - d[1], c[2] - d[2]
+  local bdxcdy, cdxbdy = bdx * cdy, cdx * bdy
+  local cdxady, adxcdy = cdx * ady, adx * cdy
+  local adxbdy, bdxady = adx * bdy, bdx * ady
+  local alift = adx * adx + ady * ady
+  local blift = bdx * bdx + bdy * bdy
+  local clift = cdx * cdx + cdy * cdy
+  local det = alift * (bdxcdy - cdxbdy) + blift * (cdxady - adxcdy)
+            + clift * (adxbdy - bdxady)
+  local permanent = (math.abs(bdxcdy) + math.abs(cdxbdy)) * alift
+                  + (math.abs(cdxady) + math.abs(adxcdy)) * blift
+                  + (math.abs(adxbdy) + math.abs(bdxady)) * clift
+  if math.abs(det) > ICC_BOUND * permanent then return sgn(det) end
+  -- The 4x4 determinant |x y x^2+y^2 1| over a,b,c,d, expanded along its
+  -- lift column; it equals the translated 3x3 one above.
+  local e = times(lift(a), det3(b, c, d))
+  e = sum(e, times(lift(b), det3(a, c, d)), -1)
+  e = sum(e, times(lift(c), det3(a, b, d)), 1)
+  e = sum(e, times(lift(d), det3(a, b, c)), -1)
+  return sign(e)
+end
+
+-- d strictly inside the circumcircle of the triangle (a,b,c), either winding.
+local function in_circumcircle(a, b, c, d)
+  local o = orient(a, b, c)
+  return o ~= 0 and o * incircle(a, b, c, d) > 0
+end
+
+-- Lua 5.3 keeps integer coordinates as integers, whose products wrap instead
+-- of rounding, so the predicates see doubles only. x + 0.0 also turns -0.0
+-- into 0.0, which M.check's duplicate key relies on.
+local function as_doubles(pts)
+  local out = {}
+  for i, p in ipairs(pts) do out[i] = { p[1] + 0.0, p[2] + 0.0 } end
+  return out
 end
 
 -- ---------------------------------------------------------- Bowyer-Watson ----
@@ -48,6 +179,7 @@ end
 -- pts. Points are indices so the caller can recover coordinates and so the
 -- edge de-duplication below can key on integers.
 function M.triangulate(pts)
+  pts = as_doubles(pts)
   local n = #pts
   if n < 3 then return {} end
 
@@ -59,23 +191,18 @@ function M.triangulate(pts)
   -- edge -- which the empty-circumcircle test cannot see, because every
   -- triangle it does contain is correct. Only the coverage check catches it.
   --
-  -- An earlier revision set K=1e4 on a 24-configuration sample (8 seeds x n
-  -- in {12,44,120}) that showed 24/24 passing. That sample was too small to
-  -- locate the knee, not wrong about those 24: sweeping the production
-  -- configuration (n=44, 16 x 4.5) over seeds 0..30000 gives
-  --     K =         1e4      1e5    1e6    1e7
-  --     failures =   74        5      0      0     (out of 30001)
-  -- i.e. 1 build in 405 lost a hull sliver at the shipped value. The failure
-  -- is invisible on the page -- the lost triangles are always hull slivers
-  -- spanning two corners of the mesh rectangle, and those border edges sit
-  -- off-page or under the sidebar fill -- but M.check rejects every one of
-  -- them, so the module was shipping a state its own invariant calls broken.
-  --
-  -- The largest K required to save any of those 74 cases is 783314, so 1e7
-  -- clears the observed worst case by more than an order of magnitude. Data
-  -- here spans ~1e0, so super-vertices at ~1e7 leave ~8 significant digits
-  -- of the ~15-16 double precision carries -- ample for a decorative mesh,
-  -- and M.check confirms it rather than assuming it.
+  -- The predicates are exact, so distance costs no precision and K is set by
+  -- that failure alone. Measured 2026-10-16 with these predicates, holes per
+  -- configuration set (2000 of the production configuration, n=44, 16 x 4.5;
+  -- 1000 random 40-point sets without the corners):
+  --     K =      1e1        1e2       1e4     1e5     1e7
+  --     holes =  1886/435   434/52    8/0     1/0     0/0
+  -- The production configuration needs the larger K: its corners and the
+  -- points near the rectangle's edges make long, flat hull triangles, whose
+  -- circumcircles are the ones that reach the super-vertices. Zero in that
+  -- sample is not zero for every seed: a point very close to the rectangle's
+  -- edge can lose a sliver at any finite K (seed 258815: 81 triangles where
+  -- Euler expects 82). M.check reports it.
   local K = 10000000
   local minx, miny = math.huge, math.huge
   local maxx, maxy = -math.huge, -math.huge
@@ -98,8 +225,7 @@ function M.triangulate(pts)
     local bad = {}
     local kept = {}
     for _, t in ipairs(tris) do
-      local ux, uy, r2 = circumcircle(work[t[1]], work[t[2]], work[t[3]])
-      if ux and ((p[1] - ux) ^ 2 + (p[2] - uy) ^ 2) < r2 then
+      if in_circumcircle(work[t[1]], work[t[2]], work[t[3]], p) then
         bad[#bad + 1] = t
       else
         kept[#kept + 1] = t
@@ -172,10 +298,10 @@ function M.points(opts)
 end
 
 -- ------------------------------------------------------------ invariants ----
--- Two oracles that need no reference implementation.
+-- Oracles that need no reference implementation.
 
--- Convex hull (monotone chain). Used by both the Euler relation and the
--- coverage check, so it lives in one place.
+-- Convex hull (monotone chain, exact orient): its corners only, counter-
+-- clockwise. Fewer than three when the points do not span a plane.
 local function hull_points(pts)
   local p = {}
   for i, q in ipairs(pts) do p[i] = { q[1], q[2] } end
@@ -183,13 +309,10 @@ local function hull_points(pts)
     if a[1] ~= b[1] then return a[1] < b[1] end
     return a[2] < b[2]
   end)
-  local function cross(o, a, b)
-    return (a[1] - o[1]) * (b[2] - o[2]) - (a[2] - o[2]) * (b[1] - o[1])
-  end
   local function build(src)
     local st = {}
     for _, q in ipairs(src) do
-      while #st >= 2 and cross(st[#st - 1], st[#st], q) <= 0 do
+      while #st >= 2 and orient(st[#st - 1], st[#st], q) <= 0 do
         table.remove(st)
       end
       st[#st + 1] = q
@@ -204,7 +327,24 @@ local function hull_points(pts)
   return lower
 end
 
-local function hull_size(pts) return #hull_points(pts) end
+-- The Euler relation counts every point on the hull's boundary: its corners,
+-- and any point lying on an edge between two of them.
+local function boundary_count(pts, hp)
+  local count = #hp
+  for _, p in ipairs(pts) do
+    for i = 1, #hp do
+      local a, b = hp[i], hp[i % #hp + 1]
+      local inside_x = math.min(a[1], b[1]) <= p[1] and p[1] <= math.max(a[1], b[1])
+      local inside_y = math.min(a[2], b[2]) <= p[2] and p[2] <= math.max(a[2], b[2])
+      local at_end = (p[1] == a[1] and p[2] == a[2]) or (p[1] == b[1] and p[2] == b[2])
+      if inside_x and inside_y and not at_end and orient(a, b, p) == 0 then
+        count = count + 1
+        break
+      end
+    end
+  end
+  return count
+end
 
 -- Three oracles, and they catch different things:
 -- (1) Euler relation  -- wrong triangle/edge COUNT
@@ -214,10 +354,19 @@ local function hull_size(pts) return #hull_points(pts) end
 -- valid-but-incomplete triangulation on 11 of 15 configurations, and (3)
 -- passed on every triangle it did produce.
 function M.check(pts, tris)
-  local n, h = #pts, hull_size(pts)
-  local expect_t = 2 * n - h - 2
+  pts = as_doubles(pts)
+  -- A repeated point is one vertex: the triangulation inserts it once.
+  local seen, distinct = {}, {}
+  for _, p in ipairs(pts) do
+    local key = ("%.17g:%.17g"):format(p[1], p[2])
+    if not seen[key] then seen[key] = true; distinct[#distinct + 1] = p end
+  end
+  local hp = hull_points(distinct)
+  local n, h = #distinct, (#hp >= 3) and boundary_count(distinct, hp) or #distinct
+  -- Points that span no plane have no triangulation.
+  local expect_t = (#hp >= 3) and 2 * n - h - 2 or 0
   local edges = M.edges(tris)
-  local expect_e = 3 * n - h - 3
+  local expect_e = (#hp >= 3) and 3 * n - h - 3 or 0
   if #tris ~= expect_t then
     return false, ("triangle count %d, Euler expects %d (n=%d, h=%d)")
       :format(#tris, expect_t, n, h)
@@ -233,29 +382,26 @@ function M.check(pts, tris)
     tri_area = tri_area
       + math.abs((b[1] - a[1]) * (c[2] - a[2]) - (c[1] - a[1]) * (b[2] - a[2])) / 2
   end
-  local hp = hull_points(pts)
+  -- Fanned from the first corner, so the products stay at the data's span
+  -- rather than its distance from the origin.
   local hull_area = 0
-  for i = 1, #hp do
-    local a, b = hp[i], hp[i % #hp + 1]
-    hull_area = hull_area + (a[1] * b[2] - b[1] * a[2])
+  for i = 2, #hp - 1 do
+    local o, a, b = hp[1], hp[i], hp[i + 1]
+    hull_area = hull_area + ((a[1] - o[1]) * (b[2] - o[2]) - (b[1] - o[1]) * (a[2] - o[2]))
   end
   hull_area = math.abs(hull_area) / 2
-  if math.abs(tri_area - hull_area) > 1e-9 * math.max(1, hull_area) then
+  if math.abs(tri_area - hull_area) > 1e-9 * hull_area then
     return false, ("coverage: triangles total %.9f, hull is %.9f (deficit %.9f)")
       :format(tri_area, hull_area, hull_area - tri_area)
   end
   for ti, t in ipairs(tris) do
-    local ux, uy, r2 = circumcircle(pts[t[1]], pts[t[2]], pts[t[3]])
-    if not ux then return false, ("triangle %d is degenerate"):format(ti) end
+    local a, b, c = pts[t[1]], pts[t[2]], pts[t[3]]
+    if orient(a, b, c) == 0 then return false, ("triangle %d is degenerate"):format(ti) end
     for i, p in ipairs(pts) do
-      if i ~= t[1] and i ~= t[2] and i ~= t[3] then
-        local d2 = (p[1] - ux) ^ 2 + (p[2] - uy) ^ 2
-        -- relative epsilon: a point exactly on the circle is co-circular,
-        -- not a violation
-        if d2 < r2 * (1 - 1e-9) then
-          return false, ("point %d lies inside triangle %d's circumcircle")
-            :format(i, ti)
-        end
+      -- exact: a point on the circle is co-circular, not a violation
+      if i ~= t[1] and i ~= t[2] and i ~= t[3] and in_circumcircle(a, b, c, p) then
+        return false, ("point %d lies inside triangle %d's circumcircle")
+          :format(i, ti)
       end
     end
   end
@@ -293,6 +439,16 @@ if run_as_script then
       if not ok then fail = fail + 1 end
     end
   end
+  -- without the rectangle's corners the hull is irregular; a floating-point
+  -- in-circle test got about a third of these wrong
+  local rnd, nc_fail = new_rng(2026), 0
+  for _ = 1, 200 do
+    local pts = {}
+    for _ = 1, 40 do pts[#pts + 1] = { rnd() * 16, rnd() * 4.5 } end
+    if not M.check(pts, M.triangulate(pts)) then nc_fail = nc_fail + 1 end
+  end
+  print(("no-corner sets: %d of 200 failed"):format(nc_fail))
+  if nc_fail > 0 then fail = fail + 1 end
   -- determinism: same seed twice must give byte-identical edge lists
   local function digest(seed)
     local pts = M.points({ seed = seed, n = 44 })

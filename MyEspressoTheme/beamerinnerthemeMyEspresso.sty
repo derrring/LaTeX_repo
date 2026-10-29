@@ -304,18 +304,29 @@
 % Mathematical environment block colors
 % =================================================================
 
-\AtBeginEnvironment{theorem}{%
-  \setbeamercolor{block body}{fg=black,bg=gray!20}
-  \setbeamercolor{block title}{fg=white,bg=structure}
+% Hooked on the theorem style rather than the environment name, so every
+% \newtheorem of that style is covered, a document's own among them.
+% Beamer's \@thm runs the style at each environment start, after any
+% \AtBeginEnvironment hook, so neither such a hook nor a preamble setting of
+% block title reaches these blocks. A document sets the colour theme's
+% block title/body theorem, plain or definition instead.
+% With noamsthm there is no amsthm style to hook.
+\ifbeamer@ams
+\def\MyEspresso@theoremenv{theorem}
+\g@addto@macro\th@plain{%
+  \ifx\@currenvir\MyEspresso@theoremenv
+    \setbeamercolor*{block title}{parent=block title theorem}%
+    \setbeamercolor*{block body}{parent=block body theorem}%
+  \else
+    \setbeamercolor*{block title}{parent=block title plain}%
+    \setbeamercolor*{block body}{parent=block body plain}%
+  \fi
 }
-\AtBeginEnvironment{definition}{%
-  \setbeamercolor{block body}{fg=black,bg=gray!10}
-  \setbeamercolor{block title}{fg=MyEspresso@example!40!black,bg=MyEspresso@example!40!white}
+\g@addto@macro\th@definition{%
+  \setbeamercolor*{block title}{parent=block title definition}%
+  \setbeamercolor*{block body}{parent=block body definition}%
 }
-\AtBeginEnvironment{corollary}{%
-  \setbeamercolor{block body}{fg=black,bg=gray!10}
-  \setbeamercolor{block title}{fg=structure,bg=structure!30}
-}
+\fi
 
 \mode<all>
 \endinput

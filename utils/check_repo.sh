@@ -54,6 +54,23 @@ compile() {
     run_latexmk "$work" "$(basename "$source")"
 }
 
+compile_once() {
+    local work="$1"
+    local source="$2"
+    local base
+    base="$(basename "$source")"
+    mkdir -p "$work"
+    cp "$source" "$work/"
+    if ! (
+        cd "$work"
+        lualatex -interaction=nonstopmode -halt-on-error "$base" >build.out 2>&1
+    ); then
+        echo "FAIL: $base did not compile" >&2
+        tail -40 "$work/${base%.tex}.log" >&2 || tail -40 "$work/build.out" >&2
+        exit 1
+    fi
+}
+
 # An audit pin phrased as "this pattern must NOT appear" passes when the file
 # cannot be read at all: commands in an `if' condition are exempt from set -e,
 # so a renamed or moved file makes grep exit 2, the condition false, and the
@@ -135,6 +152,19 @@ compile "$BUILD_ROOT/code" "$SMOKE/code_optin.tex"
 compile "$BUILD_ROOT/anchors" "$SMOKE/numberless_anchor.tex"
 compile "$BUILD_ROOT/toc-state" "$SMOKE/toc_state.tex"
 compile "$BUILD_ROOT/beamer" "$SMOKE/sample_beamer.tex"
+compile "$BUILD_ROOT/bold-math" "$SMOKE/bold_math.tex"
+compile_once "$BUILD_ROOT/warning-clean" "$SMOKE/warning_clean.tex"
+
+if grep -Eq 'Missing character|LaTeX Font Warning|patch FAILED' "$BUILD_ROOT/bold-math/bold_math.log"; then
+    echo "FAIL: bold math lost a glyph/font face, or LuaTeX-ja missed an output-routine patch" >&2
+    exit 1
+fi
+
+if grep -Eq "Token not allowed in a PDF string|Language 'sanskrit' not supported" \
+        "$BUILD_ROOT/warning-clean/warning_clean.log"; then
+    echo "FAIL: multiline-title metadata or Sanskrit biblatex fallback emitted a warning" >&2
+    exit 1
+fi
 
 ANCHOR_AUX="$BUILD_ROOT/anchors/numberless_anchor.aux"
 assert_in '{section*.1}' "$ANCHOR_AUX" 'numberless anchor 1 lost its hyperref destination'
