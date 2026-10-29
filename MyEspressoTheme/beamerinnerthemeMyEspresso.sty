@@ -310,7 +310,7 @@
 % \AtBeginEnvironment hook, so neither such a hook nor a preamble setting of
 % block title reaches these blocks. A document sets the colour theme's
 % block title/body theorem, plain or definition instead.
-% With noamsthm there is no amsthm style to hook.
+% With noamsthm beamer's theorems are not blocks, and \th@plain may not exist.
 \ifbeamer@ams
 \def\MyEspresso@theoremenv{theorem}
 \g@addto@macro\th@plain{%
