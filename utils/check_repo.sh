@@ -33,7 +33,8 @@ fi
 export TEXINPUTS="$ROOT//:${TEXINPUTS:-}"
 # kpathsea finds .lua files through LUAINPUTS, which does not include
 # TEXINPUTS. Without this line a copy or worktree tests the Delaunay module
-# that ~/Library/texmf links to, which is the live working tree.
+# that ~/Library/texmf links to, which is the live working tree, and on a
+# machine without that link finds none and fails.
 export LUAINPUTS="$ROOT//:${LUAINPUTS:-}"
 
 run_latexmk() {
@@ -77,7 +78,8 @@ compile_once() {
 # An audit pin phrased as "this pattern must NOT appear" passes when the file
 # cannot be read at all: commands in an `if' condition are exempt from set -e,
 # so a renamed or moved file makes grep exit 2, the condition false, and the
-# check silently succeed -- precisely during the refactor the pin exists to
+# check succeed with exit 0; grep's message on stderr changes nothing. That
+# happens precisely during the refactor the pin exists to
 # catch. (Positive pins, `if ! grep', fail correctly; the asymmetry is only in
 # the negative ones.) So assert the population before testing it.
 #
@@ -89,8 +91,9 @@ compile_once() {
 PINNED=""
 pin_file() {
     [[ -f "$1" ]] || {
-        echo "FAIL: audit pin references a file that does not exist: ${1#$ROOT/}" >&2
-        echo "      (a pin whose file has moved passes silently -- fix the path)" >&2
+        local shown="${1#$ROOT/}"
+        echo "FAIL: audit pin references a file that does not exist: ${shown#$BUILD_ROOT/}" >&2
+        echo "      (without this check the pin would pass -- fix the path or the build)" >&2
         exit 1
     }
     PINNED="$1"
@@ -136,6 +139,8 @@ for source in sample_article.tex sample_noteShort.tex sample_noteLong.tex sample
     run_latexmk "$STANDARD" "$source"
 done
 
+pin_file "$STANDARD/sample_noteLong.log"
+pin_file "$STANDARD/sample_thesis.log"
 if grep -Fq 'No \author given' "$STANDARD/sample_noteLong.log" ||
    grep -Fq 'No \author given' "$STANDARD/sample_thesis.log"; then
     echo "FAIL: formal-class maketitle lost author metadata" >&2
@@ -240,7 +245,8 @@ fi
 BEAMER_TEXT="$BUILD_ROOT/beamer/second-separator.txt"
 pdftotext -f 3 -l 3 -layout "$BUILD_ROOT/beamer/sample_beamer.pdf" "$BEAMER_TEXT"
 assert_in 'Second' "$BEAMER_TEXT" 'second \sepframe did not render its title on page 3'
-if grep -Fq 'Custom First' "$BEAMER_TEXT"; then
+pin_file "$BEAMER_TEXT"
+if grep -Fq 'Custom First' "$PINNED"; then
     echo "FAIL: sepframe option state leaked into the next call" >&2
     exit 1
 fi
@@ -432,7 +438,8 @@ fi
 # catches a non-fatal-mode recurrence.
 for cvzc in cv_zeroconfig_1col cv_zeroconfig_2col; do
     compile "$BUILD_ROOT/$cvzc" "$SMOKE/$cvzc.tex"
-    if grep -Fq 'Undefined color' "$BUILD_ROOT/$cvzc/$cvzc.log"; then
+    pin_file "$BUILD_ROOT/$cvzc/$cvzc.log"
+    if grep -Fq 'Undefined color' "$PINNED"; then
         echo "FAIL: CV zero-config path ($cvzc) hit an undefined color (LTX-2026-01 regression)" >&2
         exit 1
     fi
@@ -443,7 +450,8 @@ done
 # AltFont ladder as the main jfont. Assert no tofu, that the render uses Source
 # Han Sans / Harano Aji Gothic, and that it did NOT fall back to the serif.
 compile "$BUILD_ROOT/cjk-sans" "$SMOKE/cjk_sans.tex"
-if grep -Fq 'Missing character' "$BUILD_ROOT/cjk-sans/cjk_sans.log"; then
+pin_file "$BUILD_ROOT/cjk-sans/cjk_sans.log"
+if grep -Fq 'Missing character' "$PINNED"; then
     echo "FAIL: cjk_sans emitted 'Missing character' -- sans rare-glyph ladder gap (LTX-2026-02)" >&2
     exit 1
 fi
