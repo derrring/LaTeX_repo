@@ -1,5 +1,5 @@
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{e_fonts}[2026/07/11 v1.0 LuaLaTeX text and math fonts]
+\ProvidesPackage{e_fonts}[2026/07/14 v1.1 LuaLaTeX text and math fonts]
 
 \RequirePackage{e_math}
 \makeatletter
@@ -14,6 +14,10 @@
 
 \setdefaultlanguage{english}
 \setotherlanguages{german,french,russian,greek,sanskrit}
+% Russian is loaded for Cyrillic text only.  Its default mathfunctions=true
+% redefines \Prob, \Variance, \tg, \th, ... at \begin{document}, silently
+% overriding c310_math_symbol.tex (\Prob would become a sans-serif P).
+\SetGlossOptions{russian}{mathfunctions=false}
 
 \setmainfont{Noto Serif}[
   UprightFont=*-Regular,
@@ -71,12 +75,18 @@
 \AtEndPreamble{%
   \setmathfont[StylisticSet=01]{STIX Two Math}%
   \setmathfont[version=bold,StylisticSet=01,FakeBold=1.5]{STIX Two Math}%
-  \setmathfont[range={bb}]{New Computer Modern Math}%
-  \setmathfont[range={scr,bfscr},Scale=MatchUppercase]{XITS Math}%
-  \setmathfont[range={cal,bfcal}]{IBM Plex Math}%
-  \setmathfont[range={bfcal},FakeBold=1.5]{IBM Plex Math}%
-  \setmathfont[range={cal,bfcal},version=bold,FakeBold=1.5]{IBM Plex Math}%
-  \setmathfont[range={frak,bffrak}]{New Computer Modern Math}%
+  % Give every range override an NFSS bold face as well.  In particular, do
+  % not express the IBM override as range=... together with version=bold:
+  % unicode-math documents that combination as problematic, and it replaces
+  % the bold version's main symbol font with cmr.  The resulting
+  % \boldsymbol{\sigma} then emits missing U+1D70E glyphs.  BoldFont and
+  % BoldFeatures keep the range local while leaving the STIX bold version
+  % intact.
+  \setmathfont[range={bb},BoldFont={New Computer Modern Math}]{New Computer Modern Math}%
+  \setmathfont[range={scr,bfscr},Scale=MatchUppercase,BoldFont={XITS Math}]{XITS Math}%
+  \setmathfont[range={cal,bfcal},BoldFont={IBM Plex Math},BoldFeatures={FakeBold=1.5}]{IBM Plex Math}%
+  \setmathfont[range={bfcal},FakeBold=1.5,BoldFont={IBM Plex Math},BoldFeatures={FakeBold=1.5}]{IBM Plex Math}%
+  \setmathfont[range={frak,bffrak},BoldFont={New Computer Modern Math}]{New Computer Modern Math}%
 }
 
 \input{sty_components/c410_hyphenation.tex}

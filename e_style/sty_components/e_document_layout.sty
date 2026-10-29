@@ -1,5 +1,5 @@
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{e_document_layout}[2026/07/11 v1.0 Standard-document layout and navigation]
+\ProvidesPackage{e_document_layout}[2026/07/14 v1.1 Standard-document layout and navigation]
 
 \RequirePackage{e_kernel}
 \RequirePackage{e_visual}
@@ -10,6 +10,14 @@
 \RequirePackage{fancyhdr}
 \RequirePackage{titlesec,titletoc,etoc}
 \RequirePackage{enumitem}
+
+% Visual line breaks in titles/headings become ordinary spaces in bookmarks
+% and PDF metadata.  Without this rule, the frontmatter metadata bridge passes
+% a perfectly valid title such as \title{First \\ Second} to hyperref, which
+% drops the command but emits "Token not allowed in a PDF string".
+\pdfstringdefDisableCommands{%
+  \def\\{ }%
+}
 
 \input{sty_components/c110_layout.tex}
 \input{sty_components/c130_toc.tex}

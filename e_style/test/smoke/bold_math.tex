@@ -1,0 +1,19 @@
+% The unicode-math version=bold + range interaction once replaced the bold
+% version's main STIX symbol font with cmr.  AMS \boldsymbol then mapped Greek
+% letters to U+1D70E/U+1D70F but tried to take those glyphs from cmr, producing
+% six "Missing character" messages per use and dropping the output glyph.
+% tracinglostchars=3 turns any recurrence into a hard compilation failure.
+\documentclass{e_class_article}
+\tracinglostchars=3
+\pagestyle{empty}
+\begin{document}
+Legacy AMS input: $\boldsymbol{\sigma} + \boldsymbol{\tau}$.
+
+{\mathversion{bold}
+Bold math version:
+$\sigma + x + \leq + \mathbb{R}
+ + \mathscr{L} + \symbfscr{S}
+ + \mathcal{F} + \symbfcal{G}
+ + \mathfrak{g} + \symbffrak{h}$.
+}
+\end{document}
