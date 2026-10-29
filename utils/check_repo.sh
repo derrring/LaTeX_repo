@@ -108,7 +108,21 @@ grep_files() {
     local rc=0
     GREP_FILES=$(grep -l "$@") || rc=$?
     (( rc <= 1 )) || {
-        echo "FAIL: grep could not read every file it was given (exit $rc): grep -l $*" >&2
+        echo "FAIL: grep failed with exit $rc; its message above names the unreadable file or the bad pattern" >&2
+        exit 1
+    }
+}
+
+# grep -r skips symlinks and the shell's * skips dotfiles, so a pin over a
+# directory would miss both. files_under lists every regular file below a
+# directory, following symlinks, into FILES, and fails when there is none.
+FILES=()
+files_under() {
+    FILES=()
+    local f
+    while IFS= read -r -d '' f; do FILES+=("$f"); done < <(find -L "$1" -type f -print0)
+    (( ${#FILES[@]} > 0 )) || {
+        echo "FAIL: no file under ${1#$ROOT/} -- a pin over it would pass on nothing" >&2
         exit 1
     }
 }
@@ -127,7 +141,7 @@ sole_owner() {
     local found rc=0
     found="$( "$@" )" || rc=$?
     (( rc <= 1 )) || {
-        echo "FAIL: $what -- the search could not read every file (exit $rc)" >&2
+        echo "FAIL: $what -- the search failed with exit $rc; its message above names the unreadable file or the bad pattern" >&2
         exit 1
     }
     found="$(printf '%s\n' "$found" | sed -n "s#^$ROOT/##p" | sort -u)"
@@ -298,8 +312,16 @@ for naming_f in "$ROOT"/e_style/sty_components/*; do
     case " $naming_allowed " in *" $naming_b "*) continue ;; esac
     naming_stem="${naming_b%.*}"
     naming_ext="${naming_b##*.}"
+    [[ -f "$naming_f" ]] || {
+        naming_bad="$naming_bad $naming_b(not a regular file)"
+        continue
+    }
     pin_file "$naming_f"
     naming_pp=$(grep -c 'ProvidesPackage' "$PINNED" || true)
+    [[ -n "$naming_pp" ]] || {
+        echo "FAIL: could not count \\ProvidesPackage in sty_components/$naming_b" >&2
+        exit 1
+    }
     case "$naming_stem" in
         c[0-9][0-9][0-9]_*)
             [[ "$naming_ext" == "tex" && "$naming_pp" -eq 0 ]] ||
@@ -331,8 +353,8 @@ compgen -G "$ROOT/e_style/sty_components/*.sty" >/dev/null || {
     echo "FAIL: no .sty under e_style/sty_components -- the layering pin below would pass on nothing" >&2
     exit 1
 }
-# Files named on the command line, not grep -r: a recursive grep skips symlinks.
-grep_files -E '\\(RequirePackage|input)\{[^}]*e_profile' "$ROOT"/e_style/sty_components/*
+files_under "$ROOT/e_style/sty_components"
+grep_files -E '\\(RequirePackage|input)\{[^}]*e_profile' "${FILES[@]}"
 layering_bad=$GREP_FILES
 if [[ -n "$layering_bad" ]]; then
     echo "FAIL: sty_components must not load sty_profiles -- that inverts the layering." >&2
@@ -345,9 +367,10 @@ fi
 # toccolorpart is owned solely by c120_color.tex. The old dark-blue
 # \providecolor in c130_toc.tex was a second source that silently diverged
 # by load order; regressing it must fail here.
+files_under "$ROOT/e_style"
 sole_owner 'e_style/sty_components/c120_color.tex' \
     'toccolorpart must have exactly one color source' \
-    grep -rlE '\\(colorlet|definecolor|providecolor)\{toccolorpart\}' "$ROOT/e_style"
+    grep -lE '\\(colorlet|definecolor|providecolor)\{toccolorpart\}' "${FILES[@]}"
 
 # The 12pt heading-size policy belongs in the e_heading_scale feature, not in
 # the e_document_layout component (a component must not apply presentation
@@ -373,9 +396,10 @@ fi
 # The fenced-title fence geometry (rules + gaps) is single-sourced in
 # e_title_fenced_core.sty; the section and chapter styles must call it rather
 # than re-inline their own vbox.
+files_under "$ROOT/e_style/sty_features"
 sole_owner 'e_style/sty_features/e_title_fenced_core.sty' \
     'fenced fence-box geometry must live in one file' \
-    grep -rlF 'hrule height 1.5pt' "$ROOT/e_style/sty_features"
+    grep -lF 'hrule height 1.5pt' "${FILES[@]}"
 
 # luatexja reserves \zh/\zw as length primitives; e_cjk must not (re)define \zh
 # (doing so silently breaks luatexja-ruby). Inline script switches use the
@@ -437,9 +461,10 @@ fi
 # The per-author email fetch is single-sourced in e_frontbackmatter_core (the
 # \__efm_author_email:nn accessor); the simple/formal renderers must call it,
 # not re-inline \seq_item into the email seq.
+files_under "$ROOT/e_style/sty_features"
 sole_owner 'e_style/sty_features/e_frontbackmatter_core.sty' \
     'the per-author email fetch must live in one file' \
-    grep -rlF 'seq_item:Nn \g__efm_emails_seq' "$ROOT/e_style/sty_features"
+    grep -lF 'seq_item:Nn \g__efm_emails_seq' "${FILES[@]}"
 
 # ToC number columns grow for over-wide numbers via \e@settocnumeff instead of
 # clipping into fixed-width makeboxes that collide with the title (M14).
