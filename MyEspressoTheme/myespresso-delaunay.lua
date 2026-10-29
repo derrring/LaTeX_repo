@@ -31,10 +31,12 @@ end
 -- orient(a,b,c) > 0 when a,b,c turn counter-clockwise, < 0 clockwise, 0 on a
 -- line. incircle(a,b,c,d) > 0 when d lies strictly inside the circle through
 -- a,b,c taken counter-clockwise, < 0 outside, 0 on it. Both return the EXACT
--- sign, measured, for coordinates of magnitude from about 2^-216 (2^-485 for
--- orient) up to 2^996; outside that range a product inside the exact path, or
--- its rounding error, leaves the normal doubles, or Dekker's split overflows.
--- The ornament's coordinates lie in 0..16. A floating-point evaluation is
+-- sign, measured on exactly degenerate inputs with x and y on one scale, for
+-- coordinate magnitudes from about 2^-216 to 2^256 in incircle and from
+-- 2^-485 to 2^511 in orient. Beyond those, the exact path's products (degree
+-- four in incircle, two in orient) overflow, or the bits they need fall below
+-- the smallest subnormal. The predicates see the ornament's points (16 x 4.5)
+-- and the super-triangle's vertices, about 2^27. A floating-point evaluation is
 -- accepted when it clears Shewchuk's error bound, and otherwise the
 -- determinant is recomputed exactly as an expansion -- a sum of
 -- non-overlapping doubles -- built from two_sum and two_product. Lua has no
