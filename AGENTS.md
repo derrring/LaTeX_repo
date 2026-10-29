@@ -59,8 +59,8 @@ three that used to be there were resolved rather than excused: `c112_langfamily.
 ## Verification
 
 - Run `./utils/check_repo.sh`; success requires the final `PASS: repository smoke checks` line.
-- Run `PATH=/opt/homebrew/bin:$PATH ./utils/check_repo.sh --fonts` for the golden font-render checks.
-  The bare `python3` chosen by another `PATH` may lack Pillow.
+- Run `./utils/check_repo.sh --fonts` for the golden font-render checks, with a `python3` that can
+  import Pillow first on `PATH`. The script checks this before building and names the `python3` it found.
 - For an isolated compile, include the repository in `TEXINPUTS`, for example
   `TEXINPUTS="$PWD//:"` from the repository root. The MyEspresso beamer theme lives in
   `MyEspressoTheme/`, which is a second root: `TEXINPUTS="$PWD//:$PWD/MyEspressoTheme//:"`.
