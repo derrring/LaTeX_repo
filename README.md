@@ -22,7 +22,7 @@ A modular LaTeX template system with document classes, style components, and the
 ### Options
 
 - `12pt` - Adjusted font sizes for section headings
-- `cjk` / `nocjk` - Deprecated compatibility options; both are no-ops
+- `cjk` - Deprecated; it warns and points to `e_cjk_engine`. CJK glyph routing is always on, and no option disables it
 
 ## Architecture
 

@@ -412,7 +412,7 @@ if [[ "$cv_default_dups" != "1" ]]; then
     exit 1
 fi
 
-# The class-option prologue (12pt switch + cjk/nocjk) is single-sourced in
+# The class-option prologue (12pt switch + cjk) is single-sourced in
 # sty_components/e_class_prologue.tex; no .cls may re-declare the switch.
 cls_files=()
 for f in "$ROOT"/e_style/classes/*.cls; do
@@ -426,11 +426,6 @@ grep_files -F 'newif\if@e@twelvept' "${cls_files[@]}"
 if [[ -n "$GREP_FILES" ]]; then
     echo "FAIL: \\if@e@twelvept must live only in e_class_prologue.tex, found in:" >&2
     printf '        %s\n' $GREP_FILES >&2
-    exit 1
-fi
-# [nocjk] must warn (it cannot disable the always-on CJK routing), not be silent.
-if ! grep -Fq 'has no effect' "$ROOT/e_style/sty_components/e_class_prologue.tex"; then
-    echo "FAIL: [nocjk] must emit a warning (not a silent no-op)" >&2
     exit 1
 fi
 
