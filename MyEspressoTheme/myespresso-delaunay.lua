@@ -31,14 +31,14 @@ end
 -- orient(a,b,c) > 0 when a,b,c turn counter-clockwise, < 0 clockwise, 0 on a
 -- line. incircle(a,b,c,d) > 0 when d lies strictly inside the circle through
 -- a,b,c taken counter-clockwise, < 0 outside, 0 on it. Both return the EXACT
--- sign while every product they form -- up to the fourth degree, a lift times
--- a 2x2 minor in incircle -- and that product's rounding error stay normal
--- doubles: a floating-point evaluation is accepted when it clears Shewchuk's
--- error bound, and otherwise the determinant is recomputed exactly as an
--- expansion -- a sum of non-overlapping doubles -- built from two_sum and
--- two_product. Lua has no fused multiply-add, so two_product uses Dekker's
--- split, whose error term underflows about 53 binades before the product
--- does; on the small side that, not the product, sets the limit.
+-- sign, measured, for coordinates of magnitude from about 2^-216 (2^-485 for
+-- orient) up to 2^996; outside that range a product inside the exact path, or
+-- its rounding error, leaves the normal doubles, or Dekker's split overflows.
+-- The ornament's coordinates lie in 0..16. A floating-point evaluation is
+-- accepted when it clears Shewchuk's error bound, and otherwise the
+-- determinant is recomputed exactly as an expansion -- a sum of
+-- non-overlapping doubles -- built from two_sum and two_product. Lua has no
+-- fused multiply-add, so two_product uses Dekker's split.
 -- Reference: J. R. Shewchuk, "Adaptive Precision Floating-Point
 -- Arithmetic and Fast Robust Geometric Predicates", DCG 18 (1997).
 local EPS = 2.0 ^ -53
@@ -430,11 +430,12 @@ end
 --   `if not tex then`  -- texlua defines a tex table as well
 --   `local m = ...`    -- dofile() passes no varargs either, so m is nil
 -- arg[0] is the script path only in the script case. The match is anchored at
--- a path separator, so a host script whose name merely ends in this file's
--- name, and which loads it, does not run the self-test and its os.exit.
+-- the start, a path separator or a drive colon, so a host script whose name
+-- merely ends in this file's name, and which loads it, does not run the
+-- self-test and its os.exit.
 local run_as_script = arg and arg[0]
   and (arg[0]:match("^myespresso%-delaunay%.lua$")
-       or arg[0]:match("[/\\]myespresso%-delaunay%.lua$"))
+       or arg[0]:match("[/\\:]myespresso%-delaunay%.lua$"))
 if run_as_script then
   local fail = 0
   for _, seed in ipairs({ 1, 42, 20260411, 7, 99991, 3, 1234, 555, 8888, 31337 }) do
