@@ -112,8 +112,11 @@ declare custom per-script CJK families.
 ## Requirements
 
 - LuaLaTeX (required)
-- For code listings/algorithms, load `e_code` explicitly; minted may require
-  shell escape depending on the TeX installation
+- For code listings/algorithms, load `e_code` explicitly. On an up-to-date TeX
+  Live 2024 or later, minted needs no `-shell-escape`: its `latexminted` helper
+  runs under the default restricted shell escape. Compile with `latexmk` or run
+  at least twice: a fresh first pass prints a red `<MINTED>` placeholder in
+  place of each snippet
 - Text fonts: Noto Serif/Sans, Source Code Pro; and, loaded unconditionally by
   `e_fonts`, PT Serif/Sans (Cyrillic), Libertinus Serif/Sans (Greek)
 - Math fonts: STIX Two Math, New Computer Modern Math, XITS Math, IBM Plex Math
