@@ -79,14 +79,14 @@ compile_once() {
 # cannot be read at all: commands in an `if' condition are exempt from set -e,
 # so a renamed or moved file makes grep exit 2, the condition false, and the
 # check succeed with exit 0; grep's message on stderr changes nothing. That
-# happens precisely during the refactor the pin exists to
-# catch. (Positive pins, `if ! grep', fail correctly; the asymmetry is only in
-# the negative ones.) So assert the population before testing it.
+# happens precisely during the refactor the pin exists to catch. (Positive
+# pins, `if ! grep', fail correctly; the asymmetry is only in the negative
+# ones.) So assert the population before testing it.
 #
 # pin_file sets PINNED rather than echoing the path, and that is load-bearing:
 # an `exit 1' inside $(...) leaves only the subshell, so the FAIL message would
 # print, the substitution would expand to the empty string, grep would error on
-# "" and the pin would pass anyway -- the same silent pass, one layer down.
+# "" and the pin would pass anyway -- the same exit-0 pass, one layer down.
 # Measured: that form reaches the end of the script with exit 0.
 PINNED=""
 pin_file() {
@@ -139,13 +139,13 @@ for source in sample_article.tex sample_noteShort.tex sample_noteLong.tex sample
     run_latexmk "$STANDARD" "$source"
 done
 
-pin_file "$STANDARD/sample_noteLong.log"
-pin_file "$STANDARD/sample_thesis.log"
-if grep -Fq 'No \author given' "$STANDARD/sample_noteLong.log" ||
-   grep -Fq 'No \author given' "$STANDARD/sample_thesis.log"; then
-    echo "FAIL: formal-class maketitle lost author metadata" >&2
-    exit 1
-fi
+for log in sample_noteLong sample_thesis; do
+    pin_file "$STANDARD/$log.log"
+    if grep -Fq 'No \author given' "$PINNED"; then
+        echo "FAIL: formal-class maketitle lost author metadata ($log)" >&2
+        exit 1
+    fi
+done
 
 CV="$BUILD_ROOT/cv"
 mkdir -p "$CV"
@@ -394,7 +394,12 @@ fi
 
 # The class-option prologue (12pt switch + cjk/nocjk) is single-sourced in
 # sty_components/e_class_prologue.tex; no .cls may re-declare the switch.
-switch_in_cls=$({ grep -lF 'newif\if@e@twelvept' "$ROOT"/e_style/classes/*.cls 2>/dev/null || true; } | wc -l | tr -d ' ')
+cls_files=("$ROOT"/e_style/classes/*.cls)
+[[ -f "${cls_files[0]}" ]] || {
+    echo "FAIL: no .cls under e_style/classes -- the switch pin below would pass on nothing" >&2
+    exit 1
+}
+switch_in_cls=$({ grep -lF 'newif\if@e@twelvept' "${cls_files[@]}" || true; } | wc -l | tr -d ' ')
 if [[ "$switch_in_cls" != "0" ]]; then
     echo "FAIL: \\if@e@twelvept must live only in e_class_prologue.tex, found in $switch_in_cls .cls" >&2
     exit 1

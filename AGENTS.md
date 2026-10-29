@@ -63,10 +63,9 @@ three that used to be there were resolved rather than excused: `c112_langfamily.
   import Pillow first on `PATH`. The script checks this before building and names the `python3`
   it found.
 - For an isolated compile, include the repository in `TEXINPUTS`, for example
-  `TEXINPUTS="$PWD//:"` from the repository root. The MyEspresso beamer theme lives in
-  `MyEspressoTheme/`, which is a second root: `TEXINPUTS="$PWD//:$PWD/MyEspressoTheme//:"`.
-  A deck with the `delaunay` option also needs `LUAINPUTS="$PWD//:"`: kpathsea finds the theme's
-  Lua module through `LUAINPUTS`, which does not include `TEXINPUTS`.
+  `TEXINPUTS="$PWD//:"` from the repository root, which also covers the MyEspresso beamer theme
+  in `MyEspressoTheme/`. A deck with the `delaunay` option also needs `LUAINPUTS="$PWD//:"`:
+  kpathsea finds the theme's Lua module through `LUAINPUTS`, which does not include `TEXINPUTS`.
 - Verify visual changes by rendering PDFs and comparing pixels, not by reading TeX alone.
 - Beamer documents using remembered TikZ positions or tables of contents need convergence through
   `latexmk` or at least four isolated passes. One or two passes can produce a false large diff.
