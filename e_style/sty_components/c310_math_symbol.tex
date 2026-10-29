@@ -455,6 +455,9 @@
 \newcommand{\qri}{\operatorname{qri}} % for quasi-relative interior
 \newcommand{\core}{\operatorname{core}} % for algebraic core
 \newcommand{\diam}{\operatorname{diam}} % for diameter
+% amsmath's \ker typesets the same but is \protected, which hyperref drops
+% from bookmarks; this one keeps "ker" there, like the operators around it.
+\renewcommand{\ker}{\operatorname{ker}} % for kernel of a function
 \newcommand{\im}{\operatorname{im}} % for image of a function
 \newcommand{\Spec}{\mathsf{Spec}}
 \newcommand{\Fix}{\mathsf{Fix}} % for fixed points
