@@ -71,6 +71,16 @@
 \setbeamercolor{block body alerted}{parent=normal text,use=block title,bg=gray!10}
 \setbeamercolor{example text}{fg=MyEspresso@example}
 
+% Theorem-like blocks by amsthm style, theorem itself with a solid title. The
+% inner theme points block title and block body at these, so a document
+% recolours such a block by setting one of them, not block title.
+\setbeamercolor{block title theorem}{fg=white,bg=structure}
+\setbeamercolor{block body theorem}{fg=black,bg=gray!20}
+\setbeamercolor{block title plain}{fg=structure,bg=structure!30}
+\setbeamercolor{block body plain}{fg=black,bg=gray!10}
+\setbeamercolor{block title definition}{fg=MyEspressoBlack,bg=MyEspresso@definition!40!white}
+\setbeamercolor{block body definition}{fg=black,bg=gray!10}
+
 % Sidebar colors (conditional)
 \ifbeamer@me@sidebar
   \setbeamercolor{sidebar}{fg=white}
